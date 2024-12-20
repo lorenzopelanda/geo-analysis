@@ -13,7 +13,6 @@ def create_bounding_box(center_point, size_km=10):
     maxy = center_point.y + size_deg / 2
     return box(minx, miny, maxx, maxy)
 
-# Funzione to get coordinates
 def get_coordinates(query, is_address=True):
     if is_address:
         # Geocoding for address
@@ -34,15 +33,29 @@ def get_coordinates(query, is_address=True):
         else:
             return None
 
-def get_bounding_box(query, is_address=True):
+# Get the interested area based on the time travel and time mode
+def get_isochrone_area(center_point, travel_time, travel_mode):
+    G = ox.graph_from_point((center_point.y, center_point.x), dist=2000, network_type=travel_mode)
+    center_node = ox.distance.nearest_nodes(G, center_point.x, center_point.y)
+    subgraph = ox.truncate.truncate_graph_dist(G, center_node, travel_time * 60, weight='travel_time')
+    nodes, edges = ox.graph_to_gdfs(subgraph)
+    return nodes.unary_union.convex_hull
+
+def get_bounding_box(query, travel_time, travel_mode, is_address=True, ):
     coords = get_coordinates(query, is_address=is_address)
     center_point = Point(coords[1], coords[0])  # (longitude, latitude)
 
-    # Create a bounding box around the center point
-    bounding_box = create_bounding_box(center_point, size_km=10)
-    return bounding_box
+    if travel_time > 0:
+        area = get_isochrone_area(center_point, travel_time, travel_mode)
+        return area
+    
+    # Create a bounding box of 10km x 10km if no travel time is specified
+    else:
+        bounding_box = create_bounding_box(center_point, size_km=10)
+        return bounding_box
 
-def get_raster_area(query, is_address=True):
+
+def get_raster_area(query, travel_time, travel_mode, is_address=True, ):
     # Authentication with Copernicus
     client_id = "sh-a24a739d-d123-419b-a409-81a190c436c2"
     client_secret = "dcUnE32uBB1gLvlxyi3qOeUPdGGpNMRs"
@@ -66,7 +79,7 @@ def get_raster_area(query, is_address=True):
         connection.authenticate_oidc()
 
         # Convert the bounding box to GeoJSON
-        aoi_geojson = mapping(get_bounding_box(query, is_address=is_address))
+        aoi_geojson = mapping(get_bounding_box(query, is_address=is_address, travel_time=travel_time, travel_mode=travel_mode))
 
         # Perform the analysis directly on the remote data
         datacube = connection.load_collection(
