@@ -5,11 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="made some edit to have correct tile in GHSPOP">
-      <change afterPath="$PROJECT_DIR$/import_data.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tiling_schema/WGS84_tile_schema.dbf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tiling_schema/WGS84_tile_schema.prj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tiling_schema/WGS84_tile_schema.shp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tiling_schema/WGS84_tile_schema.shx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/GHSPOPDownloader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/RasterDownloader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_ghspop_download.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_raster_download.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/area.tif.aux.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/2e28844e3f62c44c4ae65c86d612cca73f0e73a7.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/33ccb080221a833c28739d313adcf0dc27ff1c86.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/34cc47f3d8a3fd8267f86ba65b2dca2147e05017.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/42575b1264a726301796104aa3f58e8b13c7bac3.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/49ac2cbd969bcc06d5e7baa4eabdf6e3d3a3bdd1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/5e1b397d0ed21f37e519658428e5ad29de228d08.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/722670ac86848a2f514977d1e8553b1b22abd704.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/728ac4721754a830e4abdff70b0e1789c5955f65.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/730789fe66b9f6e7b3d677c9e26ba4ba57e12aa6.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/9405234fa7482661ef02d56a6b9e347b7d5ecd6f.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/958cfe94b0fd3af485246b02a7fa8af1630f1797.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/ad6de63920d9bb184b85accc50c10c8933590546.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/af0443283fd4d975c736b217ff1e33294fa8ee99.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/b6ee84160c8139acf6f4f14ab72a8671130da813.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/becbf33a04758c72ce4c82d85a2245724d1e2714.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/d84c0b8a7246dbac2b2beccacf673f9494bd674f.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/d9ec47924d23993b32e9ee13549fb4f1cedf3849.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/e4724067fc7e350c2b32969d8babcddfeb79aca5.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/e751b02e5bf8b39bff4d0b4b430d1fdfcf0457d7.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/f9b3416c1f7424684277454963b0d17cd8b0957d.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/import_data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_import.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testsGHS-POP.ipynb" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,12 +61,15 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2q2GH9dxTGn0UEewCGYEKeG5PSQ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.test_ghspop_download.executor": "Run",
+    "Python.test_import.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
@@ -51,7 +79,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -61,11 +89,12 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test" />
       <recent name="$PROJECT_DIR$/tiling_schema" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="DjangoTestsConfigurationType">
+  <component name="RunManager" selected="Python.test_ghspop_download">
+    <configuration name="test_ghspop_download" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="geo-analysis" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -74,33 +103,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="TARGET" value="" />
-      <option name="SETTINGS_FILE" value="" />
-      <option name="CUSTOM_SETTINGS" value="false" />
-      <option name="USE_OPTIONS" value="false" />
-      <option name="OPTIONS" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="geo-analysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/test_ghspop_download.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -109,67 +117,35 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="Python.FlaskServer">
+    <configuration name="test_raster_download" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="geo-analysis" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="launchJavascriptDebuger" value="false" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/test_raster_download.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="Tox" factoryName="Tox">
-      <module name="geo-analysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="docs" factoryName="Docutils task">
-      <module name="geo-analysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="docutils_input_file" value="" />
-      <option name="docutils_output_file" value="" />
-      <option name="docutils_params" value="" />
-      <option name="docutils_task" value="" />
-      <option name="docutils_open_in_browser" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="docs" factoryName="Sphinx task">
-      <module name="geo-analysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="docutils_input_file" value="" />
-      <option name="docutils_output_file" value="" />
-      <option name="docutils_params" value="" />
-      <option name="docutils_task" value="" />
-      <option name="docutils_open_in_browser" value="false" />
-      <method v="2" />
-    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.test_ghspop_download" />
+        <item itemvalue="Python.test_raster_download" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -191,6 +167,7 @@
       <workItem from="1734597717233" duration="8711000" />
       <workItem from="1734630837892" duration="1760000" />
       <workItem from="1734705204362" duration="5153000" />
+      <workItem from="1736930867632" duration="5478000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -241,5 +218,9 @@
     <MESSAGE value="git commit -m &quot;started the working on the request of the chosen raster tile&quot;" />
     <MESSAGE value="made some edit to have correct tile in GHSPOP" />
     <option name="LAST_COMMIT_MESSAGE" value="made some edit to have correct tile in GHSPOP" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/geo_analysis$test_import.coverage" NAME="test_import Coverage Results" MODIFIED="1736934593388" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/geo_analysis$test_ghspop_download.coverage" NAME="test_ghspop_download Coverage Results" MODIFIED="1736935702087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
   </component>
 </project>
