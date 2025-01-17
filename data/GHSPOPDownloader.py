@@ -7,7 +7,7 @@ import os
 import osmnx as ox
 import numpy as np
 import rasterio
-from data.RasterDownloader import RasterDownloader
+from data.CopernicusDownloader import CopernicusDownloader
 
 
 ox.settings.use_cache = False
@@ -78,15 +78,15 @@ class GHSPOPDownloader:
             zip_path = self.download_tile(tile_id)
             if zip_path:
                 data = self.extract_tif_file(zip_path)
-                return data
-        return None
+                if data is not None:
+                    with rasterio.open(os.path.join(self.extracted_dir, zip_path.replace('.zip', '.tif'))) as dataset:
+                        transform = dataset.transform
+                        crs = dataset.crs
+                        shape = dataset.shape
+                    return data, transform, crs, shape
+        return None, None, None, None
 
-    def crop_population_area(self, travel_time, travel_mode):
-        data = self.get_population_area()
-        raster_downloader = RasterDownloader()
-        raster_data = raster_downloader.download_raster_area(self.address, travel_time, travel_mode)
 
-        return raster_data
 
 
 # Example usage

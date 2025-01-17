@@ -7,7 +7,7 @@ from shapely.geometry import box, Point, mapping
 import osmnx as ox
 from shapely.geometry import mapping
 from data.BoundingBox import BoundingBox
-class RasterDownloader:
+class CopernicusDownloader:
     def __init__(self, client_id=None, client_secret=None, token_url=None):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -60,29 +60,36 @@ class RasterDownloader:
             else:
                 return None
 
-    def get_isochrone_area(self, center_point, travel_time, travel_mode):
-        G = ox.graph_from_point((center_point.y, center_point.x), dist=2000, network_type=travel_mode)
-        center_node = ox.distance.nearest_nodes(G, center_point.x, center_point.y)
-        subgraph = ox.truncate.truncate_graph_dist(G, center_node, travel_time * 60, weight='travel_time')
-        nodes, edges = ox.graph_to_gdfs(subgraph)
-        return nodes.unary_union.convex_hull
+    # def get_isochrone_area(self, center_point):
+    #     G = ox.graph_from_point((center_point.y, center_point.x), dist=2000)
+    #     center_node = ox.distance.nearest_nodes(G, center_point.x, center_point.y)
+    #     subgraph = ox.truncate.truncate_graph_dist(G, center_node)
+    #     nodes, edges = ox.graph_to_gdfs(subgraph)
+    #     return nodes.unary_union.convex_hull
 
-    def get_bounding_box(self, query, travel_time, travel_mode, is_address=True):
+    def get_bounding_box(self, query, method, is_address=True, **kwargs):
         coords = self.get_coordinates(query, is_address=is_address)
         center_point = Point(coords[1], coords[0])  # (longitude, latitude)
         bbox = BoundingBox()
 
-        if travel_time > 0:
-            area = self.get_isochrone_area(center_point, travel_time, travel_mode)
-            return bbox.from_geojson(mapping(area))
-        else:
-            return bbox.from_center_radius(center_point.x, center_point.y, radius_km=10)
+        if method == 'from_center_radius':
+            radius_km = kwargs.get('radius_km', 10)
+            return bbox.from_center_radius(center_point.x, center_point.y, radius_km)
+        elif method == 'from_coordinates':
+            min_x = kwargs.get('min_x')
+            min_y = kwargs.get('min_y')
+            max_x = kwargs.get('max_x')
+            max_y = kwargs.get('max_y')
+            return bbox.from_coordinates(min_x, min_y, max_x, max_y)
+        elif method == 'from_geojson':
+            geojson = kwargs.get('geojson')
+            return bbox.from_geojson(geojson)
 
-    def download_raster_area(self, query, travel_time, travel_mode, is_address=True, use_oidc=False):
+    def download_raster_area(self, query,method,is_address=True, use_oidc=False, **kwargs):
         connection = self.connect_to_openeo(use_oidc=use_oidc)
 
         # Convert the bounding box to GeoJSON
-        aoi_geom = self.get_bounding_box(query, is_address=is_address, travel_time=travel_time, travel_mode=travel_mode)
+        aoi_geom = self.get_bounding_box(query, method, is_address=is_address, **kwargs)
 
         # Convert the geometry to GeoJSON
         aoi_geojson = mapping(aoi_geom)
@@ -101,6 +108,9 @@ class RasterDownloader:
             # Read the data into a data structure
             with rasterio.open(tmpfile.name) as dataset:
                 data = dataset.read()
+                copernicus_transform = dataset.transform
+                copernicus_crs = dataset.crs
+                copernicus_shape = dataset.shape
 
-        print(f"Temporary file still exists at: {tmpfile.name}")
-        return data
+        print(f"Temporary file still exists at: {tmpfile.name}, CRS = {copernicus_crs}")
+        return data, copernicus_transform, copernicus_crs, copernicus_shape
