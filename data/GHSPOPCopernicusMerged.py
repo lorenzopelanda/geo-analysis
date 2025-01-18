@@ -14,9 +14,9 @@ from data.GHSPOPDownloader import GHSPOPDownloader
 shapefile_path = "../tiling_schema/WGS84_tile_schema.shp"
 
 class GHSPOPCopernicusMerged:
-    def get_copernicus_population_area(self, address, method, use_oidc,copernicus_downloader,**kwargs):
+    def get_copernicus_population_area(self, bbox, address, use_oidc,copernicus_downloader,**kwargs):
         raster_data, copernicus_transform, copernicus_crs, copernicus_shape = copernicus_downloader.download_raster_area(
-            address, method, use_oidc, **kwargs
+            bbox, use_oidc, **kwargs
         )
         ghs_pop = GHSPOPDownloader(address, shapefile_path)
 

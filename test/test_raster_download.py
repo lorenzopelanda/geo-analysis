@@ -1,5 +1,7 @@
+from data.BoundingBox import BoundingBox
 from data.CopernicusDownloader import CopernicusDownloader
 from data.GHSPOPCopernicusMerged import GHSPOPCopernicusMerged
+from data.OSMDownloader import OSMDownloader
 
 
 def main():
@@ -9,14 +11,18 @@ def main():
         token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token'
     )
 
+    bbox = BoundingBox()
+    bbox= bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
     downloader_raster = GHSPOPCopernicusMerged()
     downloader_raster.get_copernicus_population_area(
+        bbox=bbox,
         address="Piazza Castello, Torino",
-        method="from_center_radius",
         use_oidc=False,
         copernicus_downloader=copernicus_downloader,
-        radius_km=15
     )
+
+    osm_area = OSMDownloader()
+    osm_area.get_vector_area(bounding_box=bbox, tags={"building": True})
 
     # bbox = get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=10)
     #

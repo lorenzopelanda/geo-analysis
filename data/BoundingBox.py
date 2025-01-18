@@ -1,4 +1,6 @@
 import json
+import geopandas as gpd
+import osmnx as ox
 from shapely.geometry import box, Point, mapping
 
 class BoundingBox:
@@ -33,6 +35,43 @@ class BoundingBox:
 
     def to_geometry(self):
         return box(self.min_x, self.min_y, self.max_x, self.max_y)
+
+    def get_coordinates(self, query, is_address=True):
+        if is_address:
+            # Geocoding for address
+            gdf = gpd.tools.geocode(query, provider="nominatim", user_agent="geoData")
+            if not gdf.empty:
+                point = gdf.geometry.iloc[0]
+                return point.y, point.x
+            else:
+                return None
+        else:
+            # Center of municipality
+            gdf = ox.geocode_to_gdf(query, which_result=1)
+            if not gdf.empty:
+                gdf_projected = gdf.to_crs(epsg=3857)
+                center_projected = gdf_projected.geometry.centroid.iloc[0]
+                center = gpd.GeoSeries([center_projected], crs="EPSG:3857").to_crs(epsg=4326).iloc[0]
+                return center.y, center.x
+            else:
+                return None
+
+    def get_bounding_box(self, query, method, is_address=True, **kwargs):
+        coords = self.get_coordinates(query, is_address=is_address)
+        center_point = Point(coords[1], coords[0])  # (longitude, latitude)
+
+        if method == 'from_center_radius':
+            radius_km = kwargs.get('radius_km', 10)
+            return self.from_center_radius(center_point.x, center_point.y, radius_km)
+        elif method == 'from_coordinates':
+            min_x = kwargs.get('min_x')
+            min_y = kwargs.get('min_y')
+            max_x = kwargs.get('max_x')
+            max_y = kwargs.get('max_y')
+            return self.from_coordinates(min_x, min_y, max_x, max_y)
+        elif method == 'from_geojson':
+            geojson = kwargs.get('geojson')
+            return self.from_geojson(geojson)
 
     def __repr__(self):
         return f"BoundingBox({self.min_x}, {self.min_y}, {self.max_x}, {self.max_y})"
