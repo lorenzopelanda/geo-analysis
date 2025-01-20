@@ -21,8 +21,8 @@ def main():
         copernicus_downloader=copernicus_downloader,
     )
 
-    osm_area = OSMDownloader()
-    osm_area.get_vector_area(bounding_box=bbox, tags={"building": True})
+    # osm_area = OSMDownloader()
+    # osm_area.get_vector_area(bounding_box=bbox, tags={"building": True})
 
     # bbox = get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=10)
     #

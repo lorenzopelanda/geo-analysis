@@ -44,7 +44,7 @@ class CopernicusDownloader:
         connection = self.connect_to_openeo(use_oidc=use_oidc)
 
         # Convert the bounding box to GeoJSON
-        aoi_geom = bounding_box.to_geometry()
+        aoi_geom = bounding_box
 
         # Convert the geometry to GeoJSON
         aoi_geojson = mapping(aoi_geom)

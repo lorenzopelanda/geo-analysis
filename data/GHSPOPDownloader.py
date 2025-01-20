@@ -54,19 +54,48 @@ class GHSPOPDownloader:
             return zip_path
         return None
 
+    # def extract_tif_file(self, zip_path):
+    #     tif_path = None
+    #     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    #         for file in zip_ref.namelist():
+    #             if file.endswith('.tif'):
+    #                 zip_ref.extract(file, self.extracted_dir)
+    #                 tif_path = os.path.join(self.extracted_dir, file)
+    #                 print(f"Extracted TIF file to: {tif_path}")
+    #                 if not os.path.exists(tif_path):
+    #                     print(f"TIF file does not exist at {tif_path}")
+    #                     tif_path = None
+    #     os.remove(zip_path)
+    #     self.remove_existing_directory()
+    #     return tif_path
+
     def extract_tif_file(self, zip_path):
-        data = None
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            for file in zip_ref.namelist():
-                if file.endswith('.tif'):
-                    zip_ref.extract(file, self.extracted_dir)
-                    tif_path = os.path.join(self.extracted_dir, file)
-                    with rasterio.open(tif_path) as dataset:
-                        data = dataset.read()
-                    os.remove(tif_path)
-        os.remove(zip_path)
-        self.remove_existing_directory()
-        return data
+        """
+        Extract TIF file from zip archive.
+        Files will be kept until explicitly cleaned up later.
+        """
+        tif_path = None
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                for file in zip_ref.namelist():
+                    if file.endswith('.tif'):
+                        zip_ref.extract(file, self.extracted_dir)
+                        tif_path = os.path.join(self.extracted_dir, file)
+                        print(f"Extracted TIF file to: {tif_path}")
+                        if not os.path.exists(tif_path):
+                            print(f"TIF file does not exist at {tif_path}")
+                            tif_path = None
+                        break  # Extract only the first TIF file found
+
+            # Remove only the zip file after successful extraction
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+
+            return tif_path
+
+        except Exception as e:
+            print(f"Error during TIF extraction: {str(e)}")
+            return None
 
     def get_population_area(self):
         self.remove_existing_directory()
