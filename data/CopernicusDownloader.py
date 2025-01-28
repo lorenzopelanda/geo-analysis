@@ -2,11 +2,8 @@ import requests
 import openeo
 import tempfile
 import rasterio
-import geopandas as gpd
-from shapely.geometry import box, Point, mapping
-import osmnx as ox
 from shapely.geometry import mapping
-from data.BoundingBox import BoundingBox
+
 class CopernicusDownloader:
     def __init__(self, client_id=None, client_secret=None, token_url=None):
         self.client_id = client_id
@@ -40,14 +37,11 @@ class CopernicusDownloader:
             connection.authenticate_oidc()
         return connection
 
-    def download_raster_area(self,bounding_box, use_oidc=False, **kwargs):
+    def download_raster_area(self, bounding_box, use_oidc=False):
         connection = self.connect_to_openeo(use_oidc=use_oidc)
 
-        # Convert the bounding box to GeoJSON
-        aoi_geom = bounding_box
-
         # Convert the geometry to GeoJSON
-        aoi_geojson = mapping(aoi_geom)
+        aoi_geojson = mapping(bounding_box)
 
         # Perform the analysis directly on the remote data
         datacube = connection.load_collection(
@@ -67,5 +61,4 @@ class CopernicusDownloader:
                 copernicus_crs = dataset.crs
                 copernicus_shape = dataset.shape
 
-        print(f"Temporary file still exists at: {tmpfile.name}, CRS = {copernicus_crs}")
         return data, copernicus_transform, copernicus_crs, copernicus_shape
