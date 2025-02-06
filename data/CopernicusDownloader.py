@@ -41,7 +41,7 @@ class CopernicusDownloader:
         connection = self.connect_to_openeo(use_oidc=use_oidc)
 
         # Convert the geometry to GeoJSON
-        aoi_geojson = mapping(bounding_box)
+        aoi_geojson = bounding_box.to_geojson()
 
         # Perform the analysis directly on the remote data
         datacube = connection.load_collection(
@@ -56,9 +56,12 @@ class CopernicusDownloader:
 
             # Read the data into a data structure
             with rasterio.open(tmpfile.name) as dataset:
-                data = dataset.read()
+                data = dataset.read(1)
                 copernicus_transform = dataset.transform
                 copernicus_crs = dataset.crs
                 copernicus_shape = dataset.shape
+
+            print("Downloaded raster shape:", copernicus_shape)
+            print("Downloaded raster type:", type(data))
 
         return data, copernicus_transform, copernicus_crs, copernicus_shape

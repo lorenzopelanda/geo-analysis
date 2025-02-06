@@ -2,6 +2,8 @@ import json
 import geopandas as gpd
 import osmnx as ox
 from shapely.geometry import box, Point, mapping
+import pyproj
+from pyproj import CRS, Transformer, exceptions
 
 class BoundingBox:
     def __init__(self, min_x=None, min_y=None, max_x=None, max_y=None):
@@ -35,6 +37,9 @@ class BoundingBox:
 
     def to_geometry(self):
         return box(self.min_x, self.min_y, self.max_x, self.max_y)
+
+    def to_geojson(self):
+        return mapping(self.to_geometry())
 
     def get_coordinates(self, query, is_address=True):
         if is_address:
@@ -72,6 +77,17 @@ class BoundingBox:
         elif method == 'from_geojson':
             geojson = kwargs.get('geojson')
             return self.from_geojson(geojson)
+
+    def transform_to_esri54009(self):
+        crs_esri_54009 = pyproj.CRS.from_string("ESRI:54009")
+
+        transformer = Transformer.from_crs(CRS.from_epsg(4326), crs_esri_54009, always_xy=True)
+
+        min_x, min_y = transformer.transform(self.min_x, self.min_y)
+        max_x, max_y = transformer.transform(self.max_x, self.max_y)
+
+        return BoundingBox(min_x, min_y, max_x, max_y)
+
 
     def __repr__(self):
         return f"BoundingBox({self.min_x}, {self.min_y}, {self.max_x}, {self.max_y})"

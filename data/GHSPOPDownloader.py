@@ -14,6 +14,9 @@ import rasterio
 import rasterio.mask
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
+from rasterio.warp import reproject, Resampling as RasterioResampling, calculate_default_transform
+from rasterio.transform import Affine
+from data.BoundingBox import BoundingBox
 
 ox.settings.use_cache = False
 
@@ -34,13 +37,14 @@ class GHSPOPDownloader:
 
     def load_shapefile(self):
         tiles_gdf = gpd.read_file(self.shapefile_path)
-        if tiles_gdf.crs != "EPSG:4326":
-            tiles_gdf = tiles_gdf.to_crs("EPSG:4326")
+        mollweide_proj = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+        if tiles_gdf.crs != mollweide_proj:
+            tiles_gdf = tiles_gdf.to_crs(mollweide_proj)
         return tiles_gdf
 
     def create_point_gdf(self):
         point = Point(self.lat, self.lon)
-        return gpd.GeoDataFrame([{'geometry': point}], crs="EPSG:4326")
+        return gpd.GeoDataFrame([{'geometry': point}], crs="ESRI:54009")
 
     def get_tile_id(self, tiles_gdf, point_gdf):
         current_tile = tiles_gdf[tiles_gdf.contains(point_gdf.geometry.iloc[0])]
@@ -49,7 +53,7 @@ class GHSPOPDownloader:
         return None
 
     def download_tile(self, tile_id):
-        url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2030_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2030_GLOBE_R2023A_4326_30ss_V1_0_{tile_id}.zip"
+        url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2025_GLOBE_R2023A_54009_100_V1_0_{tile_id}.zip"
         response = requests.get(url)
         if response.status_code == 200:
             zip_path = 'tile_download.zip'
@@ -85,18 +89,15 @@ class GHSPOPDownloader:
             return None
 
     def get_tiles_for_bounds(self, bounds, tiles_gdf):
-        """
-        Find the tiles that intersect the bounds of the bounding box.
-        """
-        # Create a shaply box from the bounds
-        bbox = box(bounds[0], bounds[1], bounds[2], bounds[3])
+        bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
 
-        bbox_gdf = gpd.GeoDataFrame([{'geometry': bbox}], crs="EPSG:4326")
+        mollweide_proj = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+        bbox_gdf = gpd.GeoDataFrame([{'geometry': bbox}], crs=mollweide_proj)
 
         # Get the tiles in the bounding box
         intersecting_tiles = tiles_gdf[tiles_gdf.intersects(bbox_gdf.geometry[0])]
 
-        # EGet the tile_id
+        # Get the tile_id
         tile_ids = []
         for _, row in intersecting_tiles.iterrows():
             tile_id = row['tile_id']
@@ -197,7 +198,7 @@ class GHSPOPDownloader:
                 tile_data = self._process_single_tile(tile_id, ghs_pop)
                 if tile_data:
                     downloaded_tiles.append(tile_data)
-                    processed_paths.append(os.path.join(ghs_pop.extracted_dir,f"GHS_POP_E2030_GLOBE_R2023A_4326_30ss_V1_0_{tile_id}.tif"))
+                    processed_paths.append(os.path.join(ghs_pop.extracted_dir,f"GHS_POP_E2025_GLOBE_R2023A_54009_100_V1_0_{tile_id}.tif"))
 
             if not downloaded_tiles:
                 raise ValueError("Failed to download any valid tiles.")
@@ -213,11 +214,11 @@ class GHSPOPDownloader:
         finally:
             self.cleanup_files(processed_paths, ghs_pop)
 
-    def crop_bounds(self, data, transform, bounds, crs="EPSG:4326"):
+    def crop_bounds(self, data, transform, bounds, crs="ESRI:54009"):
         """
         Crop the given data to the specified bounding box.
         """
-        bbox = box(bounds[0], bounds[1], bounds[2], bounds[3])
+        bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
         geo = gpd.GeoDataFrame({'geometry': [bbox]}, crs=crs)
         geo = geo.to_crs(crs=rasterio.crs.CRS.from_string(crs))
 
@@ -243,11 +244,16 @@ class GHSPOPDownloader:
 
     def get_population_area(self, bounding_box):
         """
-        Download and process GHS-POP data for the given bounding box.
+        Download and process GHS-POP data for the given bounding box, converting it to EPSG:4326.
         """
         self.remove_existing_directory()
 
-        bounds = bounding_box.bounds
+        # Ensure bounding_box is an instance of BoundingBox
+        if not isinstance(bounding_box, BoundingBox):
+            raise ValueError("bounding_box must be an instance of BoundingBox")
+
+        bounds = bounding_box.transform_to_esri54009()
+
         tiles_gdf = self.load_shapefile()
 
         # Get necessary tiles for the area
@@ -259,5 +265,36 @@ class GHSPOPDownloader:
         ghs_data, ghs_transform, ghs_crs, ghs_shape = self.download_and_process_tiles(tiles_to_download, self)
         ghs_data_cropped, ghs_transform_cropped = self.crop_bounds(ghs_data, ghs_transform, bounds)
 
-        return ghs_data_cropped, ghs_transform_cropped, ghs_crs, ghs_shape
+        # Estrarre i limiti della bounding box
+        left, bottom, right, top = bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y
 
+
+        # Calcolare la trasformazione corretta per EPSG:4326
+        dst_transform, width, height = calculate_default_transform(
+            ghs_crs, "EPSG:4326", ghs_shape[1], ghs_shape[0], left, bottom, right, top
+        )
+
+        # Crea un array vuoto per i dati riproiettati
+        ghs_data_4326 = np.empty((height, width), dtype=ghs_data_cropped.dtype)
+
+        # Riproietta i dati
+        reproject(
+            source=ghs_data_cropped,
+            destination=ghs_data_4326,
+            src_transform=ghs_transform_cropped,
+            src_crs=ghs_crs,
+            dst_transform=dst_transform,
+            dst_crs="EPSG:4326",
+            resampling=RasterioResampling.bilinear
+        )
+
+        output_tif_path = "ghs_pop_cropped.tif"
+
+        # Salva il raster riproiettato
+        with rasterio.open(output_tif_path, 'w', driver='GTiff',
+                           height=height, width=width,
+                           count=1, dtype=ghs_data_4326.dtype,
+                           crs="EPSG:4326", transform=dst_transform) as dst:
+            dst.write(ghs_data_4326, 1)
+
+        return ghs_data_4326, dst_transform, "EPSG:4326", (height, width)

@@ -21,24 +21,32 @@ def main():
     # geojson_data = '{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [[[7.68, 45.06], [7.70, 45.06], [7.70, 45.08], [7.68, 45.08], [7.68, 45.06]]]}}'
     # bbox = get_bounding_box(query="Piazza Castello, Torino", method="from_geojson", geojson=geojson_data)
     bbox = BoundingBox()
-    bounding_box= bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
+    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
+
+    # Ensure bounding_box is an instance of BoundingBox
+    bounding_box_instance = BoundingBox(
+        min_x=bounding_box.bounds[0],
+        min_y=bounding_box.bounds[1],
+        max_x=bounding_box.bounds[2],
+        max_y=bounding_box.bounds[3]
+    )
 
     copernicus_area = copernicus_downloader.download_raster_area(
-         bounding_box,
-         use_oidc=False
+        bounding_box_instance,
+        use_oidc=False
     )
 
     ghs_pop = GHSPOPDownloader(
         address="Piazza Castello, Torino",
-        shapefile_path="../tiling_schema/WGS84_tile_schema.shp"
+        shapefile_path="../tiling_schema/GHSL2_0_MWD_L1_tile_schema_land.shp"
     )
-    ghspop_area = ghs_pop.get_population_area(bounding_box)
+    ghspop_area = ghs_pop.get_population_area(bounding_box_instance)
 
     detail_adjuster = DetailLevelAdjustment()
     detail_adjuster.adjust_detail_level(copernicus_area, ghspop_area)
 
-    osm_area = OSMDownloader()
-    osm_area.get_vector_area(bounding_box=bbox, tags={"building": True})
+    # osm_area = OSMDownloader()
+    # osm_area.get_vector_area(bounding_box=bbox, tags={"building": True})
 
 
 

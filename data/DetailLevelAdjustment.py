@@ -4,15 +4,28 @@ import numpy as np
 
 class DetailLevelAdjustment:
 
-    def adjust_detail_level(self,copernicus_area, ghspop_area,):
+    def adjust_detail_level(self, copernicus_area, ghspop_area):
         """
         Get population data for a given area using Copernicus and GHS-POP data,
-        ensuring both outputs have matching resolution and extent.
+        ensuring both outputs have matching resolution, extent, and coordinates.
         """
         copernicus_data, copernicus_transform, copernicus_crs, copernicus_shape = copernicus_area
         ghs_data, ghs_transform, ghs_crs, ghs_shape = ghspop_area
 
-        # Resample GHS-POP data to match the resolution of Copernicus data
+        if ghs_crs != 'EPSG:4326':
+            ghs_resampled_4326 = np.empty_like(ghs_data)
+            reproject(
+                source=ghs_data,
+                destination=ghs_resampled_4326,
+                src_transform=ghs_transform,
+                src_crs=ghs_crs,
+                dst_transform=ghs_transform,
+                dst_crs='EPSG:4326',
+                resampling=Resampling.nearest
+            )
+            ghs_data = ghs_resampled_4326
+            ghs_crs = 'EPSG:4326'
+
         target_height, target_width = copernicus_shape
         target_transform = copernicus_transform
 
@@ -28,7 +41,6 @@ class DetailLevelAdjustment:
             resampling=Resampling.bilinear
         )
 
-        # Save resampled GHS-POP data
         with rasterio.open(
                 "ghspop_resampled.tif",
                 'w',
@@ -47,7 +59,7 @@ class DetailLevelAdjustment:
         elif copernicus_data.ndim == 3:
             copernicus_data = copernicus_data[0, :, :]
 
-        # Save copernicus data
+        # Salva i dati Copernicus
         with rasterio.open(
                 "copernicus_area.tif",
                 'w',
