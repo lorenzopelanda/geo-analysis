@@ -12,14 +12,14 @@ class BoundingBox:
         self.max_x = max_x
         self.max_y = max_y
 
-    def from_coordinates(self, min_x, min_y, max_x, max_y):
+    def __from_coordinates(self, min_x, min_y, max_x, max_y):
         self.min_x = min_x
         self.min_y = min_y
         self.max_x = max_x
         self.max_y = max_y
         return self.to_geometry()
 
-    def from_center_radius(self, center_x, center_y, radius_km):
+    def __from_center_radius(self, center_x, center_y, radius_km):
         if radius_km is None:
             radius_km = 10
         size_deg = radius_km / 111  # Convert km to degrees
@@ -29,7 +29,7 @@ class BoundingBox:
         self.max_y = center_y + size_deg
         return self.to_geometry()
 
-    def from_geojson(self, geojson):
+    def __from_geojson(self, geojson):
         geom = json.loads(geojson)
         bbox = box(*geom['bbox'])
         self.min_x, self.min_y, self.max_x, self.max_y = bbox.bounds
@@ -41,7 +41,8 @@ class BoundingBox:
     def to_geojson(self):
         return mapping(self.to_geometry())
 
-    def get_coordinates(self, query, is_address=True):
+
+    def __get_coordinates(self, query, is_address=True):
         if is_address:
             # Geocoding for address
             gdf = gpd.tools.geocode(query, provider="nominatim", user_agent="geoData")
@@ -62,21 +63,23 @@ class BoundingBox:
                 return None
 
     def get_bounding_box(self, query, method, is_address=True, **kwargs):
-        coords = self.get_coordinates(query, is_address=is_address)
+        coords = self.__get_coordinates(query, is_address=is_address)
         center_point = Point(coords[1], coords[0])  # (longitude, latitude)
 
         if method == 'from_center_radius':
             radius_km = kwargs.get('radius_km', 10)
-            return self.from_center_radius(center_point.x, center_point.y, radius_km)
+            self.__from_center_radius(center_point.x, center_point.y, radius_km)
         elif method == 'from_coordinates':
             min_x = kwargs.get('min_x')
             min_y = kwargs.get('min_y')
             max_x = kwargs.get('max_x')
             max_y = kwargs.get('max_y')
-            return self.from_coordinates(min_x, min_y, max_x, max_y)
+            self.__from_coordinates(min_x, min_y, max_x, max_y)
         elif method == 'from_geojson':
             geojson = kwargs.get('geojson')
-            return self.from_geojson(geojson)
+            self.__from_geojson(geojson)
+
+        return self
 
     def transform_to_esri54009(self):
         crs_esri_54009 = pyproj.CRS.from_string("ESRI:54009")

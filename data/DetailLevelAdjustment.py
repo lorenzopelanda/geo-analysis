@@ -1,36 +1,27 @@
-import rasterio
 from rasterio.warp import reproject, Resampling
+import geopandas as gpd
 import numpy as np
+import rasterio
+from rasterio.features import rasterize
 
 class DetailLevelAdjustment:
 
     def adjust_detail_level(self, copernicus_area, ghspop_area):
         """
         Get population data for a given area using Copernicus and GHS-POP data,
-        ensuring both outputs have matching resolution, extent, and coordinates.
+        ensuring both outputs have matching resolution and extent.
         """
         copernicus_data, copernicus_transform, copernicus_crs, copernicus_shape = copernicus_area
         ghs_data, ghs_transform, ghs_crs, ghs_shape = ghspop_area
 
-        if ghs_crs != 'EPSG:4326':
-            ghs_resampled_4326 = np.empty_like(ghs_data)
-            reproject(
-                source=ghs_data,
-                destination=ghs_resampled_4326,
-                src_transform=ghs_transform,
-                src_crs=ghs_crs,
-                dst_transform=ghs_transform,
-                dst_crs='EPSG:4326',
-                resampling=Resampling.nearest
-            )
-            ghs_data = ghs_resampled_4326
-            ghs_crs = 'EPSG:4326'
-
+        # Resample GHS-POP data to match the resolution of Copernicus data
         target_height, target_width = copernicus_shape
         target_transform = copernicus_transform
 
+        # Create an empty array for the resampled GHS-POP data
         ghs_resampled = np.empty((target_height, target_width), dtype=ghs_data.dtype)
 
+        # Reproject the GHS-POP data to match the Copernicus resolution and extent
         reproject(
             source=ghs_data,
             destination=ghs_resampled,
@@ -41,6 +32,7 @@ class DetailLevelAdjustment:
             resampling=Resampling.bilinear
         )
 
+        # Save resampled GHS-POP data
         with rasterio.open(
                 "ghspop_resampled.tif",
                 'w',
@@ -54,12 +46,13 @@ class DetailLevelAdjustment:
         ) as dst:
             dst.write(ghs_resampled, 1)
 
+        # Handle Copernicus data dimensions
         if copernicus_data.ndim == 4:
             copernicus_data = copernicus_data[0, 0, :, :]
         elif copernicus_data.ndim == 3:
             copernicus_data = copernicus_data[0, :, :]
 
-        # Salva i dati Copernicus
+        # Save Copernicus data
         with rasterio.open(
                 "copernicus_area.tif",
                 'w',
@@ -86,4 +79,61 @@ class DetailLevelAdjustment:
                 "crs": copernicus_crs,
                 "shape": (target_height, target_width)
             }
+        }
+
+
+
+    def vector_to_raster(self, osm_layer, reference_raster):
+        """
+        Convert a vector area (OSM buildings) into a raster with the same resolution and extent as a reference raster.
+
+        Parameters:
+            osm_layer (GeoDataFrame): A GeoDataFrame containing building geometries from OpenStreetMap.
+            reference_raster (tuple): A tuple containing the reference raster's data, transform, CRS, and shape.
+
+        Returns:
+            dict: A dictionary containing the rasterized building data and metadata.
+        """
+
+        ref_data, ref_transform, ref_crs, ref_shape = reference_raster
+
+        # Ensure the vector data is in the same CRS as the reference raster
+        if osm_layer.crs != ref_crs:
+            osm_layer = osm_layer.to_crs(ref_crs)
+
+        # Rasterize the building geometries
+        shapes = [(geom, 1) for geom in osm_layer.geometry if geom is not None]
+
+        # Create an empty raster with the same shape as the reference raster
+        rasterized_buildings = np.zeros(ref_shape, dtype=np.uint8)
+
+        # Rasterize the vector data
+        rasterized_buildings = rasterize(
+            shapes=shapes,
+            out_shape=ref_shape,
+            transform=ref_transform,
+            fill=0,
+            dtype=np.uint8,
+            all_touched=True
+        )
+
+        # Save the rasterized buildings to a GeoTIFF file
+        with rasterio.open(
+                "osm_buildings_rasterized.tif",
+                'w',
+                driver='GTiff',
+                height=ref_shape[0],
+                width=ref_shape[1],
+                count=1,
+                dtype=rasterized_buildings.dtype,
+                crs=ref_crs,
+                transform=ref_transform,
+        ) as dst:
+            dst.write(rasterized_buildings, 1)
+
+        return {
+            "data": rasterized_buildings,
+            "transform": ref_transform,
+            "crs": ref_crs,
+            "shape": ref_shape
         }

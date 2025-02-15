@@ -1,5 +1,6 @@
 import rasterio
 import numpy as np
+import json
 from collections import Counter
 
 
@@ -29,23 +30,16 @@ class LandUseAnalyzer:
         self.values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100]
 
 
-    def analyze(self):
+    def __analyze(self):
         data = self.raster_data
         unique, counts = np.unique(data, return_counts=True)
         land_use_types = dict(zip(unique, counts))
         return land_use_types
 
     def get_land_use_percentages(self):
-        analysis = self.analyze()
+        analysis = self.__analyze()
         total = sum(analysis.values())
-        percentages = {self.labels.get(land_use, land_use): (count / total) * 100 for land_use, count in
+        percentages = {self.labels.get(land_use, land_use): round((count / total) * 100, 4) for land_use, count in
                        analysis.items() if land_use in self.values}
 
-        print("Land Use Percentages:")
-        for land_use, percentage in percentages.items():
-            print(f"{land_use}: {percentage:.2f}%")
-
-        total_percentage = sum(percentages.values())
-        print(f"Total (should be 100%): {total_percentage:.2f}%")
-
-        return percentages
+        return json.dumps(percentages)

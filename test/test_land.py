@@ -19,7 +19,7 @@ def main():
          use_oidc=False
     )
     landuse_analyzer = LandUseAnalyzer(copernicus_area)
-    landuse_analyzer.get_land_use_percentages()
+    print(landuse_analyzer.get_land_use_percentages())
 
 
 if __name__ == "__main__":

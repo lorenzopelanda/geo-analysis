@@ -1,10 +1,7 @@
 import shutil
-from typing import List, Tuple, Optional
-
 import geopandas as gpd
 from shutil import rmtree
 from shapely.geometry import Point
-from shapely.geometry import box
 import requests
 import zipfile
 import os
@@ -14,46 +11,44 @@ import rasterio
 import rasterio.mask
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
-from rasterio.warp import reproject, Resampling as RasterioResampling, calculate_default_transform
-from rasterio.transform import Affine
-from data.BoundingBox import BoundingBox
+from shapely.geometry import box
 
 ox.settings.use_cache = False
 
 class GHSPOPDownloader:
-    def __init__(self, address, shapefile_path, extracted_dir="extracted_files"):
-        self.address = address
-        self.shapefile_path = shapefile_path
-        self.extracted_dir = extracted_dir
-        self.lat, self.lon = self.geocode_address()
+    shapefile_path = "../tiling_schema/WGS84_tile_schema.shp"
 
-    def geocode_address(self):
+    def __init__(self, address, extracted_dir="extracted_files"):
+        self.address = address
+        self.extracted_dir = extracted_dir
+        self.lat, self.lon = self.__geocode_address()
+
+    def __geocode_address(self):
         location = ox.geocode(self.address)
         return location[1], location[0]
 
-    def remove_existing_directory(self):
+    def __remove_existing_directory(self):
         if os.path.exists(self.extracted_dir):
             rmtree(self.extracted_dir)
 
-    def load_shapefile(self):
+    def __load_shapefile(self):
         tiles_gdf = gpd.read_file(self.shapefile_path)
-        mollweide_proj = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-        if tiles_gdf.crs != mollweide_proj:
-            tiles_gdf = tiles_gdf.to_crs(mollweide_proj)
+        if tiles_gdf.crs != "EPSG:4326":
+            tiles_gdf = tiles_gdf.to_crs("EPSG:4326")
         return tiles_gdf
 
-    def create_point_gdf(self):
+    def __create_point_gdf(self):
         point = Point(self.lat, self.lon)
-        return gpd.GeoDataFrame([{'geometry': point}], crs="ESRI:54009")
+        return gpd.GeoDataFrame([{'geometry': point}], crs="EPSG:4326")
 
-    def get_tile_id(self, tiles_gdf, point_gdf):
+    def __get_tile_id(self, tiles_gdf, point_gdf):
         current_tile = tiles_gdf[tiles_gdf.contains(point_gdf.geometry.iloc[0])]
         if not current_tile.empty:
             return current_tile.iloc[0]['tile_id']
         return None
 
-    def download_tile(self, tile_id):
-        url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2025_GLOBE_R2023A_54009_100_V1_0_{tile_id}.zip"
+    def __download_tile(self, tile_id):
+        url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_4326_3ss/V1-0/tiles/GHS_POP_E2025_GLOBE_R2023A_4326_3ss_V1_0_{tile_id}.zip"
         response = requests.get(url)
         if response.status_code == 200:
             zip_path = 'tile_download.zip'
@@ -62,7 +57,7 @@ class GHSPOPDownloader:
             return zip_path
         return None
 
-    def extract_tif_file(self, zip_path):
+    def __extract_tif_file(self, zip_path):
         """
         Extract TIF file from zip archive.
         Files will be kept until explicitly cleaned up later.
@@ -88,11 +83,10 @@ class GHSPOPDownloader:
             print(f"Error during TIF extraction: {str(e)}")
             return None
 
-    def get_tiles_for_bounds(self, bounds, tiles_gdf):
+    def __get_tiles_for_bounds(self, bounds, tiles_gdf):
         bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
 
-        mollweide_proj = "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-        bbox_gdf = gpd.GeoDataFrame([{'geometry': bbox}], crs=mollweide_proj)
+        bbox_gdf = gpd.GeoDataFrame([{'geometry': bbox}], crs="EPSG:4326")
 
         # Get the tiles in the bounding box
         intersecting_tiles = tiles_gdf[tiles_gdf.intersects(bbox_gdf.geometry[0])]
@@ -106,7 +100,7 @@ class GHSPOPDownloader:
 
         return tile_ids
 
-    def cleanup_files(self, file_paths, ghs_pop):
+    def __cleanup_files(self, file_paths):
         """
         Clean up processed files and directories.
         """
@@ -118,13 +112,12 @@ class GHSPOPDownloader:
                 print(f"Error removing file {path}: {str(e)}")
 
         try:
-            if os.path.exists(ghs_pop.extracted_dir) and not os.listdir(ghs_pop.extracted_dir):
-                shutil.rmtree(ghs_pop.extracted_dir)
+            if os.path.exists(self.extracted_dir) and not os.listdir(self.extracted_dir):
+                shutil.rmtree(self.extracted_dir)
         except Exception as e:
-            print(f"Error removing directory {ghs_pop.extracted_dir}: {str(e)}")
+            print(f"Error removing directory {self.extracted_dir}: {str(e)}")
 
-    def _merge_tiles(self, tiles: List[Tuple[np.ndarray, rasterio.Affine, str, Tuple[int, int]]]) -> Tuple[
-        np.ndarray, rasterio.Affine, str, Tuple[int, int]]:
+    def __merge_tiles(self, tiles):
         """
         Merge multiple GHS-POP tiles into a single raster.
         """
@@ -156,20 +149,19 @@ class GHSPOPDownloader:
             tiles[0][2],
             merged_data.shape[1:]
         )
-    def _process_single_tile(self, tile_id: str, ghs_pop) -> Optional[
-        Tuple[np.ndarray, rasterio.Affine, str, Tuple[int, int]]]:
+    def __process_single_tile(self, tile_id):
         """
         Process a single GHS-POP tile.
         """
         try:
             # Download tile
-            zip_path = ghs_pop.download_tile(tile_id)
+            zip_path = self.__download_tile(tile_id)
             if not zip_path:
                 print(f"Failed to download tile {tile_id}")
                 return None
 
             # Extract TIF file
-            tif_path = ghs_pop.extract_tif_file(zip_path)
+            tif_path = self.__extract_tif_file(zip_path)
             if tif_path is None:
                 print(f"Failed to extract TIF file from {zip_path}")
                 return None
@@ -182,8 +174,7 @@ class GHSPOPDownloader:
             print(f"Error processing tile {tile_id}: {str(e)}")
             return None
 
-    def download_and_process_tiles(self, tile_ids: List[str], ghs_pop) -> Tuple[
-        np.ndarray, rasterio.Affine, str, Tuple[int, int]]:
+    def __download_and_process_tiles(self, tile_ids):
         """
         Download and process GHS-POP tiles based on the provided tile IDs.
         """
@@ -195,10 +186,10 @@ class GHSPOPDownloader:
 
         try:
             for tile_id in tile_ids:
-                tile_data = self._process_single_tile(tile_id, ghs_pop)
+                tile_data = self.__process_single_tile(tile_id)
                 if tile_data:
                     downloaded_tiles.append(tile_data)
-                    processed_paths.append(os.path.join(ghs_pop.extracted_dir,f"GHS_POP_E2025_GLOBE_R2023A_54009_100_V1_0_{tile_id}.tif"))
+                    processed_paths.append(os.path.join(self.extracted_dir,f"GHS_POP_{tile_id}.tif"))
 
             if not downloaded_tiles:
                 raise ValueError("Failed to download any valid tiles.")
@@ -207,17 +198,18 @@ class GHSPOPDownloader:
             if len(downloaded_tiles) == 1:
                 result = downloaded_tiles[0]
             else:
-                result = self._merge_tiles(downloaded_tiles)
+                result = self.__merge_tiles(downloaded_tiles)
 
             return result
 
         finally:
-            self.cleanup_files(processed_paths, ghs_pop)
+            self.__cleanup_files(processed_paths)
 
-    def crop_bounds(self, data, transform, bounds, crs="ESRI:54009"):
+    def __crop_bounds(self, data, transform, bounds):
         """
         Crop the given data to the specified bounding box.
         """
+        crs = "EPSG:4326"
         bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
         geo = gpd.GeoDataFrame({'geometry': [bbox]}, crs=crs)
         geo = geo.to_crs(crs=rasterio.crs.CRS.from_string(crs))
@@ -240,61 +232,23 @@ class GHSPOPDownloader:
                     dataset, geo.geometry, crop=True
                 )
 
-        return out_image, out_transform
+        return out_image, out_transform, crs, out_image.shape
 
     def get_population_area(self, bounding_box):
         """
         Download and process GHS-POP data for the given bounding box, converting it to EPSG:4326.
         """
-        self.remove_existing_directory()
+        self.__remove_existing_directory()
 
-        # Ensure bounding_box is an instance of BoundingBox
-        if not isinstance(bounding_box, BoundingBox):
-            raise ValueError("bounding_box must be an instance of BoundingBox")
-
-        bounds = bounding_box.transform_to_esri54009()
-
-        tiles_gdf = self.load_shapefile()
+        tiles_gdf = self.__load_shapefile()
 
         # Get necessary tiles for the area
-        tiles_to_download = self.get_tiles_for_bounds(bounds, tiles_gdf)
+        tiles_to_download = self.__get_tiles_for_bounds(bounding_box, tiles_gdf)
 
         if not tiles_to_download:
             raise ValueError("No tiles to download for the given bounds.")
 
-        ghs_data, ghs_transform, ghs_crs, ghs_shape = self.download_and_process_tiles(tiles_to_download, self)
-        ghs_data_cropped, ghs_transform_cropped = self.crop_bounds(ghs_data, ghs_transform, bounds)
-
-        # Estrarre i limiti della bounding box
-        left, bottom, right, top = bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y
-
-
-        # Calcolare la trasformazione corretta per EPSG:4326
-        dst_transform, width, height = calculate_default_transform(
-            ghs_crs, "EPSG:4326", ghs_shape[1], ghs_shape[0], left, bottom, right, top
-        )
-
-        # Crea un array vuoto per i dati riproiettati
-        ghs_data_4326 = np.empty((height, width), dtype=ghs_data_cropped.dtype)
-
-        # Riproietta i dati
-        reproject(
-            source=ghs_data_cropped,
-            destination=ghs_data_4326,
-            src_transform=ghs_transform_cropped,
-            src_crs=ghs_crs,
-            dst_transform=dst_transform,
-            dst_crs="EPSG:4326",
-            resampling=RasterioResampling.bilinear
-        )
-
-        output_tif_path = "ghs_pop_cropped.tif"
-
-        # Salva il raster riproiettato
-        with rasterio.open(output_tif_path, 'w', driver='GTiff',
-                           height=height, width=width,
-                           count=1, dtype=ghs_data_4326.dtype,
-                           crs="EPSG:4326", transform=dst_transform) as dst:
-            dst.write(ghs_data_4326, 1)
-
-        return ghs_data_4326, dst_transform, "EPSG:4326", (height, width)
+        ghs_data, ghs_transform, ghs_crs, ghs_shape = self.__download_and_process_tiles(tiles_to_download)
+        ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped = self.__crop_bounds(ghs_data, ghs_transform, bounding_box)
+        ghs_data_cropped = np.squeeze(ghs_data_cropped, axis=0)
+        return ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped
