@@ -4,7 +4,7 @@ import numpy as np
 import rasterio
 from rasterio.features import rasterize
 
-class DetailLevelAdjustment:
+class LandUtils:
 
     def adjust_detail_level(self, copernicus_area, ghspop_area):
         """
@@ -105,10 +105,10 @@ class DetailLevelAdjustment:
         shapes = [(geom, 1) for geom in osm_layer.geometry if geom is not None]
 
         # Create an empty raster with the same shape as the reference raster
-        rasterized_buildings = np.zeros(ref_shape, dtype=np.uint8)
+        rasterized = np.zeros(ref_shape, dtype=np.uint8)
 
         # Rasterize the vector data
-        rasterized_buildings = rasterize(
+        rasterized= rasterize(
             shapes=shapes,
             out_shape=ref_shape,
             transform=ref_transform,
@@ -117,22 +117,8 @@ class DetailLevelAdjustment:
             all_touched=True
         )
 
-        # Save the rasterized buildings to a GeoTIFF file
-        with rasterio.open(
-                "osm_buildings_rasterized.tif",
-                'w',
-                driver='GTiff',
-                height=ref_shape[0],
-                width=ref_shape[1],
-                count=1,
-                dtype=rasterized_buildings.dtype,
-                crs=ref_crs,
-                transform=ref_transform,
-        ) as dst:
-            dst.write(rasterized_buildings, 1)
-
         return {
-            "data": rasterized_buildings,
+            "data": rasterized,
             "transform": ref_transform,
             "crs": ref_crs,
             "shape": ref_shape

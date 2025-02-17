@@ -1,7 +1,7 @@
 import json
 import geopandas as gpd
 import osmnx as ox
-from shapely.geometry import box, Point, mapping
+from shapely.geometry import box, Point, mapping, shape, Polygon
 import pyproj
 from pyproj import CRS, Transformer, exceptions
 
@@ -29,18 +29,52 @@ class BoundingBox:
         self.max_y = center_y + size_deg
         return self.to_geometry()
 
+    # def __from_geojson(self, geojson):
+    #     geom = json.loads(geojson)
+    #     geometry = shape(geom['features'][0]['geometry'])
+    #     bbox = geometry.bounds
+    #     self.min_x, self.min_y, self.max_x, self.max_y = bbox
+    #     return geometry
+
     def __from_geojson(self, geojson):
-        geom = json.loads(geojson)
-        bbox = box(*geom['bbox'])
-        self.min_x, self.min_y, self.max_x, self.max_y = bbox.bounds
-        return bbox
+        min_x, min_y, max_x, max_y = float('inf'), float('inf'), float('-inf'), float('-inf')
+
+        def update_min_max(coords):
+            nonlocal min_x, min_y, max_x, max_y
+            for x, y in coords:
+                min_x = min(min_x, x)
+                min_y = min(min_y, y)
+                max_x = max(max_x, x)
+                max_y = max(max_y, y)
+
+        if geojson['type'] == 'FeatureCollection':
+            for feature in geojson['features']:
+                if feature['geometry']['type'] == 'Polygon':
+                    for ring in feature['geometry']['coordinates']:
+                        update_min_max(ring)
+        elif geojson['type'] == 'Feature':
+            if geojson['geometry']['type'] == 'Polygon':
+                for ring in geojson['geometry']['coordinates']:
+                    update_min_max(ring)
+        elif geojson['type'] == 'Polygon':
+            for ring in geojson['coordinates']:
+                update_min_max(ring)
+        else:
+            raise ValueError(f"Tipo GeoJSON non supportato: {geojson['type']}")
+
+        self.min_x = min_x
+        self.min_y = min_y
+        self.max_x = max_x
+        self.max_y = max_y
+
+        self.polygon = Polygon(
+            [(self.min_x, self.min_y), (self.max_x, self.min_y), (self.max_x, self.max_y), (self.min_x, self.max_y)])
 
     def to_geometry(self):
         return box(self.min_x, self.min_y, self.max_x, self.max_y)
 
     def to_geojson(self):
-        return mapping(self.to_geometry())
-
+        return json.loads(json.dumps(mapping(self.polygon)))
 
     def __get_coordinates(self, query, is_address=True):
         if is_address:
@@ -63,23 +97,23 @@ class BoundingBox:
                 return None
 
     def get_bounding_box(self, query, method, is_address=True, **kwargs):
-        coords = self.__get_coordinates(query, is_address=is_address)
-        center_point = Point(coords[1], coords[0])  # (longitude, latitude)
+        if method == 'from_geojson':
+            geojson = kwargs.get('geojson')
+            return self.__from_geojson(geojson)
 
         if method == 'from_center_radius':
+            coords = self.__get_coordinates(query, is_address=is_address)
+            center_point = Point(coords[1], coords[0])
             radius_km = kwargs.get('radius_km', 10)
-            self.__from_center_radius(center_point.x, center_point.y, radius_km)
+            return self.__from_center_radius(center_point.x, center_point.y, radius_km)
+
         elif method == 'from_coordinates':
             min_x = kwargs.get('min_x')
             min_y = kwargs.get('min_y')
             max_x = kwargs.get('max_x')
             max_y = kwargs.get('max_y')
-            self.__from_coordinates(min_x, min_y, max_x, max_y)
-        elif method == 'from_geojson':
-            geojson = kwargs.get('geojson')
-            self.__from_geojson(geojson)
+            return self.__from_coordinates(min_x, min_y, max_x, max_y)
 
-        return self
 
     def transform_to_esri54009(self):
         crs_esri_54009 = pyproj.CRS.from_string("ESRI:54009")

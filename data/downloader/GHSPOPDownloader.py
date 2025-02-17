@@ -16,7 +16,7 @@ from shapely.geometry import box
 ox.settings.use_cache = False
 
 class GHSPOPDownloader:
-    shapefile_path = "../tiling_schema/WGS84_tile_schema.shp"
+    shapefile_path = "../../tiling_schema/WGS84_tile_schema.shp"
 
     def __init__(self, address, extracted_dir="extracted_files"):
         self.address = address
@@ -251,4 +251,4 @@ class GHSPOPDownloader:
         ghs_data, ghs_transform, ghs_crs, ghs_shape = self.__download_and_process_tiles(tiles_to_download)
         ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped = self.__crop_bounds(ghs_data, ghs_transform, bounding_box)
         ghs_data_cropped = np.squeeze(ghs_data_cropped, axis=0)
-        return ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped
+        return {"data":ghs_data_cropped, "transform":ghs_transform_cropped, "crs": ghs_crs_cropped,"shape": ghs_shape_cropped}

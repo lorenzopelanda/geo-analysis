@@ -1,10 +1,9 @@
 import os
 os.environ["PROJ_LIB"] = "/home/lorenzo/miniconda3/envs/geodata_env/share/proj"
-from data.BoundingBox import BoundingBox
-from data.CopernicusDownloader import CopernicusDownloader
-from data.DetailLevelAdjustment import DetailLevelAdjustment
-from data.GHSPOPDownloader import GHSPOPDownloader
-from data.OSMDownloader import OSMDownloader
+from data.boundingbox.BoundingBox import BoundingBox
+from data.downloader.CopernicusDownloader import CopernicusDownloader
+from data.utils.LandUtils import LandUtils
+from data.downloader.OSMDownloader import OSMDownloader
 
 
 def main():
@@ -33,12 +32,14 @@ def main():
     # )
     # ghspop_area = ghs_pop.get_population_area(bounding_box_instance)
 
-    detail_adjuster = DetailLevelAdjustment()
+    detail_adjuster = LandUtils()
     #detail_adjuster.adjust_detail_level(copernicus_area, ghspop_area)
 
     osm_area = OSMDownloader()
-    osm_area = osm_area.get_vector_area(bounding_box=bounding_box, tags={"building": True})
-    osm_raster = detail_adjuster.vector_to_raster(osm_area, copernicus_area)
+    osm_area_building = osm_area.get_vector_area(bounding_box=bounding_box, tags="building")
+    osm_bus = osm_area.get_traffic_area(bounding_box=bounding_box, network_type ="all_public", reference_raster=copernicus_area)
+
+    osm_building_raster = detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)
 
 
 

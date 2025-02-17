@@ -1,8 +1,8 @@
 import os
 os.environ["PROJ_LIB"] = "/home/lorenzo/miniconda3/envs/geodata_env/share/proj"
-from data.BoundingBox import BoundingBox
-from data.CopernicusDownloader import CopernicusDownloader
-from data.LandUseAnalyzer import LandUseAnalyzer
+from data.boundingbox.BoundingBox import BoundingBox
+from data.downloader.CopernicusDownloader import CopernicusDownloader
+from data.utils.LandUseAnalyzer import LandUseAnalyzer
 
 
 def main():
