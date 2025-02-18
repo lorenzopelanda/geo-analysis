@@ -4,20 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Finishied to make a level details adjustment methods for GHSPOP and Copernicus bounds. Made a method to have a raster file of the vector one">
-      <change afterPath="$PROJECT_DIR$/data/boundingbox/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/downloader/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/examples/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/examples/example_downloader.ipynb" afterDir="false" />
+    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Rearranged classes and packages. Added the traffic OSM area and a method to convert from OSM to raster">
+      <change afterPath="$PROJECT_DIR$/data/utils/BoundingBoxUtils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/examples/example_copernicus.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/examples/example_ghspop.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/examples/example_osm.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/BoundingBox.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/boundingbox/BoundingBox.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CopernicusDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/CopernicusDownloader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/DetailLevelAdjustment.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/GHSPOPDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/GHSPOPDownloader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/LandUseAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUseAnalyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/OSMDownloader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/boundingbox/BoundingBox.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/boundingbox/BoundingBox.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/downloader/CopernicusDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/CopernicusDownloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/downloader/GHSPOPDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/GHSPOPDownloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/utils/LandUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/examples/example_downloader.ipynb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test/test_area_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_area_download.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/test_land.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_land.py" afterDir="false" />
     </list>
@@ -29,8 +27,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jupyter Notebook" />
         <option value="Python Script" />
+        <option value="Jupyter Notebook" />
       </list>
     </option>
   </component>
@@ -257,6 +255,20 @@
       <workItem from="1739817387101" duration="453000" />
       <workItem from="1739817861141" duration="631000" />
       <workItem from="1739818502532" duration="233000" />
+      <workItem from="1739818743974" duration="348000" />
+      <workItem from="1739874849293" duration="305000" />
+      <workItem from="1739875170002" duration="372000" />
+      <workItem from="1739875554637" duration="3065000" />
+      <workItem from="1739878628186" duration="327000" />
+      <workItem from="1739887928999" duration="5073000" />
+      <workItem from="1739893505752" duration="1298000" />
+      <workItem from="1739894818959" duration="233000" />
+      <workItem from="1739895065314" duration="280000" />
+      <workItem from="1739895356690" duration="286000" />
+      <workItem from="1739895653521" duration="2440000" />
+      <workItem from="1739898808121" duration="1453000" />
+      <workItem from="1739900270291" duration="4393000" />
+      <workItem from="1739904716630" duration="1730000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -346,7 +358,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739621694811</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Rearranged classes and packages. Added the traffic OSM area and a method to convert from OSM to raster">
+      <option name="closed" value="true" />
+      <created>1739819068544</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1739819068544</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,13 +405,14 @@
     <MESSAGE value="finished resizing and cropping GHSPOP raster and Copernicus raster, now the details level and area equals" />
     <MESSAGE value="Added LandUseAnalyzer class to analyze tha land cover. Resampled the GHSPOPDownloader class to have more quality" />
     <MESSAGE value="Finishied to make a level details adjustment methods for GHSPOP and Copernicus bounds. Made a method to have a raster file of the vector one" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finishied to make a level details adjustment methods for GHSPOP and Copernicus bounds. Made a method to have a raster file of the vector one" />
+    <MESSAGE value="Rearranged classes and packages. Added the traffic OSM area and a method to convert from OSM to raster" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rearranged classes and packages. Added the traffic OSM area and a method to convert from OSM to raster" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/geo_analysis$test_raster_download.coverage" NAME="test_raster_download Coverage Results" MODIFIED="1737113451449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/geo_analysis$test_import.coverage" NAME="test_import Coverage Results" MODIFIED="1736934593388" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/geo_analysis$test_ghspop_download.coverage" NAME="test_ghspop_download Coverage Results" MODIFIED="1736935702087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
-    <SUITE FILE_PATH="coverage/geo_analysis$test_land.coverage" NAME="test_land Coverage Results" MODIFIED="1739620601602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
-    <SUITE FILE_PATH="coverage/geo_analysis$test_area_download.coverage" NAME="test_area_download Coverage Results" MODIFIED="1739813348045" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/geo_analysis$test_land.coverage" NAME="test_land Coverage Results" MODIFIED="1739890984260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/geo_analysis$test_area_download.coverage" NAME="test_area_download Coverage Results" MODIFIED="1739903473488" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
   </component>
 </project>

@@ -3,6 +3,7 @@ os.environ["PROJ_LIB"] = "/home/lorenzo/miniconda3/envs/geodata_env/share/proj"
 from data.boundingbox.BoundingBox import BoundingBox
 from data.downloader.CopernicusDownloader import CopernicusDownloader
 from data.utils.LandUtils import LandUtils
+from data.downloader.GHSPOPDownloader import GHSPOPDownloader
 from data.downloader.OSMDownloader import OSMDownloader
 
 
@@ -21,7 +22,7 @@ def main():
     # bbox = get_bounding_box(query="Piazza Castello, Torino", method="from_geojson", geojson=geojson_data)
     bbox = BoundingBox()
     bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
-
+    #
     copernicus_area = copernicus_downloader.download_raster_area(
         bounding_box,
         use_oidc=False
@@ -31,15 +32,21 @@ def main():
     #     address="Piazza Castello, Torino"
     # )
     # ghspop_area = ghs_pop.get_population_area(bounding_box_instance)
+    #
 
-    detail_adjuster = LandUtils()
-    #detail_adjuster.adjust_detail_level(copernicus_area, ghspop_area)
-
+    #
     osm_area = OSMDownloader()
-    osm_area_building = osm_area.get_vector_area(bounding_box=bounding_box, tags="building")
-    osm_bus = osm_area.get_traffic_area(bounding_box=bounding_box, network_type ="all_public", reference_raster=copernicus_area)
+    osm_area_building = osm_area.get_traffic_area(
+        bounding_box=bounding_box,
+        network_type="all_public"
+    )
+    detail_adjuster = LandUtils()
+    detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)
+    #osm_bus = osm_area.get_traffic_area(bounding_box=bounding_box, network_type ="all_public", reference_raster=copernicus_area)
 
-    osm_building_raster = detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)
+    #osm_building_raster = detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)
+
+
 
 
 

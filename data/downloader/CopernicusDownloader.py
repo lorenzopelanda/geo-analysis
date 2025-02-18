@@ -60,4 +60,10 @@ class CopernicusDownloader:
                 copernicus_crs = dataset.crs
                 copernicus_shape = dataset.shape
 
-        return {"data":data, "transform": copernicus_transform, "crs":copernicus_crs, "shape":copernicus_shape}
+        return {
+            "data": data,
+            "transform": copernicus_transform,
+            "crs": copernicus_crs,
+            "shape": copernicus_shape
+        }
+
