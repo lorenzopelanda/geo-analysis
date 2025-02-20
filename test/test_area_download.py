@@ -36,12 +36,12 @@ def main():
 
     #
     osm_area = OSMDownloader()
-    osm_area_building = osm_area.get_traffic_area(
+    osm_area_traffic = osm_area.get_traffic_area(
         bounding_box=bounding_box,
         network_type="all_public"
     )
     detail_adjuster = LandUtils()
-    detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)
+    detail_adjuster.vector_to_raster(osm_area_traffic, copernicus_area)
     #osm_bus = osm_area.get_traffic_area(bounding_box=bounding_box, network_type ="all_public", reference_raster=copernicus_area)
 
     #osm_building_raster = detail_adjuster.vector_to_raster(osm_area_building, copernicus_area)

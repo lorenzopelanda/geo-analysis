@@ -1,6 +1,7 @@
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 import numpy as np
 import rasterio
+import requests
 from rasterio.features import rasterize
 
 
@@ -153,5 +154,51 @@ class LandUtils:
             'transform': transform
         }
 
+    def get_coordinates_from_address(self, address):
+        """
+        Get the latitude and longitude coordinates for a given address.
+        """
 
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            "q": address,
+            "format": "json",
+            "limit": 1
+        }
+        headers = {
+            "User-Agent": "GeoAnalysis/1.0 (geodatalibrary@gmail.com)"
+        }
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+        if data:
+            lat = float(data[0]["lat"])
+            lon = float(data[0]["lon"])
+            return lat, lon
+        else:
+            raise ValueError("Address not found")
+
+    def get_address_from_coordinates(self, lat, lon):
+        """
+        Get the address for given latitude and longitude coordinates.
+        """
+        url = "https://nominatim.openstreetmap.org/reverse"
+        params = {
+            "lat": lat,
+            "lon": lon,
+            "format": "json"
+        }
+        headers = {
+            "User-Agent": "GeoAnalysis/1.0 (geodatalibrary@gmail.com)"
+        }
+
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+        if "display_name" in data:
+            return data["display_name"]
+        else:
+            raise ValueError("Address not found for the given coordinates")
 

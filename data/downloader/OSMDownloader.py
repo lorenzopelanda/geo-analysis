@@ -1,13 +1,5 @@
 import osmnx as ox
-import rasterio
 import geopandas as gpd
-import numpy as np
-import pandas as pd
-from rasterio.features import rasterize
-from shapely.geometry import box
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-ox.settings.overpass_url = "https://overpass.kumi.systems/api/interpreter"
 
 class OSMDownloader:
 
@@ -34,20 +26,23 @@ class OSMDownloader:
         """
         aoi_box = bounding_box.to_geometry()
 
-        # Download the OSM network data
-        if network_type in ["bus", "tram", "train", "subway"]:
-            tags = {"route": ["bus", "tram", "train", "subway"]}
-            gdf = ox.features_from_polygon(aoi_box, tags=tags)
-        else:
-            graph = ox.graph_from_polygon(aoi_box, network_type, simplify=True)
+        graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
 
-        # Convert the graph to Geodataframe
-        if network_type in ["bus", "tram", "train", "subway"]:
-            osm_area = gpd.clip(gdf, aoi_box)
-        else:
-            edges = ox.graph_to_gdfs(graph, nodes=False, edges=True)
+        if graph is None:
+            print("Failed to create graph")
+            return None
 
-            # Clip the geometries to the AOI
-            osm_area = gpd.clip(edges, aoi_box)
+        # Convert graph to GeoDataFrames
+        nodes, edges = ox.graph_to_gdfs(graph, nodes=True, edges=True)
+        # Clip to AOI
+        nodes = gpd.clip(nodes, aoi_box)
+        edges = gpd.clip(edges, aoi_box)
+        # Add coordinates
+        nodes['x'] = nodes.geometry.x
+        nodes['y'] = nodes.geometry.y
 
-        return osm_area
+        if nodes.empty or edges.empty:
+            print("Warning: Empty nodes or edges after processing")
+            return None
+
+        return (nodes, edges)
