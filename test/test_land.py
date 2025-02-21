@@ -8,6 +8,7 @@ from data.utils.LandUtils import LandUtils
 from data.utils.BoundingBoxUtils import BoundingBoxUtils
 from data.utils.GreenAreaFinder import GreenAreaFinder
 from data.downloader.OSMDownloader import OSMDownloader
+from data.downloader.GHSPOPDownloader import GHSPOPDownloader
 
 
 def main():
@@ -25,25 +26,33 @@ def main():
          bounding_box,
          use_oidc=False
     )
-    osm_area = OSMDownloader()
-    osm_area = osm_area.get_traffic_area(
-        bounding_box=bounding_box,
-        network_type="walk"
-    )
+    # osm_area = OSMDownloader()
+    # osm_area = osm_area.get_traffic_area(
+    #     bounding_box=bounding_box,
+    #     network_type="walk"
+    # )
 
-    address = "Via Antonio Bertola 48/C, Torino"
-    lat, lon = LandUtils().get_coordinates_from_address(address)
-    print(lat, lon)
-    green_area_finder = GreenAreaFinder(
-        copernicus_area,
-        osm_area
+    ghspop = GHSPOPDownloader(
+        address="Piazza Castello, Torino",
+        shapefile="../tiling_schema/WGS84_tile_schema.shp"
     )
-    distance = green_area_finder.direction_to_green(lat, lon, "walk")
-    distance = json.loads(distance)
-    minute = distance['estimated_time_minutes']
-    distance_km = distance['distance_km']
-    print(f"Estimated time to the nearest green area: {minute} minutes")
-    print(f"Distance to the nearest green area: {distance_km} km")
+    ghspop_area = ghspop.get_population_area(bounding_box)
+    ghs_pop_resized = LandUtils().adjust_detail_level(copernicus_area, ghspop_area)
+    #address = "Via Antonio Bertola 48/C, Torino"
+    #lat, lon = LandUtils().get_coordinates_from_address(address)
+
+    # green_area_finder = GreenAreaFinder(
+    #     copernicus_area,
+    #     osm_area
+    # )
+    latitude, longitude = LandUtils().get_coordinates_max_population(ghs_pop_resized)
+    print(f"Coordinates with the highest number of people: {latitude}, {longitude}")
+    # distance = green_area_finder.direction_to_green(lat, lon, "walk")
+    # distance = json.loads(distance)
+    # minute = distance['estimated_time_minutes']
+    # distance_km = distance['distance_km']
+    # print(f"Estimated time to the nearest green area: {minute} minutes")
+    # print(f"Distance to the nearest green area: {distance_km} km")
 
     #raster_data_ESRI54009 = LandUtils().transform_raster_to_crs(copernicus_area['data'],copernicus_area['transform'], copernicus_area['crs'],copernicus_area['shape'], "ESRI:54009")
     #print(raster_data_ESRI54009['crs'])

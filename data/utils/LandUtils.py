@@ -11,6 +11,8 @@ class LandUtils:
         Get population data for a given area using Target and Source data,
         ensuring both outputs have matching resolution and extent.
         """
+        # target_area the most defined
+        # source_area the less defined to adjust to target_area
         target_data= target_area['data']
         target_transform = target_area['transform']
         target_crs = target_area['crs']
@@ -29,8 +31,6 @@ class LandUtils:
         else:
             raise ValueError(f"Unexpected shape for: {target_shape}")
 
-        target_transform = target_transform
-
         # Create an empty array for the resampled Source data
         source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
 
@@ -45,26 +45,13 @@ class LandUtils:
             resampling=Resampling.bilinear
         )
 
-        # Handle Target data dimensions
-        if target_data.ndim == 4:
-            target_data = target_data[0, 0, :, :]
-        elif target_data.ndim == 3:
-            target_data = target_data[0, :, :]
-
         return {
-            "target": {
-                "data": target_data,
-                "transform": target_transform,
-                "crs": target_crs,
-                "shape": target_shape
-            },
-            "source": {
                 "data": source_resampled,
                 "transform": target_transform,
                 "crs": target_crs,
                 "shape": (target_height, target_width)
             }
-        }
+
 
     def vector_to_raster(self, vector_layer, reference_raster):
         """
@@ -201,4 +188,17 @@ class LandUtils:
             return data["display_name"]
         else:
             raise ValueError("Address not found for the given coordinates")
+
+    def get_coordinates_max_population(self, ghs_pop):
+        """
+        Get the coordinates of the cell with the maximum population.
+        """
+        data = ghs_pop['data']
+        transform = ghs_pop['transform']
+
+        idx = np.unravel_index(np.argmax(data, axis=None), data.shape)
+
+        lon, lat = rasterio.transform.xy(transform, idx[0], idx[1])
+
+        return (lat, lon)
 
