@@ -2,7 +2,6 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
-from scipy.spatial import cKDTree
 ox.settings.use_cache = True
 
 class GreenAreaFinder:
@@ -86,48 +85,68 @@ class GreenAreaFinder:
     def get_nearest_green_position(self, lat, lon, green_areas=None):
         """
         Find the nearest green area to the given coordinates.
-        It uses the Copernicus raster, it is optimised for large datasets.
         """
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
-            raise ValueError("Coordinates must be valid")
+            raise ValueError("Coordinate non valide")
 
-        # Costants for green areas in the Copernicus raster
+        # Costants for Copernicus data
         if green_areas is None:
             green_areas = frozenset([10, 20, 30, 60, 95, 100])
 
         data = self.copernicus_raster['data']
         transform = self.copernicus_raster['transform']
 
-        # Convert coordinates to raster indices
+        # Translate coordinates to raster indices
         row, col = [int(i) for i in ~transform * (lon, lat)]
 
         # Check if the point is outside the raster bounds
         if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
-            raise IndexError("Point outside raster bounds")
+            raise IndexError("Starting point outside raster bounds")
 
-        # Check if point is already in a green area
+        # Check if the point is already in a green area
         if data[row, col] in green_areas:
             return lat, lon
 
-        # Create a mask for green areas
         green_mask = np.isin(data, list(green_areas))
         green_indices = np.argwhere(green_mask)
 
-        # Optimize the ouput for large datasets
-        if len(green_indices) > 10000:
-            step = len(green_indices) // 10000
-            green_indices = green_indices[::step]
+        # translation of the indices in geographic coordinates
+        # Sorting the green indices to make the distances deterministic
+        green_indices_sorted = sorted(green_indices, key=lambda x: (x[0], x[1]))
 
-        # Converts green indices to geographic coordinates
         green_coords = np.array([
             rasterio.transform.xy(transform, idx[0], idx[1])
-            for idx in green_indices
+            for idx in green_indices_sorted
         ])
 
-        # Find the nearest green area
-        tree = cKDTree(green_coords)
-        _, idx = tree.query((lon, lat))
-        longitude, latitude = green_coords[idx]
+        # Find the distance with haversine
+        def haversine_distance(lon1, lat1, lon2, lat2):
+            """
+            Calculate the haversine distance between two points in km.
+            """
+            from math import radians, sin, cos, sqrt, atan2
+
+            R = 6371  # Earth radius in km
+
+            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+            dlat = lat2 - lat1
+            dlon = lon2 - lon1
+
+            a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+            c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+            return R * c
+
+        distances = [
+            haversine_distance(lon, lat, green_coord[0], green_coord[1])
+            for green_coord in green_coords
+        ]
+
+        # Find the smallest distance
+        nearest_index = min(range(len(distances)), key=lambda i: distances[i])
+
+        longitude, latitude = green_coords[nearest_index]
 
         return (latitude, longitude)
 
@@ -188,7 +207,7 @@ class GreenAreaFinder:
         # Calculate the total time of the path
         total_time_minutes = self.calculate_travel_time(total_distance_meters, transport_mode)
 
-        return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes})
+        return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat, "lon": nearest_lon})
 
 
     def get_isochrone_green(self, lat, lon, max_time, network_type):

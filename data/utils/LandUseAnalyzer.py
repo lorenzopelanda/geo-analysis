@@ -1,8 +1,5 @@
-import rasterio
 import numpy as np
 import json
-from collections import Counter
-
 
 class LandUseAnalyzer:
 

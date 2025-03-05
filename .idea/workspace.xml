@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Added function to get the point with max density of people">
+    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Added function for area per person and green area reachable">
+      <change afterPath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/GreenAreaFinder.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/GreenAreaFinder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/utils/LandUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_land.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_land.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/utils/LandUseAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUseAnalyzer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +18,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jupyter Notebook" />
         <option value="Python Script" />
+        <option value="Jupyter Notebook" />
       </list>
     </option>
   </component>
@@ -343,7 +343,11 @@
       <workItem from="1741013835221" duration="1318000" />
       <workItem from="1741113038231" duration="2763000" />
       <workItem from="1741115817583" duration="1600000" />
-      <workItem from="1741162445641" duration="3820000" />
+      <workItem from="1741162445641" duration="5764000" />
+      <workItem from="1741169768983" duration="1126000" />
+      <workItem from="1741170915081" duration="1026000" />
+      <workItem from="1741171953542" duration="1747000" />
+      <workItem from="1741187488363" duration="3509000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -465,7 +469,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740154515795</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Added function for area per person and green area reachable">
+      <option name="closed" value="true" />
+      <created>1741166276655</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1741166276655</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -508,7 +520,8 @@
     <MESSAGE value="Finished working on getting OSM data.Added some utils methods and some examples" />
     <MESSAGE value="Added initial functions to calculate and to reach the nearest natural area" />
     <MESSAGE value="Added function to get the point with max density of people" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added function to get the point with max density of people" />
+    <MESSAGE value="Added function for area per person and green area reachable" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added function for area per person and green area reachable" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/geo_analysis$test_raster_download.coverage" NAME="test_raster_download Coverage Results" MODIFIED="1737113451449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
