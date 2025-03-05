@@ -52,7 +52,6 @@ class LandUtils:
                 "shape": (target_height, target_width)
             }
 
-
     def vector_to_raster(self, vector_layer, reference_raster):
         """
         Convert a vector area into a raster with the same resolution and extent as a reference raster.

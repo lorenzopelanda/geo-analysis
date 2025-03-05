@@ -26,11 +26,11 @@ def main():
          bounding_box,
          use_oidc=False
     )
-    # osm_area = OSMDownloader()
-    # osm_area = osm_area.get_traffic_area(
-    #     bounding_box=bounding_box,
-    #     network_type="walk"
-    # )
+    osm_area = OSMDownloader()
+    osm_area = osm_area.get_traffic_area(
+        bounding_box=bounding_box,
+        network_type="walk"
+    )
 
     ghspop = GHSPOPDownloader(
         address="Piazza Castello, Torino",
@@ -41,18 +41,40 @@ def main():
     #address = "Via Antonio Bertola 48/C, Torino"
     #lat, lon = LandUtils().get_coordinates_from_address(address)
 
-    # green_area_finder = GreenAreaFinder(
-    #     copernicus_area,
-    #     osm_area
-    # )
-    latitude, longitude = LandUtils().get_coordinates_max_population(ghs_pop_resized)
-    print(f"Coordinates with the highest number of people: {latitude}, {longitude}")
-    # distance = green_area_finder.direction_to_green(lat, lon, "walk")
-    # distance = json.loads(distance)
-    # minute = distance['estimated_time_minutes']
-    # distance_km = distance['distance_km']
-    # print(f"Estimated time to the nearest green area: {minute} minutes")
-    # print(f"Distance to the nearest green area: {distance_km} km")
+    #lat, lon = 45.071526, 7.681753 #Via Barbaroux 12, Torino
+    lat, lon = 45.072710, 7.679646
+    print(f"Coordinates for the starting point: {lat}, {lon}")
+    #lat,lon = 45.085309, 7.631144
+
+    green_area_finder = GreenAreaFinder(
+        copernicus_area,
+        osm_area,
+        ghs_pop_resized,
+    )
+
+    # population_green_ratio = green_area_finder.green_area_per_person()
+    # print(f"Green area / population: {population_green_ratio}")
+
+    # isochrone_area = green_area_finder.get_isochrone_green(lat, lon, 12, "walk")
+    # print("Raw output:", isochrone_area)  # Stampa l'output prima della conversione
+    # isochrone_area = json.loads(isochrone_area)
+    # print("Parsed JSON:", isochrone_area)  # Stampa il dizionario convertito
+    # time = isochrone_area.get("isochrone_time_minutes")  # Usa .get() per evitare KeyError
+    # print("Time:", time)
+    # green_area_percentage = isochrone_area["green_area_percentage"]
+    # areasq = isochrone_area["green_area_sqm"]
+    # print(f"Time max to reach the green area: {time} minutes")
+    # print(f"Green area percentage: {green_area_percentage}%")
+    # print(f"Green area in sqm walked: {areasq} sqm")
+
+    #latitude, longitude = LandUtils().get_coordinates_max_population(ghs_pop_resized)
+    # print(f"Coordinates with the highest number of people: {latitude}, {longitude}")
+    distance = green_area_finder.direction_to_green(lat, lon, "walk")
+    distance = json.loads(distance)
+    minute = distance['estimated_time_minutes']
+    distance_km = distance['distance_km']
+    print(f"Estimated time to the nearest green area: {minute} minutes")
+    print(f"Distance to the nearest green area: {distance_km} km")
 
     #raster_data_ESRI54009 = LandUtils().transform_raster_to_crs(copernicus_area['data'],copernicus_area['transform'], copernicus_area['crs'],copernicus_area['shape'], "ESRI:54009")
     #print(raster_data_ESRI54009['crs'])
