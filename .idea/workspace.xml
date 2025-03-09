@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Added function for area per person and green area reachable">
-      <change afterPath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" afterDir="false" />
+    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Finished the example for GreenAreaFinder class">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/downloader/GHSPOPDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/GHSPOPDownloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/utils/BoundingBoxUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/BoundingBoxUtils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/GreenAreaFinder.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/GreenAreaFinder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/utils/LandUseAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUseAnalyzer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -347,7 +347,8 @@
       <workItem from="1741169768983" duration="1126000" />
       <workItem from="1741170915081" duration="1026000" />
       <workItem from="1741171953542" duration="1747000" />
-      <workItem from="1741187488363" duration="3509000" />
+      <workItem from="1741187488363" duration="3537000" />
+      <workItem from="1741532999107" duration="4694000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -477,7 +478,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741166276655</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Finished the example for GreenAreaFinder class">
+      <option name="closed" value="true" />
+      <created>1741191021268</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1741191021268</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -521,7 +530,8 @@
     <MESSAGE value="Added initial functions to calculate and to reach the nearest natural area" />
     <MESSAGE value="Added function to get the point with max density of people" />
     <MESSAGE value="Added function for area per person and green area reachable" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added function for area per person and green area reachable" />
+    <MESSAGE value="Finished the example for GreenAreaFinder class" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished the example for GreenAreaFinder class" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/geo_analysis$test_raster_download.coverage" NAME="test_raster_download Coverage Results" MODIFIED="1737113451449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />

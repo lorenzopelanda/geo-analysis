@@ -41,33 +41,27 @@ class GreenAreaFinder:
         SPEEDS = {
             'walk': 1.4,  # 5 km/h
             'bike': 4.17,  # 15 km/h
-            'car': 8.33,  # 30 km/h (urban)
-            'bus': 5.56,  # 20 km/h
-            'tram': 6.94,  # 25 km/h
-            'metro': 13.89,  # 50 km/h
-            'taxi': 8.33  # as car
+            'drive': 8.33,  # 30 km/h (urban)
+            'all_public': 8.33, # 30 km/h
+            'drive_service': 8.33  # as drive
         }
 
         # Medium time of fixed delays in minutes
         FIXED_DELAYS = {
             'walk': 0,
             'bike': 30,  # take/return bike
-            'car': 180,  # parking + take the car
-            'bus': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'tram': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'metro': 300,  # walk to the stop (3 min) + estimated wait (2 min)
-            'taxi': 180  # wait + call
+            'drive': 180,  # parking + take the car
+            'all_public': 420,  # walk to the stop (3 min) + estimated wait (4 min)
+            'drive_service': 180  # wait + call
         }
 
         # Delay factors depending on traffic and semaphores
         DELAY_FACTORS = {
             'walk': 1.15,  # semaphores for pedestrians
             'bike': 1.2,  # semaphores and traffic
-            'car': 1.25,  # traffic and semaphores
-            'bus': 1.2,  # bus stopes and traffic
-            'tram': 1.15,  # tram stops and traffic
-            'metro': 1.0,  # no delay
-            'taxi': 1.25  # as car
+            'drive': 1.25,  # traffic and semaphores
+            'all_public': 1.10,  # traffic and semaphores
+            'drive_service': 1.25  # as drive
         }
 
         # Base speed and time calculation
@@ -220,7 +214,7 @@ class GreenAreaFinder:
         if not isinstance(max_time, (int, float)) or max_time <= 0:
             raise ValueError("Max time not valid")
 
-        valid_transport_modes = ['walk', 'bike', 'car', 'bus', 'tram', 'metro', 'taxi']
+        valid_transport_modes = ['walk', 'bike', 'drive', 'all_public', 'drive_public']
         if network_type not in valid_transport_modes:
             raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
 
@@ -233,26 +227,22 @@ class GreenAreaFinder:
         speed_kmh = {
             'walk': 5,
             'bike': 15,
-            'car': 30,
-            'bus': 20,
-            'tram': 25,
-            'metro': 50,
-            'taxi': 30
+            'drive': 30,
+            'all_public': 30,
+            'drive_public': 30
         }.get(network_type, 5)
 
         nodes, edges = self.vector_traffic_area
         G = ox.graph_from_gdfs(nodes, edges)  # Ristructure of the graph
-        # Find nearest node from strating point
+        # Find nearest node from starting point
         start_node, _ = ox.distance.nearest_nodes(G, X=lon, Y=lat, return_dist=True)
 
         FIXED_DELAYS = {
             'walk': 0,
             'bike': 30,  # take/return bike
-            'car': 180,  # parking + take the car
-            'bus': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'tram': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'metro': 300,  # walk to the stop (3 min) + estimated wait (2 min)
-            'taxi': 180  # wait + call
+            'drive': 180,  # parking + take the car
+            'all_public': 420,  # walk to the stop (3 min) + estimated wait (4 min)
+            'drive_public': 180  # wait + call
         }
 
         fixed_delay = FIXED_DELAYS.get(network_type, 0)
@@ -268,8 +258,8 @@ class GreenAreaFinder:
 
         for u, v, data in G.edges(data=True):
             if 'travel_time' not in data and 'length' in data:
-                lunghezza_m = data['length']
-                data['travel_time'] = lunghezza_m / (speed_kmh * 1000 / 3600)
+                length_m = data['length']
+                data['travel_time'] = length_m / (speed_kmh * 1000 / 3600)
 
         # Visit the graph to find reachable nodes
         reachable_nodes = {}
@@ -398,22 +388,18 @@ class GreenAreaFinder:
         SPEEDS = {
             'walk': 5 / 3.6,
             'bike': 15 / 3.6,
-            'car': 30 / 3.6,
-            'bus': 20 / 3.6,
-            'tram': 25 / 3.6,
-            'metro': 50 / 3.6,
-            'taxi': 30 / 3.6
+            'drive': 30 / 3.6,
+            'all_public': 30 / 3.6,
+            'drive_public': 30 / 3.6
         }
 
         # Delay factors
         DELAY_FACTORS = {
             'walk': 1.15,
             'bike': 1.2,
-            'car': 1.25,
-            'bus': 1.2,
-            'tram': 1.15,
-            'metro': 1.0,
-            'taxi': 1.25
+            'drive': 1.25,
+            'all_public': 1.10,
+            'drive_public': 1.25
         }
 
         # Get values for the transport mode

@@ -10,8 +10,9 @@ class BoundingBoxUtils:
         if bounding_box.polygon is None:
             bounding_box.polygon = bounding_box.to_geometry()
 
+        crs_src = pyproj.CRS.from_string(bounding_box.crs)
         crs_dest = pyproj.CRS.from_string(dst_crs)
-        transformer = Transformer.from_crs(CRS.from_epsg(4326), crs_dest, always_xy=True)
+        transformer = Transformer.from_crs(crs_src, crs_dest, always_xy=True)
         min_x, min_y = transformer.transform(bounding_box.min_x, bounding_box.min_y)
         max_x, max_y = transformer.transform(bounding_box.max_x, bounding_box.max_y)
 

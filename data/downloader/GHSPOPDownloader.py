@@ -13,7 +13,7 @@ from rasterio.io import MemoryFile
 from rasterio.merge import merge
 from shapely.geometry import box
 
-ox.settings.use_cache = False
+ox.settings.use_cache = True
 
 class GHSPOPDownloader:
     def __init__(self, address,shapefile, extracted_dir="extracted_files" ):
