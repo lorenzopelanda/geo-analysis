@@ -2,55 +2,141 @@ from rasterio.warp import reproject, Resampling, calculate_default_transform
 import numpy as np
 import rasterio
 import requests
+import json
 from rasterio.features import rasterize
 
 
 class LandUtils:
-    def adjust_detail_level(self, target_area, source_area):
+    # def adjust_detail_level(self, target_area, source_area):
+    #     """
+    #     Get population data for a given area using Target and Source data,
+    #     ensuring both outputs have matching resolution and extent.
+    #     """
+    #     # target_area the most defined
+    #     # source_area the less defined to adjust to target_area
+    #     target_data= target_area['data']
+    #     target_transform = target_area['transform']
+    #     target_crs = target_area['crs']
+    #     target_shape = target_area['shape']
+    #
+    #     source_data = source_area['data']
+    #     source_transform = source_area['transform']
+    #     source_crs = source_area['crs']
+    #     source_shape = source_area['shape']
+    #
+    #     # Handle different shapes of Target data
+    #     if len(target_shape) == 2:
+    #         target_height, target_width = target_shape
+    #     elif len(target_shape) == 3:
+    #         _, target_height, target_width = target_shape
+    #     else:
+    #         raise ValueError(f"Unexpected shape for: {target_shape}")
+    #
+    #     # Create an empty array for the resampled Source data
+    #     source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
+    #
+    #     # Reproject the Source data to match the Target resolution and extent
+    #     reproject(
+    #         source=source_data,
+    #         destination=source_resampled,
+    #         src_transform=source_transform,
+    #         src_crs=source_crs,
+    #         dst_transform=target_transform,
+    #         dst_crs=target_crs,
+    #         resampling=Resampling.bilinear
+    #     )
+    #
+    #     return {
+    #             "data": source_resampled,
+    #             "transform": target_transform,
+    #             "crs": target_crs,
+    #             "shape": (target_height, target_width)
+    #         }
+
+    def __init__(self, copernicus, osm, ghs_pop):
+        self.copernicus = copernicus
+        self.osm = osm
+        self.ghs_pop = ghs_pop
+
+
+    def adjust_detail_level(self):
         """
-        Get population data for a given area using Target and Source data,
-        ensuring both outputs have matching resolution and extent.
+
         """
-        # target_area the most defined
-        # source_area the less defined to adjust to target_area
-        target_data= target_area['data']
+        # Calculate pixel size/resolution for all areas
+        # Smaller pixel size = higher resolution
+        area_1_pixel_size = abs(self.copernicus['transform'][0] * self.copernicus['transform'][4])
+        area_2_pixel_size = abs(self.osm['transform'][0] * self.osm['transform'][4])
+        area_3_pixel_size = abs(self.ghs_pop['transform'][0] * self.ghs_pop['transform'][4])
+
+        # Determine which area has the highest resolution (smallest pixel size)
+        pixel_sizes = [(area_1_pixel_size, self.copernicus, 'copernicus'),
+                       (area_2_pixel_size, self.osm, 'osm'),
+                       (area_3_pixel_size, self.ghs_pop, 'ghs_pop')]
+        pixel_sizes.sort(key=lambda x: x[0])  # Sort by pixel size (ascending)
+
+        # The first element has the highest resolution (smallest pixel size)
+        target_area = pixel_sizes[0][1]
+
+        # Extract target data and metadata
         target_transform = target_area['transform']
         target_crs = target_area['crs']
         target_shape = target_area['shape']
 
-        source_data = source_area['data']
-        source_transform = source_area['transform']
-        source_crs = source_area['crs']
-        source_shape = source_area['shape']
-
-        # Handle different shapes of Target data
+        # Handle different shapes of target data
         if len(target_shape) == 2:
             target_height, target_width = target_shape
         elif len(target_shape) == 3:
             _, target_height, target_width = target_shape
         else:
-            raise ValueError(f"Unexpected shape for: {target_shape}")
+            raise ValueError(f"Unexpected shape for target: {target_shape}")
 
-        # Create an empty array for the resampled Source data
-        source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
+        # Initialize result dictionary
+        result = {
+            'copernicus': None,
+            'osm': None,
+            'ghs_pop': None,
+            'highest_res_area': pixel_sizes[0][2]  # Store which area had highest resolution
+        }
 
-        # Reproject the Source data to match the Target resolution and extent
-        reproject(
-            source=source_data,
-            destination=source_resampled,
-            src_transform=source_transform,
-            src_crs=source_crs,
-            dst_transform=target_transform,
-            dst_crs=target_crs,
-            resampling=Resampling.bilinear
-        )
+        # Process all areas (including the high-res one for consistency)
+        for pixel_size, area, area_name in pixel_sizes:
+            source_data = area['data']
+            source_transform = area['transform']
+            source_crs = area['crs']
 
-        return {
-                "data": source_resampled,
-                "transform": target_transform,
-                "crs": target_crs,
-                "shape": (target_height, target_width)
-            }
+            # If this is already the highest resolution area, just use the original data
+            if area_name == pixel_sizes[0][2]:
+                result[area_name] = {
+                    "data": source_data,
+                    "transform": target_transform,
+                    "crs": target_crs,
+                    "shape": (target_height, target_width)
+                }
+            else:
+                # Create an empty array for the resampled source data
+                source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
+
+                # Reproject the source data to match the target resolution and extent
+                reproject(
+                    source=source_data,
+                    destination=source_resampled,
+                    src_transform=source_transform,
+                    src_crs=source_crs,
+                    dst_transform=target_transform,
+                    dst_crs=target_crs,
+                    resampling=Resampling.bilinear
+                )
+
+                # Add the resampled data to the result with the original area name
+                result[area_name] = {
+                    "data": source_resampled,
+                    "transform": target_transform,
+                    "crs": target_crs,
+                    "shape": (target_height, target_width)
+                }
+
+        return result
 
     def vector_to_raster(self, vector_layer, reference_raster):
         """
@@ -200,4 +286,6 @@ class LandUtils:
         lon, lat = rasterio.transform.xy(transform, idx[0], idx[1])
 
         return (lat, lon)
+
+
 

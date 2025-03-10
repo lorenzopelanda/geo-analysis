@@ -12,10 +12,11 @@ import rasterio.mask
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
 from shapely.geometry import box
+from data.utils.UtilsInterface import DownloaderInterface
 
 ox.settings.use_cache = True
 
-class GHSPOPDownloader:
+class GHSPOPDownloader(DownloaderInterface):
     def __init__(self, address,shapefile, extracted_dir="extracted_files" ):
         self.address = address
         self.extracted_dir = extracted_dir
@@ -233,7 +234,7 @@ class GHSPOPDownloader:
 
         return out_image, out_transform, crs, out_image.shape
 
-    def get_population_area(self, bounding_box):
+    def get_data(self, bounding_box):
         """
         Download and process GHS-POP data for the given bounding box, converting it to EPSG:4326.
         """

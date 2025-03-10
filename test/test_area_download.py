@@ -11,7 +11,8 @@ def main():
     copernicus_downloader = CopernicusDownloader(
         client_id="sh-a24a739d-d123-419b-a409-81a190c436c2",
         client_secret="dcUnE32uBB1gLvlxyi3qOeUPdGGpNMRs",
-        token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token'
+        token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token',
+        use_oidc=False
     )
 
     # bbox = get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=10)
@@ -23,9 +24,8 @@ def main():
     bbox = BoundingBox()
     bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
     #
-    copernicus_area = copernicus_downloader.download_raster_area(
-        bounding_box,
-        use_oidc=False
+    copernicus_area = copernicus_downloader.get_data(
+        bounding_box
     )
 
     # ghs_pop = GHSPOPDownloader(

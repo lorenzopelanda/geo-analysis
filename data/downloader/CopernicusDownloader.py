@@ -2,13 +2,15 @@ import requests
 import openeo
 import tempfile
 import rasterio
+from data.utils.UtilsInterface import DownloaderInterface, GreenInterface
 
-class CopernicusDownloader:
-    def __init__(self, client_id=None, client_secret=None, token_url=None):
+class CopernicusDownloader(DownloaderInterface, GreenInterface):
+    def __init__(self, client_id=None, client_secret=None, token_url=None, use_oidc=False):
         self.client_id = client_id
         self.client_secret = client_secret
         self.token_url = token_url
         self.access_token = None
+        self.use_oidc = use_oidc
 
     def __get_token(self):
         if not self.client_id or not self.client_secret or not self.token_url:
@@ -26,9 +28,9 @@ class CopernicusDownloader:
         else:
             self.access_token = None
 
-    def __connect_to_openeo(self, use_oidc=False):
+    def __connect_to_openeo(self):
         connection = openeo.connect("https://openeo.dataspace.copernicus.eu")
-        if use_oidc:
+        if self.use_oidc:
             connection.authenticate_oidc()
         else:
             if not self.access_token:
@@ -36,8 +38,8 @@ class CopernicusDownloader:
             connection.authenticate_oidc()
         return connection
 
-    def download_raster_area(self, bounding_box, use_oidc=False):
-        connection = self.__connect_to_openeo(use_oidc=use_oidc)
+    def get_data(self, bounding_box):
+        connection = self.__connect_to_openeo()
 
         # Convert the geometry to GeoJSON
         aoi_geojson = bounding_box.to_geojson()
@@ -66,4 +68,5 @@ class CopernicusDownloader:
             "crs": copernicus_crs,
             "shape": copernicus_shape
         }
+
 

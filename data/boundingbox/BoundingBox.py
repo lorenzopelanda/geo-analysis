@@ -1,6 +1,8 @@
 import json
 import geopandas as gpd
 import osmnx as ox
+import pyproj
+from pyproj import Transformer
 from shapely.geometry import box, Point, mapping, Polygon
 
 class BoundingBox:
@@ -94,6 +96,23 @@ class BoundingBox:
         if self.polygon is None:
             self.polygon = self.to_geometry()
         return mapping(self.polygon)
+
+    def transform_to_crs(self, dst_crs):
+        """
+        Transform the bounding box to the specified CRS.
+        """
+        if self.polygon is None:
+            self.polygon = self.to_geometry()
+
+        crs_src = pyproj.CRS.from_string(self.crs)
+        crs_dest = pyproj.CRS.from_string(dst_crs)
+        transformer = Transformer.from_crs(crs_src, crs_dest, always_xy=True)
+        min_x, min_y = transformer.transform(self.min_x, self.min_y)
+        max_x, max_y = transformer.transform(self.max_x, self.max_y)
+
+        result = BoundingBox(min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y, crs=dst_crs)
+        result.polygon = result.to_geometry()
+        return result
 
     def get_bounding_box(self, query, method, is_address=True, **kwargs):
         if method == 'from_geojson':
