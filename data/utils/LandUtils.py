@@ -2,6 +2,7 @@ from rasterio.warp import reproject, Resampling, calculate_default_transform
 import numpy as np
 import rasterio
 import requests
+from shapely.geometry import Point, LineString
 import json
 from rasterio.features import rasterize
 
@@ -53,26 +54,23 @@ class LandUtils:
     #             "shape": (target_height, target_width)
     #         }
 
-    def __init__(self, copernicus, osm, ghs_pop):
-        self.copernicus = copernicus
-        self.osm = osm
-        self.ghs_pop = ghs_pop
-
-
-    def adjust_detail_level(self):
+    def adjust_detail_level(self, osm, copernicus, ghs_pop):
         """
 
         """
         # Calculate pixel size/resolution for all areas
         # Smaller pixel size = higher resolution
-        area_1_pixel_size = abs(self.copernicus['transform'][0] * self.copernicus['transform'][4])
-        area_2_pixel_size = abs(self.osm['transform'][0] * self.osm['transform'][4])
-        area_3_pixel_size = abs(self.ghs_pop['transform'][0] * self.ghs_pop['transform'][4])
+        if osm is None or copernicus is None or ghs_pop is None:
+            raise ValueError("One or more raster datasets are None. Check rasterization process.")
+
+        area_1_pixel_size = abs(copernicus['transform'][0] * copernicus['transform'][4])
+        area_2_pixel_size = abs(osm['transform'][0] * osm['transform'][4])
+        area_3_pixel_size = abs(ghs_pop['transform'][0] * ghs_pop['transform'][4])
 
         # Determine which area has the highest resolution (smallest pixel size)
-        pixel_sizes = [(area_1_pixel_size, self.copernicus, 'copernicus'),
-                       (area_2_pixel_size, self.osm, 'osm'),
-                       (area_3_pixel_size, self.ghs_pop, 'ghs_pop')]
+        pixel_sizes = [(area_1_pixel_size, copernicus, 'copernicus'),
+                       (area_2_pixel_size, osm, 'osm'),
+                       (area_3_pixel_size, ghs_pop, 'ghs_pop')]
         pixel_sizes.sort(key=lambda x: x[0])  # Sort by pixel size (ascending)
 
         # The first element has the highest resolution (smallest pixel size)
@@ -138,35 +136,36 @@ class LandUtils:
 
         return result
 
-    def vector_to_raster(self, vector_layer, reference_raster):
+    def vector_to_raster(self, vector_data, reference_raster):
         """
         Convert a vector area into a raster with the same resolution and extent as a reference raster.
 
         Parameters:
-            vector_layer (GeoDataFrame): A GeoDataFrame containing tag geometries from OpenStreetMap.
-            reference_raster (tuple): A tuple containing the reference raster's data, transform, CRS, and shape.
+            vector_data (tuple): A tuple containing (nodes, edges) as GeoDataFrames from OpenStreetMap.
+            reference_raster (dict): A dictionary containing the reference raster's data, transform, CRS, and shape.
 
         Returns:
             dict: A dictionary containing the rasterized data and metadata.
         """
+
+        nodes, edges = vector_data  # Estrarre nodes ed edges dalla tupla
 
         ref_data = reference_raster['data']
         ref_transform = reference_raster['transform']
         ref_crs = reference_raster['crs']
         ref_shape = reference_raster['shape']
 
-        # Ensure the vector data is in the same CRS as the reference raster
-        if vector_layer.crs != ref_crs:
-            vector_layer = vector_layer.to_crs(ref_crs)
+        # Estrarre le coordinate dei nodi
+        node_geometries = [Point(x, y) for x, y in zip(nodes['x'], nodes['y'])]
 
-        # Rasterize the vector geometries
-        shapes = [(geom, 1) for geom in vector_layer.geometry if geom is not None]
+        # Creare una lista di tuple (geom, valore da assegnare nel raster)
+        shapes = [(geom, 1) for geom in node_geometries if geom is not None]
 
-        # Create an empty raster with the same shape as the reference raster
+        # Creare un array vuoto con la stessa forma del raster di riferimento
         rasterized = np.zeros(ref_shape, dtype=np.uint8)
 
-        # Rasterize the vector data
-        rasterized= rasterize(
+        # Rasterizzare i nodi
+        rasterized = rasterize(
             shapes=shapes,
             out_shape=ref_shape,
             transform=ref_transform,
@@ -182,10 +181,14 @@ class LandUtils:
             "shape": ref_shape
         }
 
-    def transform_raster_to_crs(self, src_data, src_transform, src_crs, shape, dst_crs):
+    def raster_to_crs(self, raster,dst_crs):
         """
         Transform a raster to a new CRS with a different resolution and extent.
         """
+        src_data = raster['data']
+        src_transform = raster['transform']
+        src_crs = raster['crs']
+        shape = raster['shape']
         # Check shape dimensions
         if len(shape) == 2:
             height, width = shape

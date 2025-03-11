@@ -17,15 +17,9 @@ from data.utils.UtilsInterface import DownloaderInterface
 ox.settings.use_cache = True
 
 class GHSPOPDownloader(DownloaderInterface):
-    def __init__(self, address,shapefile, extracted_dir="extracted_files" ):
-        self.address = address
+    def __init__(self,shapefile, extracted_dir="extracted_files" ):
         self.extracted_dir = extracted_dir
-        self.lat, self.lon = self.__geocode_address()
         self.shapefile_path = shapefile
-
-    def __geocode_address(self):
-        location = ox.geocode(self.address)
-        return location[1], location[0]
 
     def __remove_existing_directory(self):
         if os.path.exists(self.extracted_dir):
@@ -36,10 +30,6 @@ class GHSPOPDownloader(DownloaderInterface):
         if tiles_gdf.crs != "EPSG:4326":
             tiles_gdf = tiles_gdf.to_crs("EPSG:4326")
         return tiles_gdf
-
-    def __create_point_gdf(self):
-        point = Point(self.lat, self.lon)
-        return gpd.GeoDataFrame([{'geometry': point}], crs="EPSG:4326")
 
     def __get_tile_id(self, tiles_gdf, point_gdf):
         current_tile = tiles_gdf[tiles_gdf.contains(point_gdf.geometry.iloc[0])]

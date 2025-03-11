@@ -2,29 +2,25 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
+from .UtilsInterface import GreenInterface
 ox.settings.use_cache = True
 
-class GreenAreaFinder:
+class GreenAreaFinderCopernicus(GreenInterface):
     def __init__(self, raster_data, vector_traffic_area, ghs_pop_data):
-        self.copernicus_raster = raster_data
+        self.copernicus_green = raster_data
         self.vector_traffic_area = vector_traffic_area
         self.preprocessed_graph = None
         self.ghs_pop_data = ghs_pop_data
         self._green_positions_cache = {}
 
-    def green_area_per_person(self, green_areas=None):
+    def green_area_per_person(self):
         """
         Calculate the green area per person in the given raster and population data.
         """
-        if green_areas is None:
-            green_areas = frozenset([10, 20, 30, 60, 95, 100])
-
         ghspop_data = self.ghs_pop_data['data']
-        copernicus_data = self.copernicus_raster['data']
+        copernicus_data = self.copernicus_green['data']
 
-        green_mask = np.isin(copernicus_data, list(green_areas))
-
-        total_green_area = np.sum(green_mask) * 100 # squaremeters
+        total_green_area = np.sum(copernicus_data) * 100 # squaremeters
 
         total_population = np.sum(ghspop_data)
 
@@ -33,7 +29,7 @@ class GreenAreaFinder:
         else:
             return round(total_green_area / total_population, 4)
 
-    def calculate_travel_time(self, distance_meters, transport_mode):
+    def _calculate_travel_time(self, distance_meters, transport_mode):
         """
         Calculate the estimated travel time for a given distance and transport mode.
         """
@@ -76,19 +72,15 @@ class GreenAreaFinder:
 
         return total_time_minutes
 
-    def get_nearest_green_position(self, lat, lon, green_areas=None):
+    def get_nearest_green_position(self, lat, lon):
         """
         Find the nearest green area to the given coordinates.
         """
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
             raise ValueError("Coordinate non valide")
 
-        # Costants for Copernicus data
-        if green_areas is None:
-            green_areas = frozenset([10, 20, 30, 60, 95, 100])
-
-        data = self.copernicus_raster['data']
-        transform = self.copernicus_raster['transform']
+        data = self.copernicus_green['data']
+        transform = self.copernicus_green['transform']
 
         # Translate coordinates to raster indices
         row, col = [int(i) for i in ~transform * (lon, lat)]
@@ -98,19 +90,15 @@ class GreenAreaFinder:
             raise IndexError("Starting point outside raster bounds")
 
         # Check if the point is already in a green area
-        if data[row, col] in green_areas:
+        if data[row, col] == 1:
             return lat, lon
 
-        green_mask = np.isin(data, list(green_areas))
-        green_indices = np.argwhere(green_mask)
+        green_indices = np.argwhere(data == 1)
 
-        # translation of the indices in geographic coordinates
-        # Sorting the green indices to make the distances deterministic
-        green_indices_sorted = sorted(green_indices, key=lambda x: (x[0], x[1]))
-
+        # Translate the indices to geographic coordinates
         green_coords = np.array([
             rasterio.transform.xy(transform, idx[0], idx[1])
-            for idx in green_indices_sorted
+            for idx in green_indices
         ])
 
         # Find the distance with haversine
@@ -144,7 +132,9 @@ class GreenAreaFinder:
 
         return (latitude, longitude)
 
-    def direction_to_green(self, lat, lon, transport_mode, green_areas=None):
+
+
+    def direction_to_green(self, lat, lon, transport_mode):
         """
         Calculate the distance and estimated time to reach the nearest green area
         starting from a given position, using the vector_traffic_area graph.
@@ -154,7 +144,7 @@ class GreenAreaFinder:
         if hasattr(self, "preprocessed_graph") and self.preprocessed_graph is None:
             delattr(self, "preprocessed_graph")
 
-        nearest_lat, nearest_lon = self.get_nearest_green_position(lat, lon,green_areas)
+        nearest_lat, nearest_lon = self.get_nearest_green_position(lat, lon)
         if not hasattr(self, "preprocessed_graph"):
             G = self.vector_traffic_area
             if isinstance(G, tuple) and len(G) == 2:
@@ -199,14 +189,13 @@ class GreenAreaFinder:
         total_distance = sum(G[u][v][0].get("length", 0) for u, v in zip(route[:-1], route[1:])) / 1000
         total_distance_meters = total_distance*1000
         # Calculate the total time of the path
-        total_time_minutes = self.calculate_travel_time(total_distance_meters, transport_mode)
+        total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
 
         return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat, "lon": nearest_lon})
 
-
     def get_isochrone_green(self, lat, lon, max_time, network_type):
         """
-       Calculate the reachable green areas within a given time from a starting point.
+        Calculate the reachable green areas within a given time from a starting point.
         """
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
             raise ValueError("Coordinates not valid")
@@ -218,8 +207,9 @@ class GreenAreaFinder:
         if network_type not in valid_transport_modes:
             raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
 
-        # Copernicus green constants
-        GREEN_AREAS = frozenset([10, 20, 30, 60, 95, 100])
+        # Get the green area raster using the get_green_area method
+        data = self.copernicus_green['data']
+        transform = self.copernicus_green['transform']
 
         if not hasattr(self, 'vector_traffic_area') or self.vector_traffic_area is None:
             raise ValueError("Traffic area not reachable")
@@ -249,7 +239,6 @@ class GreenAreaFinder:
 
         # Time available for travel in seconds
         travel_time_seconds = (max_time * 60) - fixed_delay
-
 
         if travel_time_seconds <= 0:
             return json.dumps({
@@ -301,9 +290,6 @@ class GreenAreaFinder:
         # Get the coordinates of the reachable nodes
         reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
 
-        data = self.copernicus_raster['data']
-        transform = self.copernicus_raster['transform']
-
         green_area_pixels = 0
         total_pixels = 0
         green_areas_info = {}
@@ -313,13 +299,12 @@ class GreenAreaFinder:
                 # Convert coordinates to raster indices
                 row, col = [int(i) for i in ~transform * (lon_point, lat_point)]
 
-
                 if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
                     total_pixels += 1
                     pixel_value = data[row, col]
 
                     # Update green area count
-                    if pixel_value in GREEN_AREAS:
+                    if pixel_value == 1:
                         green_area_pixels += 1
 
                         category = self._get_green_area_category(pixel_value)
@@ -345,10 +330,10 @@ class GreenAreaFinder:
                     row, col = [int(i) for i in ~transform * (data['x'], data['y'])]
                     if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
                         pixel_value = data[row, col]
-                        if pixel_value in GREEN_AREAS:
+                        if pixel_value == 1:
                             time_to_node = data['time']
                             distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                            travel_time = self.calculate_travel_time(distance_meters, network_type)
+                            travel_time = self._calculate_travel_time(distance_meters, network_type)
                             category = self._get_green_area_category(pixel_value)
                             green_accessibility[node_id] = {
                                 'category': category,

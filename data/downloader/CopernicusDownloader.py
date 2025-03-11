@@ -2,9 +2,9 @@ import requests
 import openeo
 import tempfile
 import rasterio
-from data.utils.UtilsInterface import DownloaderInterface, GreenInterface
+from data.utils.UtilsInterface import DownloaderInterface
 
-class CopernicusDownloader(DownloaderInterface, GreenInterface):
+class CopernicusDownloader(DownloaderInterface):
     def __init__(self, client_id=None, client_secret=None, token_url=None, use_oidc=False):
         self.client_id = client_id
         self.client_secret = client_secret
