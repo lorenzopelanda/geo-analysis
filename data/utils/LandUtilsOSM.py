@@ -1,10 +1,15 @@
 import json
 import geopandas as gpd
+import osmnx as ox
+import pandas as pd
+from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, Point
+
 from .UtilsInterface import UtilsInterface
 
 
 class LandUtilsOSM(UtilsInterface):
-    def __init__(self, osm):
+    def __init__(self, osm, bounding_box):
+        self.bounding_box = bounding_box
         self.osm = osm
 
     def get_land_use_percentages(self):
@@ -38,36 +43,39 @@ class LandUtilsOSM(UtilsInterface):
     #         print(f"Error processing OSM green areas: {str(e)}")
     #         raise
 
-    def get_green_area(self, **kwargs):
-        nodes, edges = self.osm
-        green_tags = {
-            'natural': ['fell', 'natural', 'grassland', 'heath', 'scrub', 'tree', 'wood',
-                        'shrubbery', 'tree_row', 'tundra']
-        }
 
+    def get_green_area(self):
         try:
-            if kwargs:
-                green_tags = kwargs
+            bounding_box = self.bounding_box
+            aoi_box = bounding_box.to_geometry()
 
-            # Verifica se la colonna 'natural' esiste
-            if 'natural' not in nodes.columns:
-                print("Warning: 'natural' column not found in nodes")
-                return None
-            if 'natural' not in edges.columns:
-                print("Warning: 'natural' column not found in edges")
-                return None
+            print("Bounding box coordinates:", aoi_box.bounds)  # Debug
 
-            green_nodes = nodes[nodes['natural'].isin(green_tags.get('natural', []))]
-            green_edges = edges[edges['natural'].isin(green_tags.get('natural', []))]
+            green_tags = {
+                'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland', 'heath', 'fell'],
+                'landuse': ['forest', 'meadow', 'grass', 'recreation_ground', 'village_green', 'allotments'],
+                'leisure': ['park', 'garden', 'nature_reserve']
+            }
 
-            if green_nodes.empty or green_edges.empty:
-                print("No green areas found in the bounding box")
-                return None
+            gdf = ox.features_from_polygon(aoi_box, tags=green_tags)
 
-            return (green_nodes, green_edges)
+            print(f"{len(gdf)} green features found in the area")
+
+            polygon_types = (Polygon, MultiPolygon)
+            line_types = (LineString, MultiLineString)
+
+            nodes = gdf[gdf.geometry.apply(lambda geom: isinstance(geom, Point))].copy()
+            edges = gdf[gdf.geometry.apply(
+                lambda geom: isinstance(geom, polygon_types + line_types)
+            )].copy()
+            print(f"{len(nodes)} node features")
+            print(f"{len(edges)} edge/polygon features")
+
+            return (nodes, edges)
+
         except Exception as e:
-            print(f"Error processing OSM green areas: {str(e)}")
-            raise
+            print(f"Error extracting green areas: {str(e)}")
+            return (pd.DataFrame(), pd.DataFrame())
 
     def get_vector_area(self,tags):
         nodes, edges = self.osm
@@ -86,27 +94,30 @@ class LandUtilsOSM(UtilsInterface):
             print(f"Error extracting OSM tags: {str(e)}")
             raise
 
-
     def get_traffic_area(self, network_type):
         """
         Download the OSM network data for a given bounding box and network type, and rasterize it to a reference raster.
         """
+        bounding_box = self.bounding_box
+        aoi_box = bounding_box.to_geometry()
 
-        try:
-            nodes, edges = self.osm
-            if nodes is None or edges is None:
-                return None
+        graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
 
-            # Filter nodes and edges based on the network type
-            filtered_nodes = nodes[nodes['highway'].isin([network_type])]
-            filtered_edges = edges[edges['highway'].isin([network_type])]
+        if graph is None:
+            print("Failed to create graph")
+            return None
 
-            if filtered_nodes.empty or filtered_edges.empty:
-                print("Warning: Empty nodes or edges after processing")
-                return None
+        # Convert graph to GeoDataFrames
+        nodes, edges = ox.graph_to_gdfs(graph, nodes=True, edges=True)
+        # Clip to AOI
+        nodes = gpd.clip(nodes, aoi_box)
+        edges = gpd.clip(edges, aoi_box)
+        # Add coordinates
+        nodes['x'] = nodes.geometry.x
+        nodes['y'] = nodes.geometry.y
 
-            return (filtered_nodes, filtered_edges)
+        if nodes.empty or edges.empty:
+            print("Warning: Empty nodes or edges after processing")
+            return None
 
-        except Exception as e:
-            print(f"Error processing OSM data: {str(e)}")
-            raise
+        return (nodes, edges)

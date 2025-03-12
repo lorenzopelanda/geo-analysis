@@ -29,8 +29,8 @@ def main():
     copernicus_area= copernicus_downloader.get_data(
          bounding_box
     )
-    osm_area = OSMDownloader()
-    osm_area = osm_area.get_data(
+    osm_downloader = OSMDownloader()
+    osm_area = osm_downloader.get_data(
         bounding_box=bounding_box
     )
     osm_area_raser = LandUtils().vector_to_raster(osm_area,copernicus_area)
@@ -44,8 +44,8 @@ def main():
 
     adjusted_data = LandUtils().adjust_detail_level(osm_area_raser,copernicus_area, ghspop_area)
     ghs_pop_resized = adjusted_data['ghs_pop']
-    osm_green = LandUtilsOSM(osm_area)
-    osm_traffic = osm_green.get_traffic_area("walk")
+    osm_utils = LandUtilsOSM(osm_area, bounding_box)
+    osm_traffic = osm_utils.get_traffic_area("walk")
     #address = "Via Antonio Bertola 48/C, Torino"
     #lat, lon = LandUtils().get_coordinates_from_address(address)
 
@@ -57,7 +57,7 @@ def main():
     copernicus_green=LandUtilsCopernicus(copernicus_area)
     copernicus_green = copernicus_green.get_green_area()
 
-    osm_green = osm_green.get_green_area()
+    osm_green = osm_utils.get_green_area()
 
     green_area_finder_copernicus = GreenAreaFinderCopernicus(
         copernicus_green,

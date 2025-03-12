@@ -76,12 +76,10 @@ class LandUtils:
         # The first element has the highest resolution (smallest pixel size)
         target_area = pixel_sizes[0][1]
 
-        # Extract target data and metadata
         target_transform = target_area['transform']
         target_crs = target_area['crs']
         target_shape = target_area['shape']
 
-        # Handle different shapes of target data
         if len(target_shape) == 2:
             target_height, target_width = target_shape
         elif len(target_shape) == 3:
@@ -89,7 +87,6 @@ class LandUtils:
         else:
             raise ValueError(f"Unexpected shape for target: {target_shape}")
 
-        # Initialize result dictionary
         result = {
             'copernicus': None,
             'osm': None,
@@ -112,7 +109,6 @@ class LandUtils:
                     "shape": (target_height, target_width)
                 }
             else:
-                # Create an empty array for the resampled source data
                 source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
 
                 # Reproject the source data to match the target resolution and extent
@@ -126,7 +122,6 @@ class LandUtils:
                     resampling=Resampling.bilinear
                 )
 
-                # Add the resampled data to the result with the original area name
                 result[area_name] = {
                     "data": source_resampled,
                     "transform": target_transform,
@@ -137,38 +132,18 @@ class LandUtils:
         return result
 
     def vector_to_raster(self, vector_data, reference_raster):
-        """
-        Convert a vector area into a raster with the same resolution and extent as a reference raster.
-
-        Parameters:
-            vector_data (tuple): A tuple containing (nodes, edges) as GeoDataFrames from OpenStreetMap.
-            reference_raster (dict): A dictionary containing the reference raster's data, transform, CRS, and shape.
-
-        Returns:
-            dict: A dictionary containing the rasterized data and metadata.
-        """
-
-        nodes, edges = vector_data  # Estrarre nodes ed edges dalla tupla
-
-        ref_data = reference_raster['data']
-        ref_transform = reference_raster['transform']
+        nodes, edges = vector_data
         ref_crs = reference_raster['crs']
-        ref_shape = reference_raster['shape']
 
-        # Estrarre le coordinate dei nodi
-        node_geometries = [Point(x, y) for x, y in zip(nodes['x'], nodes['y'])]
+        if nodes.crs != ref_crs:
+            nodes = nodes.to_crs(ref_crs)
 
-        # Creare una lista di tuple (geom, valore da assegnare nel raster)
-        shapes = [(geom, 1) for geom in node_geometries if geom is not None]
+        shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
 
-        # Creare un array vuoto con la stessa forma del raster di riferimento
-        rasterized = np.zeros(ref_shape, dtype=np.uint8)
-
-        # Rasterizzare i nodi
         rasterized = rasterize(
             shapes=shapes,
-            out_shape=ref_shape,
-            transform=ref_transform,
+            out_shape=reference_raster['shape'],
+            transform=reference_raster['transform'],
             fill=0,
             dtype=np.uint8,
             all_touched=True
@@ -176,9 +151,9 @@ class LandUtils:
 
         return {
             "data": rasterized,
-            "transform": ref_transform,
+            "transform": reference_raster['transform'],
             "crs": ref_crs,
-            "shape": ref_shape
+            "shape": reference_raster['shape']
         }
 
     def raster_to_crs(self, raster,dst_crs):

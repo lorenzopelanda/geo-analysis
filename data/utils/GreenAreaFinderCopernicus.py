@@ -3,6 +3,7 @@ import numpy as np
 import json
 import osmnx as ox
 from .UtilsInterface import GreenInterface
+from shapely.geometry import Point
 ox.settings.use_cache = True
 
 class GreenAreaFinderCopernicus(GreenInterface):
@@ -129,7 +130,7 @@ class GreenAreaFinderCopernicus(GreenInterface):
         nearest_index = min(range(len(distances)), key=lambda i: distances[i])
 
         longitude, latitude = green_coords[nearest_index]
-
+        print(f"Green coordinates: {latitude}, {longitude}")
         return (latitude, longitude)
 
 
@@ -190,6 +191,8 @@ class GreenAreaFinderCopernicus(GreenInterface):
         total_distance_meters = total_distance*1000
         # Calculate the total time of the path
         total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
+        if total_distance and total_time_minutes >0 :
+            print("Distance and time calculated!")
 
         return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat, "lon": nearest_lon})
 
@@ -206,10 +209,6 @@ class GreenAreaFinderCopernicus(GreenInterface):
         valid_transport_modes = ['walk', 'bike', 'drive', 'all_public', 'drive_public']
         if network_type not in valid_transport_modes:
             raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
-
-        # Get the green area raster using the get_green_area method
-        data = self.copernicus_green['data']
-        transform = self.copernicus_green['transform']
 
         if not hasattr(self, 'vector_traffic_area') or self.vector_traffic_area is None:
             raise ValueError("Traffic area not reachable")
@@ -290,9 +289,12 @@ class GreenAreaFinderCopernicus(GreenInterface):
         # Get the coordinates of the reachable nodes
         reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
 
-        green_area_pixels = 0
+        data = self.copernicus_green['data']
+        transform = self.copernicus_green['transform']
+
         total_pixels = 0
-        green_areas_info = {}
+        green_area_pixels = 0
+        green_accessibility = {}
 
         for lat_point, lon_point in reachable_coords:
             try:
@@ -303,70 +305,40 @@ class GreenAreaFinderCopernicus(GreenInterface):
                     total_pixels += 1
                     pixel_value = data[row, col]
 
-                    # Update green area count
+                    # Count every pixel as green area
                     if pixel_value == 1:
                         green_area_pixels += 1
 
-                        category = self._get_green_area_category(pixel_value)
-                        if category in green_areas_info:
-                            green_areas_info[category] += 1
-                        else:
-                            green_areas_info[category] = 1
+                        node_data = next(
+                            (d for n, d in reachable_nodes.items() if d['y'] == lat_point and d['x'] == lon_point),
+                            None)
+                        if node_data:
+                            time_to_node = node_data['time']
+                            distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
+                            travel_time = self._calculate_travel_time(distance_meters, network_type)
+                            green_accessibility[node_data['x']] = {
+                                'time_minutes': travel_time,
+                                'distance_meters': round(distance_meters, 2),
+                                'lat': lat_point,
+                                'lon': lon_point
+                            }
             except Exception:
                 continue
 
-        # Percentage of green area
-        green_percentage = (green_area_pixels / max(1, total_pixels)) * 100
+        green_percentage = (green_area_pixels / max(1, total_pixels)) * 100 if total_pixels > 0 else 0
 
-        # Copernicus raster resolution is 10m x 10m
         pixel_area_sqm = 100  # 10m x 10m
         green_area_sqm = green_area_pixels * pixel_area_sqm
-
-        green_accessibility = {}
-        for node_id, data in reachable_nodes.items():
-            if node_id in G.nodes:
-                node_coords = (data['y'], data['x'])
-                try:
-                    row, col = [int(i) for i in ~transform * (data['x'], data['y'])]
-                    if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
-                        pixel_value = data[row, col]
-                        if pixel_value == 1:
-                            time_to_node = data['time']
-                            distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                            travel_time = self._calculate_travel_time(distance_meters, network_type)
-                            category = self._get_green_area_category(pixel_value)
-                            green_accessibility[node_id] = {
-                                'category': category,
-                                'time_minutes': travel_time,
-                                'distance_meters': round(distance_meters, 2),
-                                'lat': data['y'],
-                                'lon': data['x']
-                            }
-                except Exception:
-                    continue
 
         result = {
             "isochrone_time_minutes": max_time,
             "transport_mode": network_type,
             "green_area_percentage": round(green_percentage, 2),
             "green_area_sqm": round(green_area_sqm, 2),
-            "green_area_categories": green_areas_info,
+            "green_accessibility": list(green_accessibility.values()),
         }
 
         return json.dumps(result)
-
-
-
-    def _get_green_area_category(self, pixel_value):
-        categories = {
-            10: "tree_cover",
-            20: "shrubland",
-            30: "grassland",
-            60: "sparse_vegetation",
-            95: "mangroves",
-            100: "moss_lichen"
-        }
-        return categories.get(pixel_value, "unknown")
 
     def _estimate_distance_from_time(self, time_seconds, transport_mode):
         # Speed constants in m/s
