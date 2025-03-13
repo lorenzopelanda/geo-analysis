@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Rewrote some methods for green_finder for copernicus data.">
+    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Edited some functions for the OSM data, now everything works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/GreenAreaFinderCopernicus.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/GreenAreaFinderCopernicus.py" afterDir="false" />
@@ -12,7 +12,10 @@
       <change beforePath="$PROJECT_DIR$/data/utils/LandUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/LandUtilsCopernicus.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtilsCopernicus.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/LandUtilsOSM.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtilsOSM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_land.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_land.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/examples/example_copernicus.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_copernicus.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/examples/example_ghspop.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_ghspop.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/examples/example_osm.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_osm.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -365,7 +368,13 @@
       <workItem from="1741774292411" duration="6195000" />
       <workItem from="1741788363197" duration="9822000" />
       <workItem from="1741802754029" duration="6377000" />
-      <workItem from="1741854232684" duration="4267000" />
+      <workItem from="1741854232684" duration="4427000" />
+      <workItem from="1741873207594" duration="6590000" />
+      <workItem from="1741880555308" duration="392000" />
+      <workItem from="1741880956646" duration="558000" />
+      <workItem from="1741881523784" duration="500000" />
+      <workItem from="1741882032628" duration="2915000" />
+      <workItem from="1741885410553" duration="2171000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -535,7 +544,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741779635088</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Edited some functions for the OSM data, now everything works">
+      <option name="closed" value="true" />
+      <created>1741858544221</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1741858544221</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -584,13 +601,14 @@
     <MESSAGE value="Created some interfaces for more modularity and changed some methods for this" />
     <MESSAGE value="Added some interfaces for more modularity in finding green areas also for OpenStreetMap data" />
     <MESSAGE value="Rewrote some methods for green_finder for copernicus data." />
-    <option name="LAST_COMMIT_MESSAGE" value="Rewrote some methods for green_finder for copernicus data." />
+    <MESSAGE value="Edited some functions for the OSM data, now everything works" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edited some functions for the OSM data, now everything works" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/geo_analysis$test_raster_download.coverage" NAME="test_raster_download Coverage Results" MODIFIED="1737113451449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/geo_analysis$test_import.coverage" NAME="test_import Coverage Results" MODIFIED="1736934593388" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/geo_analysis$test_ghspop_download.coverage" NAME="test_ghspop_download Coverage Results" MODIFIED="1736935702087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/geo_analysis$test_area_download.coverage" NAME="test_area_download Coverage Results" MODIFIED="1739903473488" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
-    <SUITE FILE_PATH="coverage/geo_analysis$test_land.coverage" NAME="test_land Coverage Results" MODIFIED="1741857685475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/geo_analysis$test_land.coverage" NAME="test_land Coverage Results" MODIFIED="1741878762175" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
   </component>
 </project>

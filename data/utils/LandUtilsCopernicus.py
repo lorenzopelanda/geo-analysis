@@ -35,7 +35,7 @@ class LandUtilsCopernicus(UtilsInterface):
         osm_data = self.osm_green['data']
 
         if copernicus_data.shape != osm_data.shape:
-            raise ValueError("I raster di Copernicus e OpenStreetMap devono avere la stessa dimensione.")
+            raise ValueError("Raster shapes do not match")
 
         # Select only the pixels that are green in both rasters
         filtered_data = np.where((osm_data == 1) & (copernicus_data == 1), 1, 0)

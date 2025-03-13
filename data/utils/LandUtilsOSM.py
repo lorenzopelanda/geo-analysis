@@ -21,77 +21,44 @@ class LandUtilsOSM(UtilsInterface):
         percentages = {key: round((count / total) * 100, 4) for key, count in land_use_types.items()}
         return json.dumps(percentages)
 
-    # def get_green_area(self,**kwargs):
-    #     nodes, edges = self.osm
-    #     green_tags = {
-    #         'natural': ['fell', 'natural', 'grassland', 'heath', 'scrub', 'tree', 'wood',
-    #                     'shrubbery', 'tree_row', 'tundra']
-    #     }
-    #     try:
-    #         if kwargs:
-    #             green_tags = kwargs
-    #
-    #         green_nodes = nodes[nodes['natural'].isin(green_tags.get('natural', []))]
-    #         green_edges = edges[edges['natural'].isin(green_tags.get('natural', []))]
-    #
-    #         if green_nodes.empty or green_edges.empty:
-    #             print("No green areas found in the bounding box")
-    #             return None
-    #
-    #         return (green_nodes, green_edges)
-    #     except Exception as e:
-    #         print(f"Error processing OSM green areas: {str(e)}")
-    #         raise
-
-    def get_green_area(self):
+    def get_green_area(self, **kwargs):
         try:
-            bounding_box = self.bounding_box
-            aoi_box = bounding_box.to_geometry()
+            nodes_gdf, edges_gdf = self.osm
+            if kwargs is None:
+                green_tags = {
+                    'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland',
+                                'heath', 'fell', 'tundra', 'shrubbery'],
+                    'landuse': ['forest', 'meadow', 'grass','allotments'],
+                    'leisure': ['park', 'garden', 'nature_reserve']
+                }
+            else :
+                green_tags = kwargs.get('green_tags', {
+                    'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland',
+                                'heath', 'fell', 'tundra', 'shrubbery'],
+                    'landuse': ['forest', 'meadow', 'grass','allotments'],
+                    'leisure': ['park', 'garden', 'nature_reserve']
+                })
 
-            print("Bounding box coordinates:", aoi_box.bounds)  # Debug
+            def filter_green(df):
+                if df.empty:
+                    return df
 
-            green_tags = {
-                'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland', 'heath', 'fell', 'tundra', 'shrubbery'],
-                'landuse': ['forest', 'meadow', 'grass', 'recreation_ground', 'village_green', 'allotments'],
-                'leisure': ['park', 'garden', 'nature_reserve']
-            }
+                mask = pd.Series(False, index=df.index)
 
-            gdf = ox.features_from_polygon(aoi_box, tags=green_tags)
+                for tag, values in green_tags.items():
+                    if tag in df.columns:
+                        mask |= df[tag].isin(values)
 
-            print(f"{len(gdf)} green features found in the area")
+                return df[mask]
 
-            polygon_types = (Polygon, MultiPolygon)
-            line_types = (LineString, MultiLineString)
+            # Optimized filtering
+            green_nodes = filter_green(nodes_gdf)
+            green_edges = filter_green(edges_gdf)
 
-            nodes = gdf[gdf.geometry.apply(lambda geom: isinstance(geom, Point))].copy()
-            edges = gdf[gdf.geometry.apply(
-                lambda geom: isinstance(geom, polygon_types + line_types)
-            )].copy()
-            print(f"{len(nodes)} node features")
-            print(f"{len(edges)} edge/polygon features")
-
-            return (nodes, edges)
+            return (green_nodes, green_edges)
 
         except Exception as e:
-            print(f"Error extracting green areas: {str(e)}")
             return (pd.DataFrame(), pd.DataFrame())
-
-    def get_vector_area(self,tags):
-        nodes, edges = self.osm
-
-        try:
-            if nodes is None or edges is None:
-                return gpd.GeoDataFrame()
-
-            for key, values in tags.items():
-                nodes = nodes[nodes[key].isin(values)]
-                edges = edges[edges[key].isin(values)]
-
-            return nodes, edges
-
-        except Exception as e:
-            print(f"Error extracting OSM tags: {str(e)}")
-            raise
 
     def get_traffic_area(self, network_type):
         """

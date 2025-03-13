@@ -2,57 +2,10 @@ from rasterio.warp import reproject, Resampling, calculate_default_transform
 import numpy as np
 import rasterio
 import requests
-from shapely.geometry import Point, LineString
-import json
 from rasterio.features import rasterize
 
 
 class LandUtils:
-    # def adjust_detail_level(self, target_area, source_area):
-    #     """
-    #     Get population data for a given area using Target and Source data,
-    #     ensuring both outputs have matching resolution and extent.
-    #     """
-    #     # target_area the most defined
-    #     # source_area the less defined to adjust to target_area
-    #     target_data= target_area['data']
-    #     target_transform = target_area['transform']
-    #     target_crs = target_area['crs']
-    #     target_shape = target_area['shape']
-    #
-    #     source_data = source_area['data']
-    #     source_transform = source_area['transform']
-    #     source_crs = source_area['crs']
-    #     source_shape = source_area['shape']
-    #
-    #     # Handle different shapes of Target data
-    #     if len(target_shape) == 2:
-    #         target_height, target_width = target_shape
-    #     elif len(target_shape) == 3:
-    #         _, target_height, target_width = target_shape
-    #     else:
-    #         raise ValueError(f"Unexpected shape for: {target_shape}")
-    #
-    #     # Create an empty array for the resampled Source data
-    #     source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
-    #
-    #     # Reproject the Source data to match the Target resolution and extent
-    #     reproject(
-    #         source=source_data,
-    #         destination=source_resampled,
-    #         src_transform=source_transform,
-    #         src_crs=source_crs,
-    #         dst_transform=target_transform,
-    #         dst_crs=target_crs,
-    #         resampling=Resampling.bilinear
-    #     )
-    #
-    #     return {
-    #             "data": source_resampled,
-    #             "transform": target_transform,
-    #             "crs": target_crs,
-    #             "shape": (target_height, target_width)
-    #         }
 
     def adjust_detail_level(self, osm, copernicus, ghs_pop):
         """
@@ -131,30 +84,6 @@ class LandUtils:
 
         return result
 
-    # def vector_to_raster(self, vector_data, reference_raster):
-    #     nodes, edges = vector_data
-    #     ref_crs = reference_raster['crs']
-    #
-    #     if nodes.crs != ref_crs:
-    #         nodes = nodes.to_crs(ref_crs)
-    #
-    #     shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
-    #
-    #     rasterized = rasterize(
-    #         shapes=shapes,
-    #         out_shape=reference_raster['shape'],
-    #         transform=reference_raster['transform'],
-    #         fill=0,
-    #         dtype=np.uint8,
-    #         all_touched=True
-    #     )
-    #
-    #     return {
-    #         "data": rasterized,
-    #         "transform": reference_raster['transform'],
-    #         "crs": ref_crs,
-    #         "shape": reference_raster['shape']
-    #     }
     def vector_to_raster(self, vector_data, reference_raster):
         """
         Rasterize the OpenStreetMap vector data using a reference raster.
@@ -168,12 +97,6 @@ class LandUtils:
         """
         nodes, edges = vector_data
         ref_crs = reference_raster['crs']
-
-        # Ensure the CRS matches
-        if nodes.crs != ref_crs:
-            nodes = nodes.to_crs(ref_crs)
-        if edges.crs != ref_crs:
-            edges = edges.to_crs(ref_crs)
 
         # Rasterize nodes (points)
         node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]

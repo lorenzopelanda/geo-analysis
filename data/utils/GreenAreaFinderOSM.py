@@ -2,13 +2,8 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
-from math import radians, sin, cos, sqrt, atan2
-import geopandas as gpd
-import pandas as pd
-from shapely.geometry import Point
-from scipy.spatial import cKDTree
 from .UtilsInterface import GreenInterface
-ox.settings.use_cache = True
+ox.settings.use_cache = False
 
 class GreenAreaFinderOSM(GreenInterface):
     def __init__(self, osm_green, vector_traffic_area, ghs_pop_data):
@@ -26,20 +21,15 @@ class GreenAreaFinderOSM(GreenInterface):
         green_data = self.osm_green['data']
 
         num_green_pixels = np.count_nonzero(green_data)
-        # Debug print
-        print(f"Numero di pixel verdi: {num_green_pixels}")
 
-        total_green_area = num_green_pixels * 100  # metri quadrati
-        print(f"Area verde totale: {total_green_area} m²")
+        total_green_area = num_green_pixels * 100  # sqm
 
         total_population = np.sum(ghspop_data)
-        print(f"Popolazione totale: {total_population}")
 
         if total_population == 0:
             return float('inf')
         else:
             green_area_per_person = round(total_green_area / total_population, 4)
-            print(f"Green area per person: {green_area_per_person} m² per persona")
             return green_area_per_person
 
     def _calculate_travel_time(self, distance_meters, transport_mode):
@@ -85,70 +75,10 @@ class GreenAreaFinderOSM(GreenInterface):
 
         return total_time_minutes
 
-    # def get_nearest_green_position(self, lat, lon):
-    #     """
-    #     Find the nearest green area to the given coordinates.
-    #     """
-    #     if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
-    #         raise ValueError("Coordinate non valide")
-    #
-    #     data = self.copernicus_green['data']
-    #     transform = self.copernicus_green['transform']
-    #
-    #     # Translate coordinates to raster indices
-    #     row, col = [int(i) for i in ~transform * (lon, lat)]
-    #
-    #     # Check if the point is outside the raster bounds
-    #     if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
-    #         raise IndexError("Starting point outside raster bounds")
-    #
-    #     # Check if the point is already in a green area
-    #     if data[row, col] == 1:
-    #         return lat, lon
-    #
-    #     green_indices = np.argwhere(data == 1)
-    #
-    #     # Translate the indices to geographic coordinates
-    #     green_coords = np.array([
-    #         rasterio.transform.xy(transform, idx[0], idx[1])
-    #         for idx in green_indices
-    #     ])
-    #
-    #     # Find the distance with haversine
-    #     def haversine_distance(lon1, lat1, lon2, lat2):
-    #         """
-    #         Calculate the haversine distance between two points in km.
-    #         """
-    #         from math import radians, sin, cos, sqrt, atan2
-    #
-    #         R = 6371  # Earth radius in km
-    #
-    #         lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-    #
-    #         dlat = lat2 - lat1
-    #         dlon = lon2 - lon1
-    #
-    #         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    #         c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    #
-    #         return R * c
-    #
-    #     distances = [
-    #         haversine_distance(lon, lat, green_coord[0], green_coord[1])
-    #         for green_coord in green_coords
-    #     ]
-    #
-    #     # Find the smallest distance
-    #     nearest_index = min(range(len(distances)), key=lambda i: distances[i])
-    #
-    #     longitude, latitude = green_coords[nearest_index]
-    #     print(f"Green coordinates: {latitude}, {longitude}")
-    #     return (latitude, longitude)
-
     def get_nearest_green_position(self, lat, lon):
 
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
-            raise ValueError("Coordinate non valide")
+            raise ValueError("Coordinates not valid")
 
         data = self.osm_green['data']
         transform = self.osm_green['transform']
@@ -156,7 +86,7 @@ class GreenAreaFinderOSM(GreenInterface):
         col, row = [int(round(i)) for i in ~transform * (lon, lat)]
 
         if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
-            raise IndexError("Punto fuori dai limiti del raster")
+            raise IndexError("Starting point outside raster bounds")
 
         search_radius = 3
         for dr in range(-search_radius, search_radius + 1):
@@ -173,7 +103,7 @@ class GreenAreaFinderOSM(GreenInterface):
 
         green_indices = np.argwhere(data == 1)
         if len(green_indices) == 0:
-            raise ValueError("Nessuna area verde trovata nel raster")
+            raise ValueError("No green areas found in the raster")
 
         # Conversion to geographic coordinates
         green_coords = np.array([
@@ -184,7 +114,7 @@ class GreenAreaFinderOSM(GreenInterface):
         # Distance calculation with haversine
         lons = green_coords[:, 0]
         lats = green_coords[:, 1]
-        distances = self.haversine_vectorized(lon, lat, lons, lats)
+        distances = self._haversine_vectorized(lon, lat, lons, lats)
 
         # Find the nearest green area
         nearest_idx = np.argmin(distances)
@@ -192,7 +122,7 @@ class GreenAreaFinderOSM(GreenInterface):
 
         return (nearest_lat, nearest_lon)
 
-    def haversine_vectorized(self, lon1, lat1, lons2, lats2):
+    def _haversine_vectorized(self, lon1, lat1, lons2, lats2):
 
         R = 6371  # Earth radius in km
 
@@ -257,20 +187,15 @@ class GreenAreaFinderOSM(GreenInterface):
         # Finds the nearest nodes in the graph
         orig_node = ox.distance.nearest_nodes(G, X=lon, Y=lat)
         dest_node = ox.distance.nearest_nodes(G, X=nearest_lon, Y=nearest_lat)
-        print(f"Orig Node: {orig_node}, Dest Node: {dest_node}")
 
         # Calculate the shortest path (Djikstra algorithm and travel_time as weight)
 
         route = ox.shortest_path(G, orig_node, dest_node, weight="travel_time")
-        print(f"Percorso: {route}")
         # Calculate the total distance of the path
         total_distance = sum(G[u][v][0].get("length", 0) for u, v in zip(route[:-1], route[1:])) / 1000
         total_distance_meters = total_distance * 1000
-        print(f"Distanza totale (km): {total_distance}, Distanza totale (m): {total_distance_meters}")
         # Calculate the total time of the path
         total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
-        if total_distance and total_time_minutes > 0:
-            print("Distance and time calculated!")
 
         return json.dumps(
             {"distance_km": round(total_distance, 4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat,
