@@ -1,6 +1,6 @@
 import os
 import json
-
+import numpy as np
 from data.utils.LandUtilsCopernicus import LandUtilsCopernicus
 
 os.environ["PROJ_LIB"] = "/home/lorenzo/miniconda3/envs/geodata_env/share/proj"
@@ -33,7 +33,6 @@ def main():
     osm_area = osm_downloader.get_data(
         bounding_box=bounding_box
     )
-    osm_area_raser = LandUtils().vector_to_raster(osm_area,copernicus_area)
 
     ghspop = GHSPOPDownloader(
         shapefile="../tiling_schema/WGS84_tile_schema.shp"
@@ -42,28 +41,31 @@ def main():
 
 
 
-    adjusted_data = LandUtils().adjust_detail_level(osm_area_raser,copernicus_area, ghspop_area)
-    ghs_pop_resized = adjusted_data['ghs_pop']
+    #adjusted_data = LandUtils().adjust_detail_level(osm_area_raser,copernicus_area, ghspop_area)
+    #correction_factor = 1399264.712361979 / 139803528.15766814
+    #ghs_pop_resized = adjusted_data['ghs_pop']['data']*correction_factor
+    # Prima di chiamare green_area_per_person()
     osm_utils = LandUtilsOSM(osm_area, bounding_box)
     osm_traffic = osm_utils.get_traffic_area("walk")
     #address = "Via Antonio Bertola 48/C, Torino"
-    #lat, lon = LandUtils().get_coordinates_from_address(address)
-
-    lat, lon = 45.071526, 7.681753 #Via Barbaroux 12, Torino
+    address = "Via Principessa Clotilde 28/B, Torino"
+    lat, lon = LandUtils().get_coordinates_from_address(address)
+    #lat, lon = 45.071526, 7.681753 #Via Barbaroux 12, Torino
     #lat, lon = 45.072710, 7.679646
     print(f"Coordinates for the starting point: {lat}, {lon}")
     #lat,lon = 45.085309, 7.631144
-
-    copernicus_green=LandUtilsCopernicus(copernicus_area)
-    copernicus_green = copernicus_green.get_green_area()
-
     osm_green = osm_utils.get_green_area()
+    osm_green_raster = LandUtils().vector_to_raster(osm_green, copernicus_area)
+
+    copernicus_green=LandUtilsCopernicus(copernicus_area, osm_green_raster)
+    copernicus_green = copernicus_green.get_green_area()
 
     green_area_finder_copernicus = GreenAreaFinderCopernicus(
         copernicus_green,
         osm_traffic,
-        ghs_pop_resized,
+        ghspop_area
     )
+
 
     population_green_ratio = green_area_finder_copernicus.green_area_per_person()
     print("-----------COPERNICUS-----------")
@@ -92,9 +94,9 @@ def main():
     print("\n\n")
     print("-----------OSM-----------")
     green_area_finder_osm = GreenAreaFinderOSM(
-        osm_green,
+        osm_green_raster,
         osm_traffic,
-        ghs_pop_resized,
+        ghspop_area,
     )
     population_green_osm_ratio = green_area_finder_osm.green_area_per_person()
     print(f"Green area / population: {population_green_osm_ratio}")

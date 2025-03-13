@@ -2,6 +2,7 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
+from math import radians, sin, cos, sqrt, atan2
 from .UtilsInterface import GreenInterface
 from shapely.geometry import Point
 ox.settings.use_cache = True
@@ -14,6 +15,8 @@ class GreenAreaFinderCopernicus(GreenInterface):
         self.ghs_pop_data = ghs_pop_data
         self._green_positions_cache = {}
 
+
+
     def green_area_per_person(self):
         """
         Calculate the green area per person in the given raster and population data.
@@ -21,14 +24,23 @@ class GreenAreaFinderCopernicus(GreenInterface):
         ghspop_data = self.ghs_pop_data['data']
         copernicus_data = self.copernicus_green['data']
 
-        total_green_area = np.sum(copernicus_data) * 100 # squaremeters
+        num_green_pixels = np.count_nonzero(copernicus_data)
+
+        # Debug print
+        print(f"Numero di pixel verdi: {num_green_pixels}")
+
+        total_green_area = num_green_pixels * 100  # metri quadrati
+        print(f"Area verde totale: {total_green_area} m²")
 
         total_population = np.sum(ghspop_data)
+        print(f"Popolazione totale: {total_population}")
 
         if total_population == 0:
             return float('inf')
         else:
-            return round(total_green_area / total_population, 4)
+            green_area_per_person = round(total_green_area / total_population, 4)
+            print(f"Green area per person: {green_area_per_person} m² per persona")
+            return green_area_per_person
 
     def _calculate_travel_time(self, distance_meters, transport_mode):
         """
@@ -73,6 +85,80 @@ class GreenAreaFinderCopernicus(GreenInterface):
 
         return total_time_minutes
 
+    # def get_nearest_green_position(self, lat, lon):
+    #     """
+    #     Find the nearest green area to the given coordinates.
+    #     """
+    #     if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
+    #         raise ValueError("Coordinate non valide")
+    #
+    #     data = self.copernicus_green['data']
+    #     transform = self.copernicus_green['transform']
+    #
+    #     # Translate coordinates to raster indices
+    #     row, col = [int(i) for i in ~transform * (lon, lat)]
+    #
+    #     # Check if the point is outside the raster bounds
+    #     if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
+    #         raise IndexError("Starting point outside raster bounds")
+    #
+    #     # Check if the point is already in a green area
+    #     if data[row, col] == 1:
+    #         return lat, lon
+    #
+    #     green_indices = np.argwhere(data == 1)
+    #
+    #     # Translate the indices to geographic coordinates
+    #     green_coords = np.array([
+    #         rasterio.transform.xy(transform, idx[0], idx[1])
+    #         for idx in green_indices
+    #     ])
+    #
+    #     # Find the distance with haversine
+    #     def haversine_distance(lon1, lat1, lon2, lat2):
+    #         """
+    #         Calculate the haversine distance between two points in km.
+    #         """
+    #         from math import radians, sin, cos, sqrt, atan2
+    #
+    #         R = 6371  # Earth radius in km
+    #
+    #         lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    #
+    #         dlat = lat2 - lat1
+    #         dlon = lon2 - lon1
+    #
+    #         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    #         c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    #
+    #         return R * c
+    #
+    #     distances = [
+    #         haversine_distance(lon, lat, green_coord[0], green_coord[1])
+    #         for green_coord in green_coords
+    #     ]
+    #
+    #     # Find the smallest distance
+    #     nearest_index = min(range(len(distances)), key=lambda i: distances[i])
+    #
+    #     longitude, latitude = green_coords[nearest_index]
+    #     print(f"Green coordinates: {latitude}, {longitude}")
+    #     return (latitude, longitude)
+
+    def haversine_distance(self, lon1, lat1, lon2, lat2):
+
+        R = 6371  # Earth radius in km
+
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        return R * c
+
     def get_nearest_green_position(self, lat, lon):
         """
         Find the nearest green area to the given coordinates.
@@ -83,14 +169,13 @@ class GreenAreaFinderCopernicus(GreenInterface):
         data = self.copernicus_green['data']
         transform = self.copernicus_green['transform']
 
-        # Translate coordinates to raster indices
+        # Coordinates translation to raster indices
         row, col = [int(i) for i in ~transform * (lon, lat)]
 
-        # Check if the point is outside the raster bounds
         if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
-            raise IndexError("Starting point outside raster bounds")
+            raise IndexError("Punto di partenza fuori dai limiti del raster")
 
-        # Check if the point is already in a green area
+        # Calculate if the point is already in a green area
         if data[row, col] == 1:
             return lat, lon
 
@@ -102,38 +187,18 @@ class GreenAreaFinderCopernicus(GreenInterface):
             for idx in green_indices
         ])
 
-        # Find the distance with haversine
-        def haversine_distance(lon1, lat1, lon2, lat2):
-            """
-            Calculate the haversine distance between two points in km.
-            """
-            from math import radians, sin, cos, sqrt, atan2
-
-            R = 6371  # Earth radius in km
-
-            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-            dlat = lat2 - lat1
-            dlon = lon2 - lon1
-
-            a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-            c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-            return R * c
-
+        # Calculate the distance with haversine
         distances = [
-            haversine_distance(lon, lat, green_coord[0], green_coord[1])
+            self.haversine_distance(lon, lat, green_coord[0], green_coord[1])
             for green_coord in green_coords
         ]
 
-        # Find the smallest distance
-        nearest_index = min(range(len(distances)), key=lambda i: distances[i])
+        # Find minimun distance
+        nearest_index = np.argmin(distances)
 
         longitude, latitude = green_coords[nearest_index]
-        print(f"Green coordinates: {latitude}, {longitude}")
+        print(f"Coordinate verdi più vicine: {latitude}, {longitude}")
         return (latitude, longitude)
-
-
 
     def direction_to_green(self, lat, lon, transport_mode):
         """
@@ -181,14 +246,16 @@ class GreenAreaFinderCopernicus(GreenInterface):
         # Finds the nearest nodes in the graph
         orig_node = ox.distance.nearest_nodes(G, X=lon, Y=lat)
         dest_node = ox.distance.nearest_nodes(G, X=nearest_lon, Y=nearest_lat)
+        print(f"Orig Node: {orig_node}, Dest Node: {dest_node}")
 
         # Calculate the shortest path (Djikstra algorithm and travel_time as weight)
 
         route = ox.shortest_path(G, orig_node, dest_node, weight="travel_time")
-
+        print(f"Percorso: {route}")
         # Calculate the total distance of the path
         total_distance = sum(G[u][v][0].get("length", 0) for u, v in zip(route[:-1], route[1:])) / 1000
         total_distance_meters = total_distance*1000
+        print(f"Distanza totale (km): {total_distance}, Distanza totale (m): {total_distance_meters}")
         # Calculate the total time of the path
         total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
         if total_distance and total_time_minutes >0 :

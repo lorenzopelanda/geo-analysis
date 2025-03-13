@@ -131,17 +131,54 @@ class LandUtils:
 
         return result
 
+    # def vector_to_raster(self, vector_data, reference_raster):
+    #     nodes, edges = vector_data
+    #     ref_crs = reference_raster['crs']
+    #
+    #     if nodes.crs != ref_crs:
+    #         nodes = nodes.to_crs(ref_crs)
+    #
+    #     shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
+    #
+    #     rasterized = rasterize(
+    #         shapes=shapes,
+    #         out_shape=reference_raster['shape'],
+    #         transform=reference_raster['transform'],
+    #         fill=0,
+    #         dtype=np.uint8,
+    #         all_touched=True
+    #     )
+    #
+    #     return {
+    #         "data": rasterized,
+    #         "transform": reference_raster['transform'],
+    #         "crs": ref_crs,
+    #         "shape": reference_raster['shape']
+    #     }
     def vector_to_raster(self, vector_data, reference_raster):
+        """
+        Rasterize the OpenStreetMap vector data using a reference raster.
+
+        Args:
+            vector_data (tuple): A tuple containing nodes (GeoDataFrame of point data) and edges (GeoDataFrame of line/polygon data).
+            reference_raster (dict): Reference raster containing 'data', 'transform', 'crs', and 'shape'.
+
+        Returns:
+            dict: Rasterized output with 'data', 'transform', 'crs', and 'shape'.
+        """
         nodes, edges = vector_data
         ref_crs = reference_raster['crs']
 
+        # Ensure the CRS matches
         if nodes.crs != ref_crs:
             nodes = nodes.to_crs(ref_crs)
+        if edges.crs != ref_crs:
+            edges = edges.to_crs(ref_crs)
 
-        shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
-
-        rasterized = rasterize(
-            shapes=shapes,
+        # Rasterize nodes (points)
+        node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
+        node_rasterized = rasterize(
+            shapes=node_shapes,
             out_shape=reference_raster['shape'],
             transform=reference_raster['transform'],
             fill=0,
@@ -149,8 +186,22 @@ class LandUtils:
             all_touched=True
         )
 
+        # Rasterize edges (lines or polygons)
+        edge_shapes = [(geom, 1) for geom in edges.geometry if geom is not None]
+        edge_rasterized = rasterize(
+            shapes=edge_shapes,
+            out_shape=reference_raster['shape'],
+            transform=reference_raster['transform'],
+            fill=0,
+            dtype=np.uint8,
+            all_touched=True
+        )
+
+        # Combine node and edge rasters
+        combined_raster = np.maximum(node_rasterized, edge_rasterized)  # Combine both rasters by taking the maximum
+
         return {
-            "data": rasterized,
+            "data": combined_raster,
             "transform": reference_raster['transform'],
             "crs": ref_crs,
             "shape": reference_raster['shape']

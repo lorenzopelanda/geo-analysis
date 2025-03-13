@@ -2,8 +2,9 @@ import numpy as np
 import json
 from .UtilsInterface import UtilsInterface
 class LandUtilsCopernicus(UtilsInterface):
-    def __init__(self, copernicus):
+    def __init__(self, copernicus, osm_green):
         self.copernicus = copernicus
+        self.osm_green = osm_green
 
     def get_land_use_percentages(self):
         data = self.copernicus
@@ -29,6 +30,25 @@ class LandUtilsCopernicus(UtilsInterface):
 
         return json.dumps(percentages)
 
+    def _filter_copernicus_with_osm(self, copernicus_green):
+        copernicus_data = copernicus_green['data']
+        osm_data = self.osm_green['data']
+
+        if copernicus_data.shape != osm_data.shape:
+            raise ValueError("I raster di Copernicus e OpenStreetMap devono avere la stessa dimensione.")
+
+        # Select only the pixels that are green in both rasters
+        filtered_data = np.where((osm_data == 1) & (copernicus_data == 1), 1, 0)
+
+        filtered_raster = {
+            'data': filtered_data,
+            'transform': copernicus_green['transform'],
+            'crs': copernicus_green['crs'],
+            'shape':copernicus_green['shape']
+        }
+
+        return filtered_raster
+
     def get_green_area(self, **kwargs):
         if kwargs is None:
             green_areas = frozenset([10, 20, 30, 60, 95, 100])
@@ -43,9 +63,12 @@ class LandUtilsCopernicus(UtilsInterface):
         green_mask = np.isin(data, list(green_areas))
         raster = np.zeros_like(data, dtype=np.uint8)
         raster[green_mask] = 1
-        return{
+
+        result = {
             "data": raster,
             "transform": transform,
             "crs": copernicus_crs,
             "shape": copernicus_shape
         }
+        filtered_data = self._filter_copernicus_with_osm(result)
+        return filtered_data

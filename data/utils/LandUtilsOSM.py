@@ -43,7 +43,6 @@ class LandUtilsOSM(UtilsInterface):
     #         print(f"Error processing OSM green areas: {str(e)}")
     #         raise
 
-
     def get_green_area(self):
         try:
             bounding_box = self.bounding_box
@@ -52,7 +51,7 @@ class LandUtilsOSM(UtilsInterface):
             print("Bounding box coordinates:", aoi_box.bounds)  # Debug
 
             green_tags = {
-                'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland', 'heath', 'fell'],
+                'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland', 'heath', 'fell', 'tundra', 'shrubbery'],
                 'landuse': ['forest', 'meadow', 'grass', 'recreation_ground', 'village_green', 'allotments'],
                 'leisure': ['park', 'garden', 'nature_reserve']
             }

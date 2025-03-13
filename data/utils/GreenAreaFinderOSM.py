@@ -2,7 +2,9 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
+from math import radians, sin, cos, sqrt, atan2
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry import Point
 from scipy.spatial import cKDTree
 from .UtilsInterface import GreenInterface
@@ -10,11 +12,35 @@ ox.settings.use_cache = True
 
 class GreenAreaFinderOSM(GreenInterface):
     def __init__(self, osm_green, vector_traffic_area, ghs_pop_data):
-        self.vector_green = osm_green
+        self.osm_green = osm_green
         self.vector_traffic_area = vector_traffic_area
         self.preprocessed_graph = None
         self.ghs_pop_data = ghs_pop_data
         self._green_positions_cache = {}
+
+    def green_area_per_person(self):
+        """
+        Calculate the green area per person in the given raster and population data.
+        """
+        ghspop_data = self.ghs_pop_data['data']
+        green_data = self.osm_green['data']
+
+        num_green_pixels = np.count_nonzero(green_data)
+        # Debug print
+        print(f"Numero di pixel verdi: {num_green_pixels}")
+
+        total_green_area = num_green_pixels * 100  # metri quadrati
+        print(f"Area verde totale: {total_green_area} m²")
+
+        total_population = np.sum(ghspop_data)
+        print(f"Popolazione totale: {total_population}")
+
+        if total_population == 0:
+            return float('inf')
+        else:
+            green_area_per_person = round(total_green_area / total_population, 4)
+            print(f"Green area per person: {green_area_per_person} m² per persona")
+            return green_area_per_person
 
     def _calculate_travel_time(self, distance_meters, transport_mode):
         """
@@ -25,7 +51,7 @@ class GreenAreaFinderOSM(GreenInterface):
             'walk': 1.4,  # 5 km/h
             'bike': 4.17,  # 15 km/h
             'drive': 8.33,  # 30 km/h (urban)
-            'all_public': 8.33, # 30 km/h
+            'all_public': 8.33,  # 30 km/h
             'drive_service': 8.33  # as drive
         }
 
@@ -59,102 +85,132 @@ class GreenAreaFinderOSM(GreenInterface):
 
         return total_time_minutes
 
-    def green_area_per_person(self):
-        green_nodes, green_edges = self.vector_green
-
-        ghspop_data = self.ghs_pop_data['data']
-        total_population = np.sum(ghspop_data)
-
-        # Calculate total green area in square meters
-        total_green_area = 0.0
-
-        # Calculate area from green edges (polygons)
-        if not green_edges.empty:
-            for _, edge in green_edges.iterrows():
-                if hasattr(edge, 'geometry') and edge.geometry is not None:
-                    total_green_area += edge.geometry.area
-
-        # Per i nodi (punti come alberi singoli), assegniamo un'area standard stimata
-        if not green_nodes.empty:
-            standard_node_area = 10.0  # Ad esempio, 10 mq per un albero
-            total_green_area += len(green_nodes) * standard_node_area
-
-        # Return green area per person
-        if total_population == 0:
-            return float('inf')
-        else:
-            return round(total_green_area / total_population, 4)
+    # def get_nearest_green_position(self, lat, lon):
+    #     """
+    #     Find the nearest green area to the given coordinates.
+    #     """
+    #     if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
+    #         raise ValueError("Coordinate non valide")
+    #
+    #     data = self.copernicus_green['data']
+    #     transform = self.copernicus_green['transform']
+    #
+    #     # Translate coordinates to raster indices
+    #     row, col = [int(i) for i in ~transform * (lon, lat)]
+    #
+    #     # Check if the point is outside the raster bounds
+    #     if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
+    #         raise IndexError("Starting point outside raster bounds")
+    #
+    #     # Check if the point is already in a green area
+    #     if data[row, col] == 1:
+    #         return lat, lon
+    #
+    #     green_indices = np.argwhere(data == 1)
+    #
+    #     # Translate the indices to geographic coordinates
+    #     green_coords = np.array([
+    #         rasterio.transform.xy(transform, idx[0], idx[1])
+    #         for idx in green_indices
+    #     ])
+    #
+    #     # Find the distance with haversine
+    #     def haversine_distance(lon1, lat1, lon2, lat2):
+    #         """
+    #         Calculate the haversine distance between two points in km.
+    #         """
+    #         from math import radians, sin, cos, sqrt, atan2
+    #
+    #         R = 6371  # Earth radius in km
+    #
+    #         lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    #
+    #         dlat = lat2 - lat1
+    #         dlon = lon2 - lon1
+    #
+    #         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    #         c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    #
+    #         return R * c
+    #
+    #     distances = [
+    #         haversine_distance(lon, lat, green_coord[0], green_coord[1])
+    #         for green_coord in green_coords
+    #     ]
+    #
+    #     # Find the smallest distance
+    #     nearest_index = min(range(len(distances)), key=lambda i: distances[i])
+    #
+    #     longitude, latitude = green_coords[nearest_index]
+    #     print(f"Green coordinates: {latitude}, {longitude}")
+    #     return (latitude, longitude)
 
     def get_nearest_green_position(self, lat, lon):
-        """
-        Find the nearest green area to the given coordinates using OpenStreetMap vector data.
 
-        Args:
-            lat (float): Latitude of the point
-            lon (float): Longitude of the point
-
-        Returns:
-            tuple: (latitude, longitude) of the nearest green area
-        """
-        # Validate coordinates
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
             raise ValueError("Coordinate non valide")
 
-        # Get green areas from OSM data
-        green_nodes, green_edges = self.vector_green['data']
+        data = self.osm_green['data']
+        transform = self.osm_green['transform']
 
-        # Create a point from input coordinates
-        point = Point(lon, lat)
-        user_point = gpd.GeoDataFrame(geometry=[point], crs="EPSG:4326")
+        col, row = [int(round(i)) for i in ~transform * (lon, lat)]
 
-        # Check if the point is already in a green area
-        if not green_edges.empty:
-            # Check if point is within any green edge/polygon
-            is_in_green = False
-            for _, edge in green_edges.iterrows():
-                if hasattr(edge, 'geometry') and edge.geometry is not None:
-                    if edge.geometry.contains(point):
-                        return lat, lon
+        if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
+            raise IndexError("Punto fuori dai limiti del raster")
 
-        # Prepare nodes for distance calculation
-        if not green_nodes.empty:
-            # Extract coordinates from green nodes
-            green_points = []
-            for _, node in green_nodes.iterrows():
-                if hasattr(node, 'geometry') and node.geometry is not None:
-                    green_points.append((node.geometry.y, node.geometry.x))  # (lat, lon)
+        search_radius = 3
+        for dr in range(-search_radius, search_radius + 1):
+            for dc in range(-search_radius, search_radius + 1):
+                if (0 <= (row + dr) < data.shape[0] and
+                        0 <= (col + dc) < data.shape[1]):
+                    if data[row + dr, col + dc] == 1:
+                        nearest_lon, nearest_lat = rasterio.transform.xy(
+                            transform,
+                            row + dr,
+                            col + dc
+                        )
+                        return (nearest_lat, nearest_lon)
 
-            if not green_points:
-                raise ValueError("No valid green points found")
+        green_indices = np.argwhere(data == 1)
+        if len(green_indices) == 0:
+            raise ValueError("Nessuna area verde trovata nel raster")
 
-            # Create KDTree for efficient nearest neighbor search
-            tree = cKDTree(green_points)
+        # Conversion to geographic coordinates
+        green_coords = np.array([
+            rasterio.transform.xy(transform, idx[0], idx[1])
+            for idx in green_indices
+        ])
 
-            # Find nearest point
-            dist, idx = tree.query((lat, lon), k=1)
-            nearest_point = green_points[idx]
+        # Distance calculation with haversine
+        lons = green_coords[:, 0]
+        lats = green_coords[:, 1]
+        distances = self.haversine_vectorized(lon, lat, lons, lats)
 
-            return nearest_point  # Returns (lat, lon)
+        # Find the nearest green area
+        nearest_idx = np.argmin(distances)
+        nearest_lon, nearest_lat = green_coords[nearest_idx]
 
-        # If we have edges but no nodes, use edge centroids
-        if not green_edges.empty and green_nodes.empty:
-            centroids = []
-            for _, edge in green_edges.iterrows():
-                if hasattr(edge, 'geometry') and edge.geometry is not None:
-                    centroid = edge.geometry.centroid
-                    centroids.append((centroid.y, centroid.x))  # (lat, lon)
+        return (nearest_lat, nearest_lon)
 
-            if not centroids:
-                raise ValueError("No green edges with valid geometry found")
+    def haversine_vectorized(self, lon1, lat1, lons2, lats2):
 
-            # Create KDTree for efficient nearest neighbor search
-            tree = cKDTree(centroids)
+        R = 6371  # Earth radius in km
 
-            # Find nearest point
-            dist, idx = tree.query((lat, lon), k=1)
-            nearest_point = centroids[idx]
 
-            return nearest_point  # Returns (lat, lon)
+        lat1 = np.radians(lat1)
+        lon1 = np.radians(lon1)
+        lats2 = np.radians(lats2)
+        lons2 = np.radians(lons2)
+
+        dlat = lats2 - lat1
+        dlon = lons2 - lon1
+
+        # Vectorized formula
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
+        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+        return R * c
+
     def direction_to_green(self, lat, lon, transport_mode):
         """
         Calculate the distance and estimated time to reach the nearest green area
@@ -201,39 +257,29 @@ class GreenAreaFinderOSM(GreenInterface):
         # Finds the nearest nodes in the graph
         orig_node = ox.distance.nearest_nodes(G, X=lon, Y=lat)
         dest_node = ox.distance.nearest_nodes(G, X=nearest_lon, Y=nearest_lat)
+        print(f"Orig Node: {orig_node}, Dest Node: {dest_node}")
 
         # Calculate the shortest path (Djikstra algorithm and travel_time as weight)
 
         route = ox.shortest_path(G, orig_node, dest_node, weight="travel_time")
-
+        print(f"Percorso: {route}")
         # Calculate the total distance of the path
         total_distance = sum(G[u][v][0].get("length", 0) for u, v in zip(route[:-1], route[1:])) / 1000
-        total_distance_meters = total_distance*1000
+        total_distance_meters = total_distance * 1000
+        print(f"Distanza totale (km): {total_distance}, Distanza totale (m): {total_distance_meters}")
         # Calculate the total time of the path
         total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
+        if total_distance and total_time_minutes > 0:
+            print("Distance and time calculated!")
 
-        return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat, "lon": nearest_lon})
+        return json.dumps(
+            {"distance_km": round(total_distance, 4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat,
+             "lon": nearest_lon})
 
     def get_isochrone_green(self, lat, lon, max_time, network_type):
         """
-        Calculate the reachable green areas within a given time from a starting point
-        using OSM vector data instead of raster data.
-
-        Args:
-            lat (float): Latitude of starting point
-            lon (float): Longitude of starting point
-            max_time (int/float): Maximum travel time in minutes
-            network_type (str): Type of transportation network
-
-        Returns:
-            str: JSON string with information about reachable green areas
+        Calculate the reachable green areas within a given time from a starting point.
         """
-        import json
-        import geopandas as gpd
-        from shapely.geometry import Point, Polygon
-        import numpy as np
-        import osmnx as ox
-
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
             raise ValueError("Coordinates not valid")
 
@@ -243,13 +289,6 @@ class GreenAreaFinderOSM(GreenInterface):
         valid_transport_modes = ['walk', 'bike', 'drive', 'all_public', 'drive_public']
         if network_type not in valid_transport_modes:
             raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
-
-        # Get green areas using the get_green_area method
-        green_data = self.get_green_area()
-        if green_data is None:
-            return json.dumps({"error": "No green areas found in the region"})
-
-        green_nodes, green_edges = green_data
 
         if not hasattr(self, 'vector_traffic_area') or self.vector_traffic_area is None:
             raise ValueError("Traffic area not reachable")
@@ -263,8 +302,7 @@ class GreenAreaFinderOSM(GreenInterface):
         }.get(network_type, 5)
 
         nodes, edges = self.vector_traffic_area
-        G = ox.graph_from_gdfs(nodes, edges)  # Restructure of the graph
-
+        G = ox.graph_from_gdfs(nodes, edges)  # Ristructure of the graph
         # Find nearest node from starting point
         start_node, _ = ox.distance.nearest_nodes(G, X=lon, Y=lat, return_dist=True)
 
@@ -286,7 +324,6 @@ class GreenAreaFinderOSM(GreenInterface):
                 "error": f"Time after delays is ({fixed_delay / 60} min) not enough to travel"
             })
 
-        # Calculate travel time for each edge
         for u, v, data in G.edges(data=True):
             if 'travel_time' not in data and 'length' in data:
                 length_m = data['length']
@@ -327,157 +364,62 @@ class GreenAreaFinderOSM(GreenInterface):
                         queue.append((neighbor, new_time))
 
         if not reachable_nodes:
-            return json.dumps({"error": "No reachable nodes for the time limit"})
+            return json.dumps({"error": "No reachable green area for the time limit"})
 
-        # Create a GeoDataFrame from reachable nodes
-        reachable_points = []
-        for node_id, data in reachable_nodes.items():
-            reachable_points.append(Point(data['x'], data['y']))
+        # Get the coordinates of the reachable nodes
+        reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
 
-        reachable_gdf = gpd.GeoDataFrame(geometry=reachable_points, crs="EPSG:4326")
+        data = self.osm_green['data']
+        transform = self.osm_green['transform']
 
-        # Try to create a convex hull or concave hull to represent the isochrone area
-        # Simplifying by using convex hull for this example
-        if len(reachable_points) >= 3:
-            isochrone_polygon = Polygon([(p.x, p.y) for p in reachable_points]).convex_hull
-        else:
-            # Not enough points for a polygon, use a buffer around points
-            isochrone_polygon = reachable_gdf.unary_union.buffer(0.001)  # Small buffer in degrees
-
-        isochrone_gdf = gpd.GeoDataFrame(geometry=[isochrone_polygon], crs="EPSG:4326")
-
-        # Calculate intersection with green areas
-        green_area_total = 0
-        green_areas_info = {}
+        total_pixels = 0
+        green_area_pixels = 0
         green_accessibility = {}
 
-        # Calculate total isochrone area
-        isochrone_area = isochrone_polygon.area
+        for lat_point, lon_point in reachable_coords:
+            try:
+                # Convert coordinates to raster indices
+                row, col = [int(i) for i in ~transform * (lon_point, lat_point)]
 
-        # Process green edges (polygons/lines)
-        if not green_edges.empty:
-            # Make sure CRS matches
-            if green_edges.crs != isochrone_gdf.crs:
-                green_edges = green_edges.to_crs(isochrone_gdf.crs)
+                if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
+                    total_pixels += 1
+                    pixel_value = data[row, col]
 
-            # Find intersection
-            intersecting_greens = gpd.overlay(green_edges, isochrone_gdf, how='intersection')
+                    # Count every pixel as green area
+                    if pixel_value == 1:
+                        green_area_pixels += 1
 
-            if not intersecting_greens.empty:
-                for idx, green in intersecting_greens.iterrows():
-                    if hasattr(green, 'geometry') and green.geometry is not None:
-                        area = green.geometry.area
-                        green_area_total += area
+                        node_data = next(
+                            (d for n, d in reachable_nodes.items() if d['y'] == lat_point and d['x'] == lon_point),
+                            None)
+                        if node_data:
+                            time_to_node = node_data['time']
+                            distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
+                            travel_time = self._calculate_travel_time(distance_meters, network_type)
+                            green_accessibility[node_data['x']] = {
+                                'time_minutes': travel_time,
+                                'distance_meters': round(distance_meters, 2),
+                                'lat': lat_point,
+                                'lon': lon_point
+                            }
+            except Exception:
+                continue
 
-                        # Categorize green areas - using natural tag as category
-                        category = green.get('natural', 'unknown')
-                        if category in green_areas_info:
-                            green_areas_info[category] += area
-                        else:
-                            green_areas_info[category] = area
+        green_percentage = (green_area_pixels / max(1, total_pixels)) * 100 if total_pixels > 0 else 0
 
-        # Process green nodes (points)
-        if not green_nodes.empty:
-            # Make sure CRS matches
-            if green_nodes.crs != isochrone_gdf.crs:
-                green_nodes = green_nodes.to_crs(isochrone_gdf.crs)
-
-            # Standard area for node features (e.g., trees)
-            standard_node_area = 10.0  # 10 sq meters for a tree
-
-            # Find nodes within isochrone
-            nodes_within = gpd.sjoin(green_nodes, isochrone_gdf, predicate='within')
-
-            if not nodes_within.empty:
-                node_count = len(nodes_within)
-                node_area_total = node_count * standard_node_area
-                green_area_total += node_area_total
-
-                # Group by category
-                for category, group in nodes_within.groupby('natural'):
-                    count = len(group)
-                    area = count * standard_node_area
-                    if category in green_areas_info:
-                        green_areas_info[category] += area
-                    else:
-                        green_areas_info[category] = area
-
-        # Calculate percentage of green area within isochrone
-        # Convert area to square meters
-        # Since we're using EPSG:4326, we need to approximate the area in sq meters
-        # This is a rough approximation - for precision, a projected CRS would be better
-        isochrone_area_sqm = isochrone_area * 111320 * 111320  # rough conversion from degrees to meters
-        green_percentage = (green_area_total / max(0.000001, isochrone_area_sqm)) * 100
-
-        # Identify accessible green areas with travel times
-        for node_id, data in reachable_nodes.items():
-            node_point = Point(data['x'], data['y'])
-
-            # Check green edges
-            if not green_edges.empty:
-                for idx, green in green_edges.iterrows():
-                    if green.geometry.contains(node_point) or green.geometry.distance(node_point) < 0.0001:
-                        time_to_node = data['time']
-                        distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                        travel_time = self._calculate_travel_time(distance_meters, network_type)
-                        category = self._get_green_area_category_osm(green)
-
-                        green_accessibility[node_id] = {
-                            'category': category,
-                            'time_minutes': travel_time,
-                            'distance_meters': round(distance_meters, 2),
-                            'lat': data['y'],
-                            'lon': data['x']
-                        }
-                        break
-
-            # Check green nodes
-            if not green_nodes.empty and node_id not in green_accessibility:
-                for idx, green_node in green_nodes.iterrows():
-                    green_point = green_node.geometry
-                    if node_point.distance(green_point) < 0.0001:  # Close enough
-                        time_to_node = data['time']
-                        distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                        travel_time = self._calculate_travel_time(distance_meters, network_type)
-                        category = self._get_green_area_category_osm(green)
-
-                        green_accessibility[node_id] = {
-                            'category': category,
-                            'time_minutes': travel_time,
-                            'distance_meters': round(distance_meters, 2),
-                            'lat': data['y'],
-                            'lon': data['x']
-                        }
-                        break
-
-        # Round values in green_areas_info
-        green_areas_info = {k: round(v, 2) for k, v in green_areas_info.items()}
+        pixel_area_sqm = 100  # 10m x 10m
+        green_area_sqm = green_area_pixels * pixel_area_sqm
 
         result = {
             "isochrone_time_minutes": max_time,
             "transport_mode": network_type,
             "green_area_percentage": round(green_percentage, 2),
-            "green_area_sqm": round(green_area_total, 2),
-            "green_area_categories": green_areas_info,
-            "accessibility": green_accessibility
+            "green_area_sqm": round(green_area_sqm, 2),
+            "green_accessibility": list(green_accessibility.values()),
         }
 
         return json.dumps(result)
 
-    def _get_green_area_category_osm(self, feature):
-        green_tags = {
-            'natural': ['fell', 'natural', 'grassland', 'heath', 'scrub', 'tree', 'wood',
-                        'shrubbery', 'tree_row', 'tundra']
-        }
-        if hasattr(feature, 'natural') and feature.natural in green_tags.get('natural', []):
-            return feature.natural
-
-        # Could extend with additional tag checks if needed
-        # For example, if you also use 'landuse' tags for green areas:
-        # if hasattr(feature, 'landuse') and feature.landuse in self.green_tags.get('landuse', []):
-        #     return feature.landuse
-
-        return "unknown"
     def _estimate_distance_from_time(self, time_seconds, transport_mode):
         # Speed constants in m/s
         SPEEDS = {
