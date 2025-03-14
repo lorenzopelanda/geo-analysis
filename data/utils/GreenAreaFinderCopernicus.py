@@ -28,10 +28,10 @@ class GreenAreaFinderCopernicus(GreenInterface):
         total_population = np.sum(ghspop_data)
 
         if total_population == 0:
-            return float('inf')
+            return json.dumps({'green_area_per_person': float('inf')})
         else:
             green_area_per_person = round(total_green_area / total_population, 4)
-            return green_area_per_person
+            return json.dumps({'green_area_per_person': green_area_per_person})
 
     def _calculate_travel_time(self, distance_meters, transport_mode):
         """
@@ -76,61 +76,73 @@ class GreenAreaFinderCopernicus(GreenInterface):
 
         return total_time_minutes
 
-    def haversine_distance(self, lon1, lat1, lon2, lat2):
-
-        R = 6371  # Earth radius in km
-
-        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-
-        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return R * c
 
     def get_nearest_green_position(self, lat, lon):
-        """
-        Find the nearest green area to the given coordinates.
-        Returns (lat, lon) of the nearest green area.
-        """
+
         if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
             raise ValueError("Coordinates not valid")
 
         data = self.copernicus_green['data']
         transform = self.copernicus_green['transform']
 
-        # Coordinates translation to raster indices
-        col, row = [int(i) for i in ~transform * (lon, lat)]
+        col, row = [int(round(i)) for i in ~transform * (lon, lat)]
 
-        # Check if indices are within bounds
         if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
             raise IndexError("Starting point outside raster bounds")
 
-        # Calculate if the point is already in a green area
-        if data[row, col] == 1:
-            return lat, lon
+        search_radius = 3
+        for dr in range(-search_radius, search_radius + 1):
+            for dc in range(-search_radius, search_radius + 1):
+                if (0 <= (row + dr) < data.shape[0] and
+                        0 <= (col + dc) < data.shape[1]):
+                    if data[row + dr, col + dc] == 1:
+                        nearest_lon, nearest_lat = rasterio.transform.xy(
+                            transform,
+                            row + dr,
+                            col + dc
+                        )
+                        return (nearest_lat, nearest_lon)
 
         green_indices = np.argwhere(data == 1)
+        if len(green_indices) == 0:
+            raise ValueError("No green areas found in the raster")
 
-        # Translate the indices to geographic coordinates (x, y) -> (lon, lat)
+        # Conversion to geographic coordinates
         green_coords = np.array([
             rasterio.transform.xy(transform, idx[0], idx[1])
             for idx in green_indices
         ])
 
-        # Calculate the distance with haversine
-        distances = [
-            self.haversine_distance(lon, lat, green_lon, green_lat)
-            for green_lon, green_lat in green_coords
-        ]
+        # Distance calculation with haversine
+        lons = green_coords[:, 0]
+        lats = green_coords[:, 1]
+        distances = self._haversine_vectorized(lon, lat, lons, lats)
 
-        # Find minimum distance
-        nearest_index = np.argmin(distances)
+        # Find the nearest green area
+        nearest_idx = np.argmin(distances)
+        nearest_lon, nearest_lat = green_coords[nearest_idx]
 
-        nearest_lon, nearest_lat = green_coords[nearest_index]
         return (nearest_lat, nearest_lon)
+
+    def _haversine_vectorized(self, lon1, lat1, lons2, lats2):
+
+        R = 6371  # Earth radius in km
+
+
+        lat1 = np.radians(lat1)
+        lon1 = np.radians(lon1)
+        lats2 = np.radians(lats2)
+        lons2 = np.radians(lons2)
+
+        dlat = lats2 - lat1
+        dlon = lons2 - lon1
+
+        # Vectorized formula
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
+        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+        return R * c
+
 
     def direction_to_green(self, lat, lon, transport_mode):
         """

@@ -4,18 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Edited some functions for the OSM data, now everything works">
+    <list default="true" id="559b7502-1d10-4649-b2a5-233c685cce13" name="Changes" comment="Ultimated the examples jupyter noteboks">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/downloader/OSMDownloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/GreenAreaFinderCopernicus.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/GreenAreaFinderCopernicus.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/utils/GreenAreaFinderOSM.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/GreenAreaFinderOSM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/utils/LandUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/utils/LandUtilsCopernicus.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtilsCopernicus.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/utils/LandUtilsOSM.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/utils/LandUtilsOSM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/examples/example_copernicus.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_copernicus.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/examples/example_ghspop.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_ghspop.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_green_area_finder.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/examples/example_osm.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test/examples/example_osm.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_area_download.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -374,7 +368,11 @@
       <workItem from="1741880956646" duration="558000" />
       <workItem from="1741881523784" duration="500000" />
       <workItem from="1741882032628" duration="2915000" />
-      <workItem from="1741885410553" duration="2171000" />
+      <workItem from="1741885410553" duration="2234000" />
+      <workItem from="1741941795620" duration="391000" />
+      <workItem from="1741942195122" duration="195000" />
+      <workItem from="1741942398354" duration="345000" />
+      <workItem from="1741942751481" duration="1491000" />
     </task>
     <task id="LOCAL-00001" summary="git commit -m &quot;started the working on the request of the chosen raster tile&quot;">
       <option name="closed" value="true" />
@@ -552,7 +550,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741858544221</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Ultimated the examples jupyter noteboks">
+      <option name="closed" value="true" />
+      <created>1741887620474</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1741887620474</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -602,7 +608,8 @@
     <MESSAGE value="Added some interfaces for more modularity in finding green areas also for OpenStreetMap data" />
     <MESSAGE value="Rewrote some methods for green_finder for copernicus data." />
     <MESSAGE value="Edited some functions for the OSM data, now everything works" />
-    <option name="LAST_COMMIT_MESSAGE" value="Edited some functions for the OSM data, now everything works" />
+    <MESSAGE value="Ultimated the examples jupyter noteboks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ultimated the examples jupyter noteboks" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/geo_analysis$test_raster_download.coverage" NAME="test_raster_download Coverage Results" MODIFIED="1737113451449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />

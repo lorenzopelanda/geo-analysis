@@ -27,10 +27,10 @@ class GreenAreaFinderOSM(GreenInterface):
         total_population = np.sum(ghspop_data)
 
         if total_population == 0:
-            return float('inf')
+            return json.dumps({'green_area_per_person': float('inf')})
         else:
             green_area_per_person = round(total_green_area / total_population, 4)
-            return green_area_per_person
+            return json.dumps({'green_area_per_person': green_area_per_person})
 
     def _calculate_travel_time(self, distance_meters, transport_mode):
         """
