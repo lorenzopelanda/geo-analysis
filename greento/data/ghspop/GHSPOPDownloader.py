@@ -12,7 +12,8 @@ import rasterio.mask
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
 from shapely.geometry import box
-from data.utils.UtilsInterface import DownloaderInterface
+from greento.data.DataInterface import DownloaderInterface
+from tqdm import tqdm
 
 ox.settings.use_cache = True
 
@@ -228,18 +229,31 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Download and process GHS-POP data for the given bounding box, converting it to EPSG:4326.
         """
-        self.__remove_existing_directory()
+        steps=["Removing existing directory","Loading shapefile","Getting tiles for bounds","Downloading and processing tiles","Cropping bounds"]
+        with tqdm(total=100, desc="Overall Progress", unit = "steps") as pbar:
+            self.__remove_existing_directory()
+            pbar.update(10)
+            
+            pbar.set_description(steps[1])
+            tiles_gdf = self.__load_shapefile()
+            pbar.update(10)
 
-        tiles_gdf = self.__load_shapefile()
+            pbar.set_description(steps[2])
+            # Get necessary tiles for the area
+            tiles_to_download = self.__get_tiles_for_bounds(bounding_box, tiles_gdf)
+            pbar.update(10)
 
-        # Get necessary tiles for the area
-        tiles_to_download = self.__get_tiles_for_bounds(bounding_box, tiles_gdf)
-
-        if not tiles_to_download:
-            raise ValueError("No tiles to download for the given bounds.")
-
-        ghs_data, ghs_transform, ghs_crs, ghs_shape = self.__download_and_process_tiles(tiles_to_download)
-        ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped = self.__crop_bounds(ghs_data, ghs_transform, bounding_box)
-        ghs_data_cropped = np.squeeze(ghs_data_cropped, axis=0)
-        self.__remove_existing_directory()
-        return {"data":ghs_data_cropped, "transform":ghs_transform_cropped, "crs": ghs_crs_cropped,"shape": ghs_shape_cropped}
+            if not tiles_to_download:
+                raise ValueError("No tiles to download for the given bounds.")
+            
+            pbar.set_description(steps[3])
+            ghs_data, ghs_transform, ghs_crs, ghs_shape = self.__download_and_process_tiles(tiles_to_download)
+            pbar.update(50)
+            pbar.set_description(steps[4])
+            ghs_data_cropped, ghs_transform_cropped, ghs_crs_cropped, ghs_shape_cropped = self.__crop_bounds(ghs_data, ghs_transform, bounding_box)
+            pbar.update(10)
+            ghs_data_cropped = np.squeeze(ghs_data_cropped, axis=0)
+            self.__remove_existing_directory()
+            pbar.update(10)
+            pbar.set_description("GHS-POP data downloaded")
+            return {"data":ghs_data_cropped, "transform":ghs_transform_cropped, "crs": ghs_crs_cropped,"shape": ghs_shape_cropped}

@@ -4,4 +4,6 @@ data/__pycache__
 utils/__pycache__
 test/__pycache__
 bounding_box/__pycache__
-test/test_land.py
+test_land.py
+geo_analysis.egg-info/
+cache/
