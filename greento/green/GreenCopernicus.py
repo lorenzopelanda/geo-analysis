@@ -1,10 +1,11 @@
 import numpy as np
-from greento.green.GreenInterface import Interface
+from tqdm import tqdm
+from greento.green.GreenInterface import GreenInterface
 
-class GreenCopernicus(Interface):
+class GreenCopernicus(GreenInterface):
     def __init__(self, copernicus):
         self.copernicus = copernicus
-    def get_green_area(self, **kwargs):
+    def get_green(self, **kwargs):
         if kwargs is None:
             green_areas = frozenset([10,20, 30])
         else:

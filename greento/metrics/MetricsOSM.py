@@ -1,8 +1,8 @@
 import json
 import numpy as np
 import osmnx as ox
-from MetricsInterface import MetricsInterface
-from greento.utils.GeoUtils import Utils
+from .MetricsInterface import MetricsInterface
+from greento.utils.GeoUtils import GeoUtils
 
 class MetricsOSM(MetricsInterface):
     def __init__(self, osm, vector_traffic_area, ghs_pop_data):
@@ -148,7 +148,7 @@ class MetricsOSM(MetricsInterface):
                         if node_data:
                             time_to_node = node_data['time']
                             distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                            travel_time = Utils()._calculate_travel_time(distance_meters, network_type)
+                            travel_time = GeoUtils()._calculate_travel_time(distance_meters, network_type)
                             green_accessibility[node_data['x']] = {
                                 'time_minutes': travel_time,
                                 'distance_meters': round(distance_meters, 2),

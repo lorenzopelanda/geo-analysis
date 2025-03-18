@@ -1,10 +1,10 @@
 import osmnx as ox
 import geopandas as gpd
+from tqdm import tqdm
 
 class Traffic:
-    def __init__(self, osm, bounding_box):
+    def __init__(self, bounding_box):
         self.bounding_box = bounding_box
-        self.osm = osm    
 
     def get_traffic_area(self, network_type):
         """
@@ -12,24 +12,34 @@ class Traffic:
         """
         bounding_box = self.bounding_box
         aoi_box = bounding_box.to_geometry()
+        with tqdm(total = 100, desc= "Downloading traffic data") as pbar:
+            pbar.update(10)
+            # Download traffic network
+            graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
+            pbar.update(40)
+            pbar.set_description("Processing traffic data")
 
-        graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
+            if graph is None:
+                print("Failed to create graph")
+                return None
 
-        if graph is None:
-            print("Failed to create graph")
-            return None
+            # Convert graph to GeoDataFrames
+            nodes, edges = ox.graph_to_gdfs(graph, nodes=True, edges=True)
+            pbar.update(20)
+            # Clip to AOI
+            nodes = gpd.clip(nodes, aoi_box)
+            pbar.update(10)
+            edges = gpd.clip(edges, aoi_box)
+            pbar.update(10)
+            # Add coordinates
+            nodes['x'] = nodes.geometry.x
+            nodes['y'] = nodes.geometry.y
 
-        # Convert graph to GeoDataFrames
-        nodes, edges = ox.graph_to_gdfs(graph, nodes=True, edges=True)
-        # Clip to AOI
-        nodes = gpd.clip(nodes, aoi_box)
-        edges = gpd.clip(edges, aoi_box)
-        # Add coordinates
-        nodes['x'] = nodes.geometry.x
-        nodes['y'] = nodes.geometry.y
-
-        if nodes.empty or edges.empty:
-            print("Warning: Empty nodes or edges after processing")
-            return None
+            if nodes.empty or edges.empty:
+                print("Warning: Empty nodes or edges after processing")
+                return None
+            
+            pbar.update(10)
+            pbar.set_description("Finished obtaining traffic data")
 
         return (nodes, edges)

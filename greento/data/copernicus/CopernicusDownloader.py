@@ -32,27 +32,26 @@ class CopernicusDownloader(DownloaderInterface):
     def __connect_to_openeo(self):
         connection = openeo.connect("https://openeo.dataspace.copernicus.eu")
         if self.use_oidc:
-            connection.authenticate_oidc()
+            with tqdm(disable=True):
+                connection.authenticate_oidc()
         else:
             if not self.access_token:
                 self.__get_token()
-            connection.authenticate_oidc()
+            with tqdm(disable=True):
+                connection.authenticate_oidc()
         return connection
 
     def get_data(self, bounding_box):
-        steps = ["Connecting to OpenEO", "Converting geometry to GeoJSON", "Loading collection", "Downloading data", "Reading data"]
-        with tqdm(total=100, desc="Overall Progress", unit="step") as pbar:
-            # Step 1: Connect to OpenEO
+        with tqdm(total=100, desc="Downloading Copernicus data") as pbar:
+            #Connect to OpenEO
             connection = self.__connect_to_openeo()
             pbar.update(20)
 
-            # Step 2: Convert the geometry to GeoJSON
-            pbar.set_description(steps[1])
+            #Convert the geometry to GeoJSON
             aoi_geojson = bounding_box.to_geojson()
             pbar.update(10)
 
-            # Step 3: Perform the analysis directly on the remote data
-            pbar.set_description(steps[2])
+            # Perform the analysis directly on the remote data
             datacube = connection.load_collection(
                 "ESA_WORLDCOVER_10M_2021_V2",
                 spatial_extent=aoi_geojson,
@@ -60,14 +59,11 @@ class CopernicusDownloader(DownloaderInterface):
             )
             pbar.update(30)
 
-            # Step 4: Execute the process and get the result
-            pbar.set_description(steps[3])
             with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmpfile:
                 datacube.download(tmpfile.name, format="GTiff")
                 pbar.update(30)
 
-                # Step 5: Read the data into a data structure
-                pbar.set_description(steps[4])
+                #Read the data into a data structure
                 with rasterio.open(tmpfile.name) as dataset:
                     data = dataset.read(1)
                     copernicus_transform = dataset.transform

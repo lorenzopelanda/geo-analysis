@@ -19,7 +19,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            # Aggiungi eventuali script eseguibili qui
         ],
     },
 )

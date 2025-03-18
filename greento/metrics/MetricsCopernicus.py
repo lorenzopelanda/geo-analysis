@@ -1,8 +1,9 @@
 import json
 import osmnx as ox
 import numpy as np
-from greento.utils.GeoUtils import Utils
-from MetricsInterface import MetricsInterface
+from tqdm import tqdm
+from greento.utils.GeoUtils import GeoUtils
+from .MetricsInterface import MetricsInterface
 class MetricsCopernicus(MetricsInterface):
     def __init__(self, raster_data, vector_traffic_area, ghs_pop_data):
         self.copernicus_green = raster_data
@@ -13,20 +14,26 @@ class MetricsCopernicus(MetricsInterface):
         """
         Calculate the green area per person in the given raster and population data.
         """
-        ghspop_data = self.ghs_pop_data['data']
-        copernicus_data = self.copernicus_green['data']
+        with tqdm(total=100, desc="Calculating green area per person") as pbar:
+            ghspop_data = self.ghs_pop_data['data']
+            copernicus_data = self.copernicus_green['data']
+            pbar.update(20)
 
-        num_green_pixels = np.count_nonzero(copernicus_data)
+            num_green_pixels = np.count_nonzero(copernicus_data)
+            pbar.update(20)
+            total_green_area = num_green_pixels * 100  # sqm
 
-        total_green_area = num_green_pixels * 100  # sqm
-
-        total_population = np.sum(ghspop_data)
-
-        if total_population == 0:
-            return json.dumps({'green_area_per_person': float('inf')})
-        else:
-            green_area_per_person = round(total_green_area / total_population, 4)
-            return json.dumps({'green_area_per_person': green_area_per_person})
+            total_population = np.sum(ghspop_data)
+            pbar.update(40)
+            if total_population == 0:
+                pbar.update(20)
+                pbar.set_description("Finished calculating green area per person")
+                return json.dumps({'green_area_per_person': float('inf')})
+            else:
+                green_area_per_person = round(total_green_area / total_population, 4)
+                pbar.update(20)
+                pbar.set_description("Finished calculating green area per person")
+                return json.dumps({'green_area_per_person': green_area_per_person})
 
 
     def get_isochrone_green(self, lat, lon, max_time, network_type):
@@ -148,7 +155,7 @@ class MetricsCopernicus(MetricsInterface):
                         if node_data:
                             time_to_node = node_data['time']
                             distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                            travel_time = Utils()._calculate_travel_time(distance_meters, network_type)
+                            travel_time = GeoUtils()._calculate_travel_time(distance_meters, network_type)
                             green_accessibility[node_data['x']] = {
                                 'time_minutes': travel_time,
                                 'distance_meters': round(distance_meters, 2),
