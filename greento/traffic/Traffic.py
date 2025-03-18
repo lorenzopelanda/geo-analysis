@@ -3,12 +3,43 @@ import geopandas as gpd
 from tqdm import tqdm
 
 class Traffic:
+    """
+    A class to download and process traffic data using OpenStreetMap (OSM) data.
+
+    Attributes:
+    ----------
+    bounding_box : BoundingBox
+        The bounding box for which to download traffic data.
+
+    Methods:
+    -------
+    get_traffic_area(network_type):
+        Downloads the OSM network data for a given bounding box and network type, and rasterizes it to a reference raster.
+    """
     def __init__(self, bounding_box):
+        """
+        Initializes the Traffic class with a bounding box.
+
+        Parameters:
+        ----------
+        bounding_box : BoundingBox
+            The bounding box for which to download traffic data.
+        """
         self.bounding_box = bounding_box
 
     def get_traffic_area(self, network_type):
         """
-        Download the OSM network data for a given bounding box and network type, and rasterize it to a reference raster.
+        Downloads the OSM network data for a given bounding box and network type, and rasterizes it to a reference raster.
+
+        Parameters:
+        ----------
+        network_type : str
+            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all', 'all_private', 'all_public').
+
+        Returns:
+        -------
+        tuple
+            A tuple containing two GeoDataFrames: nodes and edges.
         """
         bounding_box = self.bounding_box
         aoi_box = bounding_box.to_geometry()

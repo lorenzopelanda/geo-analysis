@@ -6,8 +6,29 @@ from shapely.geometry import Point, LineString, MultiLineString, Polygon, MultiP
 from greento.data.DataInterface import DownloaderInterface
 
 class OSMDownloader(DownloaderInterface):
+    """
+    A class to download and process OpenStreetMap (OSM) data.
+
+    Methods:
+    -------
+    get_data(bounding_box):
+        Downloads and processes OSM data for the given bounding box.
+    """
 
     def get_data(self, bounding_box):
+        """
+        Downloads and processes OSM data for the given bounding box.
+
+        Parameters:
+        ----------
+        bounding_box : BoundingBox
+            The bounding box for which to download data.
+
+        Returns:
+        -------
+        tuple
+            A tuple containing two GeoDataFrames: nodes and edges.
+        """
         steps = ["Converting bounding box to geometry", "Downloading OSM data", "Filtering data"]
         with tqdm(total=100, desc="Overall Progress", unit="step") as pbar:
             pbar.set_description(steps[0])

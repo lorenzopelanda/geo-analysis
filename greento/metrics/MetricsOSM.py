@@ -1,179 +1,255 @@
 import json
 import numpy as np
 import osmnx as ox
+from tqdm import tqdm
 from .MetricsInterface import MetricsInterface
 from greento.utils.GeoUtils import GeoUtils
 
 class MetricsOSM(MetricsInterface):
+    """
+    A class to calculate metrics using OpenStreetMap (OSM) data.
+
+    Attributes:
+    ----------
+    osm_file : str
+        The file path to the OSM data.
+    vector_traffic_area : tuple
+        A tuple containing two GeoDataFrames: nodes and edges for traffic area.
+    ghs_pop_data : dict
+        The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+
+    Methods:
+    -------
+    green_area_per_person():
+        Calculates the green area per person in the given raster and population data.
+    get_isochrone_green(lat, lon, max_time, network_type):
+        Calculates the reachable green areas within a given time from a starting point.
+    _estimate_distance_from_time(time_seconds, transport_mode):
+        Estimates the distance that can be traveled in a given time for a specific transport mode.
+    """
     def __init__(self, osm, vector_traffic_area, ghs_pop_data):
+        """
+        Initializes the MetricsOSM with OSM data, traffic area, and population data.
+
+        Parameters:
+        ----------
+        osm : str
+            The file path to the OSM data.
+        vector_traffic_area : tuple
+            A tuple containing two GeoDataFrames: nodes and edges for traffic area.
+        ghs_pop_data : dict
+            The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+        """
         self.osm_file = osm
         self.vector_traffic_area = vector_traffic_area
         self.ghs_pop_data = ghs_pop_data
 
     def green_area_per_person(self):
         """
-        Calculate the green area per person in the given raster and population data.
+        Calculates the green area per person in the given raster and population data.
+
+        Returns:
+        -------
+        str
+            A JSON string containing the green area per person.
         """
-        ghspop_data = self.ghs_pop_data['data']
-        green_data = self.osm_green['data']
+        with tqdm(total=100, desc="Calculating OSM green area per person") as pbar:
+            ghspop_data = self.ghs_pop_data['data']
+            green_data = self.osm_green['data']
+            pbar.update(20)
 
-        num_green_pixels = np.count_nonzero(green_data)
+            num_green_pixels = np.count_nonzero(green_data)
+            pbar.update(20)
+            total_green_area = num_green_pixels * 100  # sqm
 
-        total_green_area = num_green_pixels * 100  # sqm
-
-        total_population = np.sum(ghspop_data)
-
-        if total_population == 0:
-            return json.dumps({'green_area_per_person': float('inf')})
-        else:
-            green_area_per_person = round(total_green_area / total_population, 4)
-            return json.dumps({'green_area_per_person': green_area_per_person})
+            total_population = np.sum(ghspop_data)
+            pbar.update(40)
+            if total_population == 0:
+                pbar.update(20)
+                pbar.set_description("Finished calculating OSM green area per person")
+                return json.dumps({'green_area_per_person': float('inf')})
+            else:
+                green_area_per_person = round(total_green_area / total_population, 4)
+                pbar.update(20)
+                pbar.set_description("Finished calculating OSM green area per person")
+                return json.dumps({'green_area_per_person': green_area_per_person})
     
     def get_isochrone_green(self, lat, lon, max_time, network_type):
         """
-        Calculate the reachable green areas within a given time from a starting point.
+        Calculates the reachable green areas within a given time from a starting point.
+
+        Parameters:
+        ----------
+        lat : float
+            The latitude of the starting point.
+        lon : float
+            The longitude of the starting point.
+        max_time : float
+            The maximum travel time in minutes.
+        network_type : str
+            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+
+        Returns:
+        -------
+        str
+            A JSON string containing the reachable green areas and related metrics.
         """
-        if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
-            raise ValueError("Coordinates not valid")
+        with tqdm(total=100, desc="Calculating OSM isochrone green area", unit="%") as pbar:
+            if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
+                raise ValueError("Coordinates not valid")
+            pbar.update(5)
 
-        if not isinstance(max_time, (int, float)) or max_time <= 0:
-            raise ValueError("Max time not valid")
+            if not isinstance(max_time, (int, float)) or max_time <= 0:
+                raise ValueError("Max time not valid")
 
-        valid_transport_modes = ['walk', 'bike', 'drive', 'all_public', 'drive_public']
-        if network_type not in valid_transport_modes:
-            raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
+            valid_transport_modes = ['walk', 'bike', 'drive', 'all_public', 'drive_public']
+            if network_type not in valid_transport_modes:
+                raise ValueError(f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}")
+            pbar.update(5)
+            if not hasattr(self, 'vector_traffic_area') or self.vector_traffic_area is None:
+                raise ValueError("Traffic area not reachable")
 
-        if not hasattr(self, 'vector_traffic_area') or self.vector_traffic_area is None:
-            raise ValueError("Traffic area not reachable")
+            speed_kmh = {
+                'walk': 5,
+                'bike': 15,
+                'drive': 30,
+                'all_public': 30,
+                'drive_public': 30
+            }.get(network_type, 5)
 
-        speed_kmh = {
-            'walk': 5,
-            'bike': 15,
-            'drive': 30,
-            'all_public': 30,
-            'drive_public': 30
-        }.get(network_type, 5)
+            nodes, edges = self.vector_traffic_area
+            G = ox.graph_from_gdfs(nodes, edges)  
+            start_node, _ = ox.distance.nearest_nodes(G, X=lon, Y=lat, return_dist=True)
+            pbar.update(10)
+            FIXED_DELAYS = {
+                'walk': 0,
+                'bike': 30,  # take/return bike
+                'drive': 180,  # parking + take the car
+                'all_public': 420,  # walk to the stop (3 min) + estimated wait (4 min)
+                'drive_public': 180  # wait + call
+            }
 
-        nodes, edges = self.vector_traffic_area
-        G = ox.graph_from_gdfs(nodes, edges)  # Ristructure of the graph
-        # Find nearest node from starting point
-        start_node, _ = ox.distance.nearest_nodes(G, X=lon, Y=lat, return_dist=True)
+            fixed_delay = FIXED_DELAYS.get(network_type, 0)
 
-        FIXED_DELAYS = {
-            'walk': 0,
-            'bike': 30,  # take/return bike
-            'drive': 180,  # parking + take the car
-            'all_public': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'drive_public': 180  # wait + call
-        }
+            travel_time_seconds = (max_time * 60) - fixed_delay
 
-        fixed_delay = FIXED_DELAYS.get(network_type, 0)
+            if travel_time_seconds <= 0:
+                return json.dumps({
+                    "error": f"Time after delays is ({fixed_delay / 60} min) not enough to travel"
+                })
 
-        # Time available for travel in seconds
-        travel_time_seconds = (max_time * 60) - fixed_delay
+            for u, v, data in G.edges(data=True):
+                if 'travel_time' not in data and 'length' in data:
+                    length_m = data['length']
+                    data['travel_time'] = length_m / (speed_kmh * 1000 / 3600)
+            pbar.update(10)
+            reachable_nodes = {}
+            visited = set()
+            queue = [(start_node, 0)] 
 
-        if travel_time_seconds <= 0:
-            return json.dumps({
-                "error": f"Time after delays is ({fixed_delay / 60} min) not enough to travel"
-            })
+            while queue:
+                current_node, current_time = queue.pop(0)
 
-        for u, v, data in G.edges(data=True):
-            if 'travel_time' not in data and 'length' in data:
-                length_m = data['length']
-                data['travel_time'] = length_m / (speed_kmh * 1000 / 3600)
+                if current_node in visited:
+                    continue
 
-        # Visit the graph to find reachable nodes
-        reachable_nodes = {}
-        visited = set()
-        queue = [(start_node, 0)]  # (node, time)
+                visited.add(current_node)
+                pbar.update(5)
+                if pbar.n > 75:
+                    pbar.n = 75
+                if current_node in G.nodes:
+                    node_data = G.nodes[current_node]
+                    reachable_nodes[current_node] = {
+                        'y': node_data.get('y'),
+                        'x': node_data.get('x'),
+                        'time': current_time
+                    }
 
-        while queue:
-            current_node, current_time = queue.pop(0)
+                for neighbor in G.neighbors(current_node):
+                    if neighbor not in visited:
+                        edges = G.get_edge_data(current_node, neighbor).values()
+                        edge_time = min(edge.get('travel_time', float('inf')) for edge in edges)
 
-            if current_node in visited:
-                continue
+                        new_time = current_time + edge_time
 
-            visited.add(current_node)
+                        if new_time <= travel_time_seconds:
+                            queue.append((neighbor, new_time))
+            pbar.update(10)
+            if not reachable_nodes:
+                return json.dumps({"error": "No reachable green area for the time limit"})
 
-            # Put the current node in the reachable nodes
-            if current_node in G.nodes:
-                node_data = G.nodes[current_node]
-                reachable_nodes[current_node] = {
-                    'y': node_data.get('y'),
-                    'x': node_data.get('x'),
-                    'time': current_time
-                }
+            reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
 
-            # Visit the neighbors
-            for neighbor in G.neighbors(current_node):
-                if neighbor not in visited:
-                    edges = G.get_edge_data(current_node, neighbor).values()
-                    edge_time = min(edge.get('travel_time', float('inf')) for edge in edges)
+            data = self.osm_green['data']
+            transform = self.osm_green['transform']
 
-                    new_time = current_time + edge_time
+            total_pixels = 0
+            green_area_pixels = 0
+            green_accessibility = {}
 
-                    # Add the neighbor to the queue if the time is within the limit
-                    if new_time <= travel_time_seconds:
-                        queue.append((neighbor, new_time))
+            for lat_point, lon_point in reachable_coords:
+                try:
+                    row, col = [int(i) for i in ~transform * (lon_point, lat_point)]
 
-        if not reachable_nodes:
-            return json.dumps({"error": "No reachable green area for the time limit"})
+                    if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
+                        total_pixels += 1
+                        pixel_value = data[row, col]
 
-        # Get the coordinates of the reachable nodes
-        reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
+                        if pixel_value == 1:
+                            green_area_pixels += 1
 
-        data = self.osm_green['data']
-        transform = self.osm_green['transform']
+                            node_data = next(
+                                (d for n, d in reachable_nodes.items() if d['y'] == lat_point and d['x'] == lon_point),
+                                None)
+                            if node_data:
+                                time_to_node = node_data['time']
+                                distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
+                                travel_time = GeoUtils()._calculate_travel_time(distance_meters, network_type)
+                                green_accessibility[node_data['x']] = {
+                                    'time_minutes': travel_time,
+                                    'distance_meters': round(distance_meters, 2),
+                                    'lat': lat_point,
+                                    'lon': lon_point
+                                }
+                except Exception:
+                    continue
+            pbar.update(10)
+            green_percentage = (green_area_pixels / max(1, total_pixels)) * 100 if total_pixels > 0 else 0
 
-        total_pixels = 0
-        green_area_pixels = 0
-        green_accessibility = {}
+            pixel_area_sqm = 100  # 10m x 10m
+            green_area_sqm = green_area_pixels * pixel_area_sqm
 
-        for lat_point, lon_point in reachable_coords:
-            try:
-                # Convert coordinates to raster indices
-                row, col = [int(i) for i in ~transform * (lon_point, lat_point)]
+            result = {
+                "isochrone_time_minutes": max_time,
+                "transport_mode": network_type,
+                "green_area_percentage": round(green_percentage, 2),
+                "green_area_sqm": round(green_area_sqm, 2),
+                "green_accessibility": list(green_accessibility.values()),
+            }
+            pbar.update(5)
+            if pbar.n > 100:
+                pbar.n = 100
+                pbar.last_print_n = 100
+            pbar.set_description("Finished calculating OSM isochrone green area")
 
-                if 0 <= row < data.shape[0] and 0 <= col < data.shape[1]:
-                    total_pixels += 1
-                    pixel_value = data[row, col]
-
-                    # Count every pixel as green area
-                    if pixel_value == 1:
-                        green_area_pixels += 1
-
-                        node_data = next(
-                            (d for n, d in reachable_nodes.items() if d['y'] == lat_point and d['x'] == lon_point),
-                            None)
-                        if node_data:
-                            time_to_node = node_data['time']
-                            distance_meters = self._estimate_distance_from_time(time_to_node, network_type)
-                            travel_time = GeoUtils()._calculate_travel_time(distance_meters, network_type)
-                            green_accessibility[node_data['x']] = {
-                                'time_minutes': travel_time,
-                                'distance_meters': round(distance_meters, 2),
-                                'lat': lat_point,
-                                'lon': lon_point
-                            }
-            except Exception:
-                continue
-
-        green_percentage = (green_area_pixels / max(1, total_pixels)) * 100 if total_pixels > 0 else 0
-
-        pixel_area_sqm = 100  # 10m x 10m
-        green_area_sqm = green_area_pixels * pixel_area_sqm
-
-        result = {
-            "isochrone_time_minutes": max_time,
-            "transport_mode": network_type,
-            "green_area_percentage": round(green_percentage, 2),
-            "green_area_sqm": round(green_area_sqm, 2),
-            "green_accessibility": list(green_accessibility.values()),
-        }
-
-        return json.dumps(result)
+            return json.dumps(result)
 
     def _estimate_distance_from_time(self, time_seconds, transport_mode):
+        """
+        Estimates the distance that can be traveled in a given time for a specific transport mode.
+
+        Parameters:
+        ----------
+        time_seconds : float
+            The time available for travel in seconds.
+        transport_mode : str
+            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+
+        Returns:
+        -------
+        float
+            The estimated distance that can be traveled in meters.
+        """
         # Speed constants in m/s
         SPEEDS = {
             'walk': 5 / 3.6,
@@ -183,7 +259,6 @@ class MetricsOSM(MetricsInterface):
             'drive_public': 30 / 3.6
         }
 
-        # Delay factors
         DELAY_FACTORS = {
             'walk': 1.15,
             'bike': 1.2,
