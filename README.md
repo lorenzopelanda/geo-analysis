@@ -1,13 +1,13 @@
 # GreenTo
 
-GreenTo is a Python package designed for analyzing geographic data, including OpenStreetMap (OSM) and Copernicus data and GHS-POP data. This package provides tools for downloading, processing, and visualizing geographic data to help with urban planning, environmental analysis, and more.
+GreenTo is a Python library designed for analyzing geographic data, including OpenStreetMap (OSM), Copernicus data and Global Human Settlement Population (GHS-POP) data. This library provides tools for downloading, processing, and visualizing geographic data to help with urban planning, environmental analysis, specifically for green areas.
 
 
 
 
 ## Installation
 
-To install the Geo-Analysis package, follow these steps:
+To install the GreenTo package, follow these steps:
 
 1. Clone the repository:
     ```sh
@@ -28,5 +28,5 @@ To install the Geo-Analysis package, follow these steps:
 
 ## Usage
 
-For detailed usage examples, refer to the [Examples](EXAMPLES.md) file.
+For detailed usage examples, refer to the examples [here](EXAMPLES.md).
 

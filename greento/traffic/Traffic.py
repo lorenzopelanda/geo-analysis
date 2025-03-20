@@ -62,6 +62,7 @@ class Traffic:
             pbar.update(10)
             edges = gpd.clip(edges, aoi_box)
             pbar.update(10)
+
             # Add coordinates
             nodes['x'] = nodes.geometry.x
             nodes['y'] = nodes.geometry.y
@@ -72,5 +73,6 @@ class Traffic:
             
             pbar.update(10)
             pbar.set_description("Finished obtaining traffic data")
+            print(edges.columns)
 
         return (nodes, edges)

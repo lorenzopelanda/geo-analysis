@@ -2,16 +2,16 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
-from DistanceInterface import DistanceInterface
+import networkx as nx
+from .DistanceInterface import DistanceInterface
 ox.settings.use_cache = False
 
-class DistanceCoprnicus(DistanceInterface):
+class DistanceCopernicus(DistanceInterface):
 
-    def __init__(self, raster_data, vector_traffic_area, ghs_pop_data):
+    def __init__(self, raster_data, vector_traffic_area):
         self.copernicus_green = raster_data
         self.vector_traffic_area = vector_traffic_area
         self.preprocessed_graph = None
-        self.ghs_pop_data = ghs_pop_data
         self._green_positions_cache = {}
 
 
@@ -80,7 +80,6 @@ class DistanceCoprnicus(DistanceInterface):
         c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
         return R * c
-
 
     def direction_to_green(self, lat, lon, transport_mode):
         """

@@ -50,14 +50,12 @@ class VectorUtils(UtilsInterface):
         percentages = {key: round((count / total) * 100, 4) for key, count in land_use_types.items()}
         return json.dumps(percentages)
     
-    def to_raster(self, vector_data, reference_raster):
+    def to_raster(self, reference_raster):
         """
         Rasterizes the OpenStreetMap vector data using a reference raster.
 
         Parameters:
         ----------
-        vector_data : tuple
-            A tuple containing nodes (GeoDataFrame of point data) and edges (GeoDataFrame of line/polygon data).
         reference_raster : dict
             Reference raster containing 'data', 'transform', 'crs', and 'shape'.
 
@@ -66,7 +64,7 @@ class VectorUtils(UtilsInterface):
         dict
             Rasterized output with 'data', 'transform', 'crs', and 'shape'.
         """
-        nodes, edges = vector_data
+        nodes, edges = self.osm
         ref_crs = reference_raster['crs']
 
         with tqdm(total=100, desc="Rasterizing OSM data") as pbar:

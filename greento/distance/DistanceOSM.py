@@ -3,7 +3,7 @@ import osmnx as ox
 import numpy as np
 import rasterio
 from greento.utils.GeoUtils import GeoUtils
-from DistanceInterface import DistanceInterface
+from .DistanceInterface import DistanceInterface
 ox.settings.use_cache = False
 
 class DistanceOSM(DistanceInterface):

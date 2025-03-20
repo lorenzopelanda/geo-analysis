@@ -15,7 +15,8 @@ setup(
         'openeo',
         'rasterio',
         'tqdm',
-        'geopandas'
+        'geopandas',
+        'networkx',
     ],
     entry_points={
         'console_scripts': [

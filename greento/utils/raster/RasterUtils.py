@@ -36,7 +36,7 @@ class RasterUtils(UtilsInterface):
         """
         self.copernicus = copernicus
 
-    def filter_copernicus_with_osm(self, copernicus_green):
+    def filter_with_osm(self, copernicus_green, osm_green):
         """
         Filters the Copernicus data using OSM green data.
 
@@ -44,6 +44,8 @@ class RasterUtils(UtilsInterface):
         ----------
         copernicus_green : dict
             The Copernicus green area data containing 'data', 'transform', 'crs', and 'shape'.
+        osm_green : dict
+            The OSM green area data containing 'data', 'transform', 'crs', and 'shape'.
 
         Returns:
         -------
@@ -56,7 +58,7 @@ class RasterUtils(UtilsInterface):
             If the raster shapes do not match.
         """
         copernicus_data = copernicus_green['data']
-        osm_data = self.osm_green['data']
+        osm_data = osm_green['data']
 
         if copernicus_data.shape != osm_data.shape:
             raise ValueError("Raster shapes do not match")
