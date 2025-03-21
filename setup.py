@@ -17,6 +17,7 @@ setup(
         'tqdm',
         'geopandas',
         'networkx',
+        'scipy'
     ],
     entry_points={
         'console_scripts': [

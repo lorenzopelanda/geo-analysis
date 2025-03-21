@@ -73,6 +73,5 @@ class Traffic:
             
             pbar.update(10)
             pbar.set_description("Finished obtaining traffic data")
-            print(edges.columns)
 
         return (nodes, edges)

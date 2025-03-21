@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from rasterio.features import rasterize 
-from greento.utils import UtilsInterface
+from greento.utils.UtilsInterface import UtilsInterface
 
 class VectorUtils(UtilsInterface):
     """

@@ -10,8 +10,12 @@
 - [Obtaining green areas for OSM](#obtaining-green-areas-for-osm)
 - [Obtaining green areas for Copernicus](#obtaining-green-areas-for-copernicus)
 - [Obtaining the traffic network](#obtaining-the-traffic-network)
-- [Get the OSM green metrics](#get-the-osm-green-metrics)
-- [Get the Copernicus green metrics](#get-the-copernicus-green-metrics)
+- [Green metrics](#green-metrics)
+    - [Get the OSM green metrics](#get-the-osm-green-metrics)
+    - [Get the Copernicus green metrics](#get-the-copernicus-green-metrics)
+- [Green distances](#green-distances)
+    - [Distance to nearest green area for OSM data](#distance-to-nearest-green-area-for-osm-data)
+    - [Distance to nearest green area for Copernicus data](#distance-to-nearest-green-area-for-copernicus-data)
 - [Utils functions](#utils-functions)
     - [`raster` functions](#raster-functions)
     - [`vector` functions](#vector-functions)
@@ -260,14 +264,16 @@ traffic_area = traffic.get_traffic_area("walk")
 
 <br><br>
 
-
-
 ---
+
+# Green metrics
+<br>
+
 ## Get the OSM green metrics
 
 ### `green_area_per_person()`
 
-This function calculates the square meters of green areas in the bounding box per person using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP.
+This function calculates the square meters of green areas in the bounding box per person using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using `to_raster(reference_raster)` function in `utils.vector.VectorUtils`.
 
 ```python
 from greento.metrics.MetricsOSM import MetricsOSM
@@ -280,7 +286,7 @@ green_are_per_person = metrics_osm.green_area_per_person()
 
 ### `green_isochrone_green(lat, lon, max_time, network_type)`
 
-This function calculates from a starting point the max reachable green areas with a time limit and a network type. Using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP.
+This function calculates from a starting point the max reachable green areas with a time limit and a network type. Using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using `to_raster(reference_raster)` function in `utils.vector.VectorUtils`.
 
 ```python
 from greento.metrics.MetricsOSM import MetricsOSM
@@ -295,8 +301,6 @@ max_reachable_green = metrics_osm.green_isochrone_green(45.0628, 7.6781, 12, "wa
 <br><br>
 
 
-
----
 ## Get the Copernicus green metrics
 
 ### `green_area_per_person()`
@@ -325,6 +329,81 @@ max_reachable_green = metrics_copernicus.green_isochrone_green(45.0628, 7.6781, 
 ```
 
 
+
+<br><br>
+
+---
+
+# Green distances
+<br>
+
+## Distance to nearest green area for OSM data
+
+### `get_nearest_green_position(lat, lon)`
+
+This function calculate the coordinates of the nearest green area for the OSM data and the traffic area downloaded before.
+The green data must be in raster form, so you have to rasterize them using `to_raster(reference_raster)` function in `utils.vector.VectorUtils`.
+The functions returns a tuple with the nearest green latitude and longitude.
+
+```python
+from greento.distance.DistanceOSM import DistanceOSM
+
+distance_osm = DistanceOSM(green_osm_raster, traffic_area)
+green_lat, green_lon = distance_osm.get_nearest_green_position(lat, lon)
+
+```
+<br>
+
+### `directions(lat1, lon1, lat2, lon2, transport_mode)`
+
+This function calculates the necessary time to reach a target point from a starting one. 
+This function returns a json response containing the distance in km and the ncessarity time to reach the target in the selected transport mode.
+
+```python
+from greento.distance.DistanceOSM import DistanceOSM
+
+distance_osm = DistanceOSM(green_osm_raster, traffic_area)
+green_lat, green_lon = distance_osm.get_nearest_green_position(lat, lon)
+distance = distance_osm.directions(lat, lon, green_lat, green_lon, "walk")
+print(f"Distance \n {distance} ")
+
+```
+
+
+
+<br><br>
+
+
+## Distance to nearest green area for Copernicus data
+
+### `get_nearest_green_position(lat, lon)`
+
+This function calculate the coordinates of the nearest green area for the Copernicus data and the traffic area downloaded before.
+The functions returns a tuple with the nearest green latitude and longitude.
+
+```python
+from greento.distance.DistanceCopernicus import DistanceCopernicus
+
+distance_copernicus = DistanceCopernicus(green_copernicus, traffic_area)
+green_lat, green_lon = distance_copernicus.get_nearest_green_position(lat, lon)
+
+```
+<br>
+
+### `directions(lat1, lon1, lat2, lon2, transport_mode)`
+
+This function calculates the necessary time to reach a target point from a starting one. 
+This function returns a json response containing the distance in km and the ncessarity time to reach the target in the selected transport mode.
+
+```python
+from greento.distance.DistanceCopernicus import DistanceCopernicus
+
+distance_copernicus = DistanceCopernicus(green_copernicus, traffic_area)
+green_lat, green_lon = distance_copernicus.get_nearest_green_position(lat, lon)
+distance = distance_copernicus.directions(lat, lon, green_lat, green_lon, "walk")
+print(f"Distance \n {distance} ")
+
+```
 
 <br><br>
 
@@ -449,6 +528,17 @@ from greento.utils.GeoUtils import GeoUtils
 
 utils = GeoUtils()
 utils.get_coordinates_max_population(ghs_pop)
+```
+
+#### `haversine_distance(lon1, lat1, lons2, lats2)`
+
+This function calculate the euclidean distance from two points giving the latitude and longitude of each.
+
+```python
+from greento.utils.GeoUtils import GeoUtils
+
+utils = GeoUtils()
+utils.haversine_distance(lon1, lat1, 7.6784, 45.0637)
 ```
 
 #### `adjust_detail_level(osm, copernicus, ghs_pop)`

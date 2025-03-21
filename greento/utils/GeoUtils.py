@@ -178,6 +178,35 @@ class GeoUtils:
 
         return (lat, lon)
     
+
+    def haversine_distance(self, lon1, lat1, lons2, lats2):
+            """
+            Calculate the Haversine distance between two points.
+
+            Args:
+                lon1 (float): Longitude of the first point.
+                lat1 (float): Latitude of the first point.
+                lons2 (float): Longitudes of the second points.
+                lats2 (float): Latitudes of the second points.
+
+            Returns:
+                float: The Haversine distance in kilometers.
+            """
+            R = 6371  # Earth radius in km
+
+
+            lat1 = np.radians(lat1)
+            lon1 = np.radians(lon1)
+            lats2 = np.radians(lats2)
+            lons2 = np.radians(lons2)
+
+            dlat = lats2 - lat1
+            dlon = lons2 - lon1
+            a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
+            c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+            return R * c
+    
     def adjust_detail_level(self, osm, copernicus, ghs_pop):
         """
         Adjusts the detail level of the given raster datasets to match the highest resolution.

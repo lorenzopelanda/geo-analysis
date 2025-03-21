@@ -2,7 +2,13 @@ import rasterio
 import numpy as np
 import json
 import osmnx as ox
+import numpy as np
+import geopandas as gpd
+from shapely.geometry import Point
 import networkx as nx
+from scipy.spatial import cKDTree
+from math import radians, sin, cos, sqrt, atan2
+from greento.utils.GeoUtils import GeoUtils
 from .DistanceInterface import DistanceInterface
 ox.settings.use_cache = False
 
@@ -12,91 +18,110 @@ class DistanceCopernicus(DistanceInterface):
         self.copernicus_green = raster_data
         self.vector_traffic_area = vector_traffic_area
         self.preprocessed_graph = None
-        self._green_positions_cache = {}
+        self._green_positions_cache = {}    
 
+    def get_nearest_green_position(self, lat, lon,):
+        """
+        Finds the nearest green area from a given starting point using a raster dataset and a traffic network graph.
 
-    def get_nearest_green_position(self, lat, lon):
+        Args:
+            lat (float): Latitude of the starting point.
+            lon (float): Longitude of the starting point.
 
-        if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
-            raise ValueError("Coordinates not valid")
+        Returns:
+            tuple: A tuple containing the latitude and longitude of the nearest green area, or None if no green areas are found.
 
-        data = self.copernicus_green['data']
+        Raises:
+            ValueError: If there is an error calculating the nearest green point.
+        """
+
+        nodes, edges = self.vector_traffic_area
+        raster_data = self.copernicus_green['data']
         transform = self.copernicus_green['transform']
+        
+        G = ox.graph_from_gdfs(nodes, edges)
+        
+        nearest_node = ox.distance.nearest_nodes(G, X=lon, Y=lat)
+        
+        green_rows, green_cols = np.where(raster_data == 1)
+        
+        if len(green_rows) == 0:
+            print("No green areas found in the raster")
+            return None
+        
+        if len(green_rows) < 2000:
+            max_green_points = len(green_rows)
+        elif len(green_rows) < 10000:
+            max_green_points = len(green_rows) // 5
+        else:
+            max_green_points = 5000
+        
+        green_coords = []
+        for row, col in zip(green_rows, green_cols):
+            lon_pixel, lat_pixel = transform * (col + 0.5, row + 0.5) 
+            green_coords.append((lat_pixel, lon_pixel))
 
-        col, row = [int(round(i)) for i in ~transform * (lon, lat)]
+        distances_euclidian = [GeoUtils().haversine_distance(lat, lon, gp_lat, gp_lon) for gp_lat, gp_lon in green_coords]
+        
+        indices_sorted = np.argsort(distances_euclidian)[:max_green_points]
+        green_coords_filtered = [green_coords[i] for i in indices_sorted]
+                
+        node_points = np.array([(data['y'], data['x']) for _, data in G.nodes(data=True)])
+        node_ids = list(G.nodes())
+        tree = cKDTree(node_points)
+        
+        green_nodes = []
+        batch_size = 100  
+        
+        for i in range(0, len(green_coords_filtered), batch_size):
+            batch = green_coords_filtered[i:i+batch_size]
+            batch_points = np.array(batch)
+            distances_batch, indices_batch = tree.query(batch_points, k=1)
+            for j, (dist, idx) in enumerate(zip(distances_batch, indices_batch)):
+                green_lat, green_lon = batch[j]
+                closest_node = node_ids[idx]
+                green_nodes.append((green_lat, green_lon, closest_node, dist))
+        
+        try:
+            distances = nx.single_source_dijkstra_path_length(G, nearest_node, weight='length', cutoff=100000)
+        except nx.NetworkXError as e:
+            raise ValueError("Error calculating nearest green point") from e
+        
+        min_distance = float('inf')
+        closest_green_point = None
+        for green_lat, green_lon, node, node_dist in green_nodes:
+            if node in distances:
+                total_distance = distances[node] + node_dist
+                if total_distance < min_distance:
+                    min_distance = total_distance
+                    closest_green_point = (green_lat, green_lon)        
+        
+        return closest_green_point
 
-        if not (0 <= row < data.shape[0] and 0 <= col < data.shape[1]):
-            raise IndexError("Starting point outside raster bounds")
-
-        search_radius = 3
-        for dr in range(-search_radius, search_radius + 1):
-            for dc in range(-search_radius, search_radius + 1):
-                if (0 <= (row + dr) < data.shape[0] and
-                        0 <= (col + dc) < data.shape[1]):
-                    if data[row + dr, col + dc] == 1:
-                        nearest_lon, nearest_lat = rasterio.transform.xy(
-                            transform,
-                            row + dr,
-                            col + dc
-                        )
-                        return (nearest_lat, nearest_lon)
-
-        green_indices = np.argwhere(data == 1)
-        if len(green_indices) == 0:
-            raise ValueError("No green areas found in the raster")
-
-        # Conversion to geographic coordinates
-        green_coords = np.array([
-            rasterio.transform.xy(transform, idx[0], idx[1])
-            for idx in green_indices
-        ])
-
-        # Distance calculation with haversine
-        lons = green_coords[:, 0]
-        lats = green_coords[:, 1]
-        distances = self._haversine_vectorized(lon, lat, lons, lats)
-
-        # Find the nearest green area
-        nearest_idx = np.argmin(distances)
-        nearest_lon, nearest_lat = green_coords[nearest_idx]
-
-        return (nearest_lat, nearest_lon)
-
-    def _haversine_vectorized(self, lon1, lat1, lons2, lats2):
-
-        R = 6371  # Earth radius in km
-
-
-        lat1 = np.radians(lat1)
-        lon1 = np.radians(lon1)
-        lats2 = np.radians(lats2)
-        lons2 = np.radians(lons2)
-
-        dlat = lats2 - lat1
-        dlon = lons2 - lon1
-
-        # Vectorized formula
-        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
-
-        return R * c
-
-    def direction_to_green(self, lat, lon, transport_mode):
+    def directions(self, lat1, lon1, lat2, lon2, transport_mode):
         """
-        Calculate the distance and estimated time to reach the nearest green area
-        starting from a given position, using the vector_traffic_area graph.
-        """
+        Calculate the shortest path and estimated travel time between two points using a traffic network graph.
 
-        # Reset preprocessed_graph if None
+        Args:
+            lat1 (float): Latitude of the starting point.
+            lon1 (float): Longitude of the starting point.
+            lat2 (float): Latitude of the destination point.
+            lon2 (float): Longitude of the destination point.
+            transport_mode (str): Mode of transport (e.g., "walk", "bike", "drive").
+
+        Returns:
+            str: A JSON string containing the total distance in kilometers and the estimated travel time in minutes.
+
+        Raises:
+            ValueError: If there is an error creating the graph or if the graph has no nodes.
+        """
         if hasattr(self, "preprocessed_graph") and self.preprocessed_graph is None:
             delattr(self, "preprocessed_graph")
 
-        nearest_lat, nearest_lon = self.get_nearest_green_position(lat, lon)
         if not hasattr(self, "preprocessed_graph"):
             G = self.vector_traffic_area
             if isinstance(G, tuple) and len(G) == 2:
                 gdf_nodes, gdf_edges = G
-                # Check nodes coordinates
                 if 'x' not in gdf_nodes.columns or 'y' not in gdf_nodes.columns:
                     gdf_nodes['x'] = gdf_nodes.geometry.x
                     gdf_nodes['y'] = gdf_nodes.geometry.y
@@ -105,7 +130,6 @@ class DistanceCopernicus(DistanceInterface):
                 if G is None:
                     raise ValueError("Failed to create graph from GeoDataFrames")
 
-                # Check if graph has nodes
                 if len(G.nodes()) == 0:
                     raise ValueError("Graph has no nodes")
             else:
@@ -116,26 +140,21 @@ class DistanceCopernicus(DistanceInterface):
 
             self.preprocessed_graph = G
 
-        # Use preprocessed graph
         G = self.preprocessed_graph
 
-        # Checks if nodes have x and y coordinates
         for node_id, data in G.nodes(data=True):
             if "x" not in data or "y" not in data:
                 raise ValueError("Node must have coordinates 'x' e 'y'")
 
-        # Finds the nearest nodes in the graph
-        orig_node = ox.distance.nearest_nodes(G, X=lon, Y=lat)
-        dest_node = ox.distance.nearest_nodes(G, X=nearest_lon, Y=nearest_lat)
+        orig_node = ox.distance.nearest_nodes(G, X=lon1, Y=lat1)
+        dest_node = ox.distance.nearest_nodes(G, X=lon2, Y=lat2)
 
-        # Calculate the shortest path (Djikstra algorithm and travel_time as weight)
 
         route = ox.shortest_path(G, orig_node, dest_node, weight="travel_time")
-        # Calculate the total distance of the path
         total_distance = sum(G[u][v][0].get("length", 0) for u, v in zip(route[:-1], route[1:])) / 1000
-        total_distance_meters = total_distance*1000
-        # Calculate the total time of the path
-        total_time_minutes = self._calculate_travel_time(total_distance_meters, transport_mode)
+        total_distance_meters = total_distance * 1000
+        total_time_minutes = GeoUtils()._calculate_travel_time(total_distance_meters, transport_mode)
 
-        return json.dumps({"distance_km": round(total_distance,4), "estimated_time_minutes": total_time_minutes, "lat": nearest_lat, "lon": nearest_lon})
+        return json.dumps({"distance_km": round(total_distance, 4), "estimated_time_minutes": total_time_minutes})
+
  
