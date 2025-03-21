@@ -104,7 +104,7 @@ class RasterUtils(UtilsInterface):
         progress_bar = None
         elapsed_time = time.time() - start_time
         if elapsed_time > 5: 
-            progress_bar = tqdm(total=100, desc="Processing Land Use Percentages", unit="%") 
+            progress_bar = tqdm(total=100, desc="Processing Land Use Percentages", unit="%", leave=False) 
 
         unique, counts = np.unique(data, return_counts=True)
         land_use_types = dict(zip(unique, counts))
@@ -164,7 +164,7 @@ class RasterUtils(UtilsInterface):
 
         dst_data = np.empty((count, int(height), int(width)), dtype=src_data.dtype)
 
-        with tqdm(total=100, desc="Reprojecting raster data") as pbar:
+        with tqdm(total=100, desc="Reprojecting raster data", leave=False) as pbar:
             for i in range(count):
                 reproject(
                     source=src_data[i] if count > 1 else src_data,
@@ -176,6 +176,8 @@ class RasterUtils(UtilsInterface):
                     resampling=Resampling.nearest
                 )
                 pbar.update(1)
+            pbar.set_description("Reprojected raster data")    
+            pbar.close()    
             return {
                 'data': dst_data,
                 'crs': dst_crs,

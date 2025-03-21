@@ -110,7 +110,7 @@ class CopernicusDownloader(DownloaderInterface):
         dict
             A dictionary containing the downloaded data, transform, CRS, and shape.
         """
-        with tqdm(total=100, desc="Downloading Copernicus data") as pbar:
+        with tqdm(total=100, desc="Downloading Copernicus data", leave=False) as pbar:
             #Connect to OpenEO
             connection = self.__connect_to_openeo()
             pbar.update(20)
@@ -139,6 +139,7 @@ class CopernicusDownloader(DownloaderInterface):
                     copernicus_shape = dataset.shape
                 pbar.update(10)
                 pbar.set_description("Copernicus data downloaded")
+                pbar.close()
 
         return {
             "data": data,

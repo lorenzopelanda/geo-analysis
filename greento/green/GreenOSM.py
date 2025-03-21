@@ -1,5 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
+import geopandas as gpd
 from .GreenInterface import GreenInterface
 
 class GreenOSM(GreenInterface):
@@ -41,39 +42,43 @@ class GreenOSM(GreenInterface):
         tuple
             A tuple containing two DataFrames: filtered green nodes and edges.
         """
+        
         try:
             nodes_gdf, edges_gdf = self.osm
             if kwargs is None:
                 green_tags = {
                     'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland',
-                                'heath', 'fell', 'tundra', 'shrubbery'],
+                            'heath', 'fell', 'tundra', 'shrubbery'],
                     'landuse': ['forest', 'meadow', 'grass','allotments'],
                     'leisure': ['park', 'garden', 'nature_reserve']
                 }
             else:
                 green_tags = kwargs.get('green_tags', {
                     'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland',
-                                'heath', 'fell', 'tundra', 'shrubbery'],
+                            'heath', 'fell', 'tundra', 'shrubbery'],
                     'landuse': ['forest', 'meadow', 'grass','allotments'],
                     'leisure': ['park', 'garden', 'nature_reserve']
                 })
 
             def filter_green(df):
                 if df.empty:
-                    return df
+                    return gpd.GeoDataFrame(geometry=gpd.GeoSeries(), crs=df.crs if hasattr(df, 'crs') else None)
 
                 mask = pd.Series(False, index=df.index)
 
                 for tag, values in green_tags.items():
                     if tag in df.columns:
                         mask |= df[tag].isin(values)
+                
+                if not mask.any():
+                    return gpd.GeoDataFrame(geometry=gpd.GeoSeries(), crs=df.crs if hasattr(df, 'crs') else None)
+                
+                return df[mask]  
 
-                return df[mask]
+            green_nodes = gpd.GeoDataFrame(geometry=gpd.GeoSeries())
+            green_edges = gpd.GeoDataFrame(geometry=gpd.GeoSeries())
 
-            green_nodes = pd.DataFrame()
-            green_edges = pd.DataFrame()
-
-            for df, name in tqdm([(nodes_gdf, 'nodes'), (edges_gdf, 'edges')], desc="Filtering OSM green areas"):
+            for df, name in tqdm([(nodes_gdf, 'nodes'), (edges_gdf, 'edges')], desc="Filtering OSM green areas", leave=False):
                 if name == 'nodes':
                     green_nodes = filter_green(df)
                 else:
@@ -82,4 +87,5 @@ class GreenOSM(GreenInterface):
             return (green_nodes, green_edges)
 
         except Exception as e:
-            return (pd.DataFrame(), pd.DataFrame())
+            empty_geo = gpd.GeoDataFrame(geometry=gpd.GeoSeries())
+            return (empty_geo, empty_geo)

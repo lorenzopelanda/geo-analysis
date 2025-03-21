@@ -2,6 +2,7 @@ import json
 import osmnx as ox
 import pandas as pd
 import numpy as np
+import geopandas as gpd
 from tqdm import tqdm
 from rasterio.features import rasterize 
 from greento.utils.UtilsInterface import UtilsInterface
@@ -67,7 +68,12 @@ class VectorUtils(UtilsInterface):
         nodes, edges = self.osm
         ref_crs = reference_raster['crs']
 
-        with tqdm(total=100, desc="Rasterizing OSM data") as pbar:
+        if not isinstance(nodes, gpd.GeoDataFrame) or 'geometry' not in nodes.columns:
+            raise ValueError("Nodes must be a GeoDataFrame and contain a 'geometry' column")
+        if not isinstance(edges, gpd.GeoDataFrame) or 'geometry' not in edges.columns:
+            raise ValueError("Edges must be a GeoDataFrame and contain a 'geometry' column")
+
+        with tqdm(total=100, desc="Rasterizing OSM data", leave=False) as pbar:
             # Rasterize nodes (points)
             node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
             node_rasterized = rasterize(
@@ -96,6 +102,7 @@ class VectorUtils(UtilsInterface):
             combined_raster = np.maximum(node_rasterized, edge_rasterized)  # Combine both rasters by taking the maximum
             pbar.update(20)
             pbar.set_description("Finished rasterizing OSM data")
+            pbar.close()
             return {
                 "data": combined_raster,
                 "transform": reference_raster['transform'],

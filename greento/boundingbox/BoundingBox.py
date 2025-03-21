@@ -238,7 +238,7 @@ class BoundingBox:
         BoundingBox
             The transformed bounding box object.
         """
-        with tqdm(total=100, desc="Transforming bounding box") as pbar:
+        with tqdm(total=100, desc="Transforming bounding box", leave=False) as pbar:
             if self.polygon is None:
                 self.polygon = self.to_geometry()
             pbar.update(20)
@@ -252,6 +252,8 @@ class BoundingBox:
             result = BoundingBox(min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y, crs=dst_crs)
             result.polygon = result.to_geometry()
             pbar.update(20)
+            pbar.set_description("Bounding box transformed")
+            pbar.close()
         return result
 
     def get_bounding_box(self, query, method, is_address=True, **kwargs):

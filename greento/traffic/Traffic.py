@@ -43,7 +43,7 @@ class Traffic:
         """
         bounding_box = self.bounding_box
         aoi_box = bounding_box.to_geometry()
-        with tqdm(total = 100, desc= "Downloading traffic data") as pbar:
+        with tqdm(total = 100, desc= "Downloading traffic data", leave=False) as pbar:
             pbar.update(10)
             # Download traffic network
             graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
@@ -73,5 +73,6 @@ class Traffic:
             
             pbar.update(10)
             pbar.set_description("Finished obtaining traffic data")
+            pbar.close()
 
         return (nodes, edges)

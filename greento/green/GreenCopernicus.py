@@ -52,12 +52,14 @@ class GreenCopernicus(GreenInterface):
         copernicus_crs = self.copernicus['crs']
         copernicus_shape = self.copernicus['shape']
 
-        with tqdm(total=100, desc="Filtering Copernicus green areas") as pbar:
+        with tqdm(total=100, desc="Filtering Copernicus green areas", leave=False) as pbar:
             green_mask = np.isin(data, list(green_areas))
             pbar.update(50)
             raster = np.zeros_like(data, dtype=np.uint8)
             raster[green_mask] = 1
             pbar.update(50)
+            pbar.set_description("Green areas filtered")
+            pbar.close()
             result = {
                 "data": raster,
                 "transform": transform,

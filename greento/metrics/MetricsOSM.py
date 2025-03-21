@@ -53,9 +53,9 @@ class MetricsOSM(MetricsInterface):
         str
             A JSON string containing the green area per person.
         """
-        with tqdm(total=100, desc="Calculating OSM green area per person") as pbar:
+        with tqdm(total=100, desc="Calculating OSM green area per person", leave=False) as pbar:
             ghspop_data = self.ghs_pop_data['data']
-            green_data = self.osm_green['data']
+            green_data = self.osm_file['data']
             pbar.update(20)
 
             num_green_pixels = np.count_nonzero(green_data)
@@ -67,11 +67,13 @@ class MetricsOSM(MetricsInterface):
             if total_population == 0:
                 pbar.update(20)
                 pbar.set_description("Finished calculating OSM green area per person")
+                pbar.close()
                 return json.dumps({'green_area_per_person': float('inf')})
             else:
                 green_area_per_person = round(total_green_area / total_population, 4)
                 pbar.update(20)
                 pbar.set_description("Finished calculating OSM green area per person")
+                pbar.close()
                 return json.dumps({'green_area_per_person': green_area_per_person})
     
     def get_isochrone_green(self, lat, lon, max_time, network_type):
@@ -94,7 +96,7 @@ class MetricsOSM(MetricsInterface):
         str
             A JSON string containing the reachable green areas and related metrics.
         """
-        with tqdm(total=100, desc="Calculating OSM isochrone green area", unit="%") as pbar:
+        with tqdm(total=100, desc="Calculating OSM isochrone green area", unit="%", leave=False) as pbar:
             if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
                 raise ValueError("Coordinates not valid")
             pbar.update(5)
@@ -180,8 +182,8 @@ class MetricsOSM(MetricsInterface):
 
             reachable_coords = [(data['y'], data['x']) for node_id, data in reachable_nodes.items()]
 
-            data = self.osm_green['data']
-            transform = self.osm_green['transform']
+            data = self.osm_file['data']
+            transform = self.osm_file['transform']
 
             total_pixels = 0
             green_area_pixels = 0
@@ -220,7 +222,7 @@ class MetricsOSM(MetricsInterface):
             green_area_sqm = green_area_pixels * pixel_area_sqm
 
             result = {
-                "isochrone_time_minutes": max_time,
+                "max_time": max_time,
                 "transport_mode": network_type,
                 "green_area_percentage": round(green_percentage, 2),
                 "green_area_sqm": round(green_area_sqm, 2),
@@ -231,7 +233,7 @@ class MetricsOSM(MetricsInterface):
                 pbar.n = 100
                 pbar.last_print_n = 100
             pbar.set_description("Finished calculating OSM isochrone green area")
-
+            pbar.close()
             return json.dumps(result)
 
     def _estimate_distance_from_time(self, time_seconds, transport_mode):

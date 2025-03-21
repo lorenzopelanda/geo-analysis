@@ -393,7 +393,7 @@ class GHSPOPDownloader(DownloaderInterface):
             A dictionary containing the downloaded data, transform, CRS, and shape.
         """
         steps=["Removing existing directory","Loading shapefile","Getting tiles for bounds","Downloading and processing tiles","Cropping bounds"]
-        with tqdm(total=100, desc="Overall Progress", unit = "steps") as pbar:
+        with tqdm(total=100, desc="Overall Progress", unit = "steps", leave=False) as pbar:
             self.__remove_existing_directory()
             pbar.update(10)
             
@@ -418,4 +418,5 @@ class GHSPOPDownloader(DownloaderInterface):
             self.__remove_existing_directory()
             pbar.update(10)
             pbar.set_description("GHS-POP data downloaded")
+            pbar.close()
             return {"data":ghs_data_cropped, "transform":ghs_transform_cropped, "crs": ghs_crs_cropped,"shape": ghs_shape_cropped}

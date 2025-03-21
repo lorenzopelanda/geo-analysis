@@ -53,7 +53,7 @@ class MetricsCopernicus(MetricsInterface):
         str
             A JSON string containing the green area per person.
         """
-        with tqdm(total=100, desc="Calculating Copernicus green area per person") as pbar:
+        with tqdm(total=100, desc="Calculating Copernicus green area per person", leave=False) as pbar:
             ghspop_data = self.ghs_pop_data['data']
             copernicus_data = self.copernicus_green['data']
             pbar.update(20)
@@ -67,11 +67,13 @@ class MetricsCopernicus(MetricsInterface):
             if total_population == 0:
                 pbar.update(20)
                 pbar.set_description("Finished calculating Copernicus green area per person")
+                pbar.close()
                 return json.dumps({'green_area_per_person': float('inf')})
             else:
                 green_area_per_person = round(total_green_area / total_population, 4)
                 pbar.update(20)
                 pbar.set_description("Finished calculating Copernicus green area per person")
+                pbar.close()
                 return json.dumps({'green_area_per_person': green_area_per_person})
 
 
@@ -95,7 +97,7 @@ class MetricsCopernicus(MetricsInterface):
         str
             A JSON string containing the reachable green areas and related metrics.
         """
-        with tqdm(total=100, desc="Calculating Copernicus isochrone green area", unit="%") as pbar:
+        with tqdm(total=100, desc="Calculating Copernicus isochrone green area", unit="%", leave=False) as pbar:
             if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
                 raise ValueError("Coordinates not valid")
             pbar.update(5)
@@ -220,7 +222,7 @@ class MetricsCopernicus(MetricsInterface):
             green_area_sqm = green_area_pixels * pixel_area_sqm
 
             result = {
-                "isochrone_time_minutes": max_time,
+                "max_time": max_time,
                 "transport_mode": network_type,
                 "green_area_percentage": round(green_percentage, 2),
                 "green_area_sqm": round(green_area_sqm, 2),
@@ -231,6 +233,7 @@ class MetricsCopernicus(MetricsInterface):
                 pbar.n = 100
                 pbar.last_print_n = 100
             pbar.set_description("Finished calculating Copernicus isochrone green area")
+            pbar.close()
 
             return json.dumps(result)
 

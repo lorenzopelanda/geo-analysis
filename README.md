@@ -26,7 +26,7 @@ To install the GreenTo package, follow these steps:
     pip install .
     ```
 
-## Usage
+## Usage examples
 
 For detailed usage examples, refer to the examples [here](EXAMPLES.md).
 

@@ -30,7 +30,7 @@ class OSMDownloader(DownloaderInterface):
             A tuple containing two GeoDataFrames: nodes and edges.
         """
         steps = ["Converting bounding box to geometry", "Downloading OSM data", "Filtering data"]
-        with tqdm(total=100, desc="Overall Progress", unit="step") as pbar:
+        with tqdm(total=100, desc="Overall Progress", unit="step", leave=False) as pbar:
             pbar.set_description(steps[0])
             aoi_box = bounding_box.to_geometry()
             pbar.update(20)
@@ -69,7 +69,7 @@ class OSMDownloader(DownloaderInterface):
                     edges_gdf = features.loc[poly_mask].copy()
                     pbar.update(30)
                     pbar.set_description("OSM data downloaded")
-
+                    pbar.close()
                     return (nodes_gdf, edges_gdf)
 
                 except Exception as e:

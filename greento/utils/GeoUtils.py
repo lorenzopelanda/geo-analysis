@@ -166,7 +166,7 @@ class GeoUtils:
         tuple
             A tuple containing the latitude and longitude coordinates of the cell with the maximum population.
         """
-        with tqdm(total=100, desc="Getting coordinates of maximum population") as pbar:
+        with tqdm(total=100, desc="Getting coordinates of maximum population", leave=False) as pbar:
             data = ghs_pop['data']
             transform = ghs_pop['transform']
             pbar.update(30)
@@ -175,7 +175,7 @@ class GeoUtils:
             lon, lat = rasterio.transform.xy(transform, idx[0], idx[1])
             pbar.update(20)
             pbar.set_description("Coordinates of maximum population found")
-
+            pbar.close()
         return (lat, lon)
     
 
@@ -262,7 +262,7 @@ class GeoUtils:
             'highest_res_area': pixel_sizes[0][2]  
         }
 
-        with tqdm(total=len(pixel_sizes), desc="Adjusting detail level") as pbar:
+        with tqdm(total=len(pixel_sizes), desc="Adjusting detail level", leave=False) as pbar:
             for pixel_size, area, area_name in pixel_sizes:
                 source_data = area['data']
                 source_transform = area['transform']
@@ -295,5 +295,6 @@ class GeoUtils:
                         "shape": (target_height, target_width)
                     }
                 pbar.update(1)    
-
+            pbar.set_description("Detail level adjusted")
+            pbar.close()
         return result
