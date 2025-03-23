@@ -2,8 +2,7 @@
 ---
 
 .page-header {
-  background-image: url('/assets/images/background.jpg') !important;
-  background: none; /* colore di fallback */
+  background-image: url('/geo-analysis/assets/images/background.jpg') !important;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
