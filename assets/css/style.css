@@ -1,9 +1,10 @@
-/* ---
+---
 ---
 
+@import "jekyll-theme-cayman";
+
 .page-header {
-  background-image: url('https://lorenzopelanda.github.io/geo-analysis/assets/images/background.jpg') !important;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-} */
+  background-image: url('https://raw.githubusercontent.com/lorenzopelanda/geo-analysis/main/assets/images/background.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
