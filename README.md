@@ -1,17 +1,4 @@
-<style>
-    .page-header {
-  background-image: url('https://images.unsplash.com/photo-1506260408121-e353d10b87c7?q=80&w=2728&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-  background-size: cover;
-  background-position: center;
-  text-shadow: 2px 2px 4px rgba(12, 23, 6, 5);
-  color: #fff;
-  height: 50vh;
-}
-.page-header h1{
-    padding:2px 4px;
-    background-color: #0000;
-}
-</style>
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
 # GreenTo
 
