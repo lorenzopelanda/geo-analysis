@@ -13,11 +13,9 @@
   
 .btn {
   background-color: rgba(79,79,79,0.4) !important;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 
   &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px 10px #fff;
+    box-shadow: 0 0 20px 4px #fff;
   }
 }
 
