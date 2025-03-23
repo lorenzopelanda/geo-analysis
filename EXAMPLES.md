@@ -554,8 +554,8 @@ from greento.utils.GeoUtils import GeoUtils
 utils = GeoUtils()
 utils.adjust_detail_level(osm, copernicus, ghs_pop)
 ```
-
-BACK to [Homepage](README.md)
+<br>
+#### BACK to [Homepage](README.md)
 
 
 
