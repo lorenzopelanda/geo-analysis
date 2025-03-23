@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+
 # GreenTo Examples
 
 - [Defining a Bounding Box](#defining-a-bounding-box)
