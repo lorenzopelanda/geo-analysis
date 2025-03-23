@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 <style>
 .page-header {
   background-image: url('assets/images/background.jpg') !important;
