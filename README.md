@@ -32,17 +32,3 @@ To install the GreenTo package, follow these steps:
 
 For detailed usage examples, refer to the examples [here](EXAMPLES.md).
 
-<script>
-  // Esegui questo codice quando la pagina è completamente caricata
-  window.onload = function() {
-    // Trova l'elemento header
-    var header = document.querySelector('.page-header');
-    if (header) {
-      // Applica l'immagine di sfondo
-      header.style.backgroundImage = "url('https://raw.githubusercontent.com/lorenzopelanda/geo-analysis/main/assets/images/background.jpg')";
-      header.style.backgroundSize = "cover";
-      header.style.backgroundPosition = "center";
-    }
-  };
-</script>
-
