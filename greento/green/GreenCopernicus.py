@@ -43,7 +43,7 @@ class GreenCopernicus(GreenInterface):
             A dictionary containing the filtered green areas, transform, CRS, and shape.
         """
         if kwargs is None:
-            green_areas = frozenset([10,20, 30])
+            green_areas = frozenset([10,20, 30]) # 10: tree cover, 20: shrubland, 30: grassland
         else:
             green_areas = kwargs.get('green_areas', frozenset([10, 20, 30]))
 

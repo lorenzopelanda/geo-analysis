@@ -74,7 +74,6 @@ class VectorUtils(UtilsInterface):
             raise ValueError("Edges must be a GeoDataFrame and contain a 'geometry' column")
 
         with tqdm(total=100, desc="Rasterizing OSM data", leave=False) as pbar:
-            # Rasterize nodes (points)
             node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
             node_rasterized = rasterize(
                 shapes=node_shapes,
@@ -86,7 +85,6 @@ class VectorUtils(UtilsInterface):
             )
             pbar.update(40)
 
-            # Rasterize edges (lines or polygons)
             edge_shapes = [(geom, 1) for geom in edges.geometry if geom is not None]
             edge_rasterized = rasterize(
                 shapes=edge_shapes,
@@ -98,8 +96,7 @@ class VectorUtils(UtilsInterface):
             )
             pbar.update(40)
 
-            # Combine node and edge rasters
-            combined_raster = np.maximum(node_rasterized, edge_rasterized)  # Combine both rasters by taking the maximum
+            combined_raster = np.maximum(node_rasterized, edge_rasterized)  
             pbar.update(20)
             pbar.set_description("Finished rasterizing OSM data")
             pbar.close()

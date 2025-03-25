@@ -111,15 +111,12 @@ class CopernicusDownloader(DownloaderInterface):
             A dictionary containing the downloaded data, transform, CRS, and shape.
         """
         with tqdm(total=100, desc="Downloading Copernicus data", leave=False) as pbar:
-            #Connect to OpenEO
             connection = self.__connect_to_openeo()
             pbar.update(20)
 
-            #Convert the geometry to GeoJSON
             aoi_geojson = bounding_box.to_geojson()
             pbar.update(10)
 
-            # Perform the analysis directly on the remote data
             datacube = connection.load_collection(
                 "ESA_WORLDCOVER_10M_2021_V2",
                 spatial_extent=aoi_geojson,
@@ -131,7 +128,6 @@ class CopernicusDownloader(DownloaderInterface):
                 datacube.download(tmpfile.name, format="GTiff")
                 pbar.update(30)
 
-                #Read the data into a data structure
                 with rasterio.open(tmpfile.name) as dataset:
                     data = dataset.read(1)
                     copernicus_transform = dataset.transform

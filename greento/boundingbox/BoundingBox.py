@@ -312,7 +312,6 @@ class BoundingBox:
             The coordinates (latitude, longitude) or None if not found.
         """
         if is_address:
-            # Geocoding for address
             gdf = gpd.tools.geocode(query, provider="nominatim", user_agent="geoData")
             if not gdf.empty:
                 point = gdf.geometry.iloc[0]
@@ -320,7 +319,6 @@ class BoundingBox:
             else:
                 return None
         else:
-            # Center of municipality
             gdf = ox.geocode_to_gdf(query, which_result=1)
             if not gdf.empty:
                 gdf_projected = gdf.to_crs(epsg=3857)
