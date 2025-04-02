@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>greento.data.ghspop package &#8212; GreenTo</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=e031e9a9"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'greento.data.ghspop';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="greento.data.osm package" href="greento.data.osm.html" />
+    <link rel="prev" title="greento.data.copernicus package" href="greento.data.copernicus.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">GreenTo</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="EXAMPLES.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="modules.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="EXAMPLES.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="modules.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="greento.html">greento package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="greento.boundingbox.html">greento.boundingbox package</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="greento.data.html">greento.data package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">greento.data.ghspop package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="greento.distance.html">greento.distance package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.green.html">greento.green package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.metrics.html">greento.metrics package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.traffic.html">greento.traffic package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="greento.utils.html">greento.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="greento.boundingbox.html">greento.boundingbox package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">greento.data.ghspop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="greento.data.html">greento.data package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">greento.data.ghspop package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="greento.distance.html">greento.distance package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="greento.green.html">greento.green package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="greento.traffic.html">greento.traffic package</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="greento.utils.html">greento.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="modules.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="greento.data.html" class="nav-link">greento.data package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">greento.data...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="greento-data-ghspop-package">
+<h1>greento.data.ghspop package<a class="headerlink" href="#greento-data-ghspop-package" title="Permalink to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="module-greento.data.ghspop.GHSPOPDownloader">
+<span id="greento-data-ghspop-ghspopdownloader-module"></span><h2>greento.data.ghspop.GHSPOPDownloader module<a class="headerlink" href="#module-greento.data.ghspop.GHSPOPDownloader" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.data.ghspop.GHSPOPDownloader.</span></span><span class="sig-name descname"><span class="pre">GHSPOPDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapefile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extracted_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'extracted_files'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/data/ghspop/GHSPOPDownloader.html#GHSPOPDownloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="greento.data.html#greento.data.DataInterface.DownloaderInterface" title="greento.data.DataInterface.DownloaderInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">DownloaderInterface</span></code></a></p>
+<p>A class to download and process GHS-POP data.</p>
+<section id="attributes">
+<h3>Attributes:<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
+<dl class="simple">
+<dt>shapefile_path<span class="classifier">str</span></dt><dd><p>Path to the shapefile containing tile information.</p>
+</dd>
+<dt>extracted_dir<span class="classifier">str</span></dt><dd><p>Directory to store extracted files.</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h3>Methods:<a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h3>
+<dl class="simple">
+<dt>__remove_existing_directory():</dt><dd><p>Removes the existing directory if it exists.</p>
+</dd>
+<dt>__load_shapefile():</dt><dd><p>Loads the shapefile and converts it to the correct CRS.</p>
+</dd>
+<dt>__get_tile_id(tiles_gdf, point_gdf):</dt><dd><p>Gets the tile ID for a given point.</p>
+</dd>
+<dt>__download_tile(tile_id):</dt><dd><p>Downloads a tile based on the tile ID.</p>
+</dd>
+<dt>__extract_tif_file(zip_path):</dt><dd><p>Extracts the TIF file from the downloaded zip archive.</p>
+</dd>
+<dt>__get_tiles_for_bounds(bounds, tiles_gdf):</dt><dd><p>Gets the tile IDs for the given bounding box.</p>
+</dd>
+<dt>__cleanup_files(file_paths):</dt><dd><p>Cleans up processed files and directories.</p>
+</dd>
+<dt>__merge_tiles(tiles):</dt><dd><p>Merges multiple GHS-POP tiles into a single raster.</p>
+</dd>
+<dt>__process_single_tile(tile_id):</dt><dd><p>Processes a single GHS-POP tile.</p>
+</dd>
+<dt>__download_and_process_tiles(tile_ids):</dt><dd><p>Downloads and processes GHS-POP tiles based on the provided tile IDs.</p>
+</dd>
+<dt>__crop_bounds(data, transform, bounds):</dt><dd><p>Crops the given data to the specified bounding box.</p>
+</dd>
+<dt>get_data(bounding_box):</dt><dd><p>Downloads and processes GHS-POP data for the given bounding box.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounding_box</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/data/ghspop/GHSPOPDownloader.html#GHSPOPDownloader.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader.get_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Downloads and processes GHS-POP data for the given bounding box.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bounding_box (BoundingBox): The bounding box for which to download data.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: A dictionary containing the downloaded data, transform, CRS, and shape.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-greento.data.ghspop">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-greento.data.ghspop" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="greento.data.copernicus.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">greento.data.copernicus package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="greento.data.osm.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">greento.data.osm package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.data.ghspop.GHSPOPDownloader">greento.data.ghspop.GHSPOPDownloader module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader"><code class="docutils literal notranslate"><span class="pre">GHSPOPDownloader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.data.ghspop.GHSPOPDownloader.GHSPOPDownloader.get_data"><code class="docutils literal notranslate"><span class="pre">GHSPOPDownloader.get_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.data.ghspop">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/greento.data.ghspop.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, GreenTo.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
