@@ -23,7 +23,7 @@ jobs:
           pip install sphinx pydata_sphinx_theme  
 
       - name: Build Sphinx documentation
-        run: make html
+        run: sphinx-build -b html docs/ _build/html
 
       - name: Create .nojekyll file
         run: touch _build/html/.nojekyll
