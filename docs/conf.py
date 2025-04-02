@@ -33,3 +33,13 @@ html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 html_title = "GreenTo"
+
+html_theme_options = { 
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/lorenzopelanda/geo-analysis",
+            "icon": "fab fa-github", 
+        }
+    ],
+}
