@@ -29,10 +29,11 @@ class RasterUtils(UtilsInterface):
         """
         Initializes the RasterUtils with Copernicus data.
 
-        Parameters:
-        ----------
-        copernicus : dict
-            The Copernicus data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            copernicus (dict): The Copernicus data containing 'data', 'transform', 'crs', and 'shape'.
+
+        Returns:
+            None
         """
         self.copernicus = copernicus
 
@@ -40,22 +41,19 @@ class RasterUtils(UtilsInterface):
         """
         Filters the Copernicus data using OSM green data.
 
-        Parameters:
-        ----------
-        copernicus_green : dict
-            The Copernicus green area data containing 'data', 'transform', 'crs', and 'shape'.
-        osm_green : dict
-            The OSM green area data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            copernicus_green (dict): The Copernicus green area data containing 'data', 'transform', 'crs', and 'shape'.
+            osm_green (dict): The OSM green area data containing 'data', 'transform', 'crs', and 'shape'.
 
         Returns:
-        -------
-        dict
-            The filtered raster data.
-        
+            dict: The filtered raster data containing:
+                - 'data': The filtered raster data.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
+
         Raises:
-        ------
-        ValueError
-            If the raster shapes do not match.
+            ValueError: If the raster shapes do not match.
         """
         copernicus_data = copernicus_green['data']
         osm_data = osm_green['data']
@@ -79,9 +77,7 @@ class RasterUtils(UtilsInterface):
         Calculates the land use percentages from the Copernicus data.
 
         Returns:
-        -------
-        str
-            A JSON string containing the land use percentages.
+            str: A JSON string containing the land use percentages, where keys are land use types and values are percentages.
         """
         start_time = time.time()
 
@@ -124,20 +120,17 @@ class RasterUtils(UtilsInterface):
         """
         Transforms a raster to a new CRS with a different resolution and extent.
 
-        Parameters:
-        ----------
-        dst_crs : str
-            The destination coordinate reference system.
+        Args:
+            dst_crs (str): The destination coordinate reference system.
 
         Returns:
-        -------
-        dict
-            The transformed raster data.
-        
+            dict: The transformed raster data containing:
+                - 'data': The reprojected raster data.
+                - 'crs': The destination coordinate reference system.
+                - 'transform': The affine transform of the reprojected raster.
+
         Raises:
-        ------
-        ValueError
-            If the shape of the data is incorrect.
+            ValueError: If the shape of the data is incorrect.
         """
         src_data = self.copernicus['data']
         src_transform = self.copernicus['transform']

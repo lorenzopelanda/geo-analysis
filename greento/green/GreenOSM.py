@@ -19,12 +19,13 @@ class GreenOSM(GreenInterface):
     """
     def __init__(self, osm):
         """
-        Initializes the GreenOSM with OSM data.
+        Initializes the GreenOSM class with OSM data.
 
-        Parameters:
-        ----------
-        osm : tuple
-            A tuple containing two GeoDataFrames: nodes and edges.
+        Args:
+            osm (tuple): A tuple containing two GeoDataFrames: nodes and edges.
+
+        Returns:
+            None
         """
         self.osm = osm    
     
@@ -32,15 +33,24 @@ class GreenOSM(GreenInterface):
         """
         Filters and processes green areas from the OSM data.
 
-        Parameters:
-        ----------
-        **kwargs : dict, optional
-            Additional arguments to specify green tags (default is a predefined set of green tags).
+        Args:
+            **kwargs: Additional arguments to specify green tags.
+                - green_tags (dict, optional): A dictionary of tags to filter green areas. 
+                  Default is:
+                  {
+                      'natural': ['wood', 'tree_row', 'tree', 'scrub', 'grassland',
+                                  'heath', 'fell', 'tundra', 'shrubbery'],
+                      'landuse': ['forest', 'meadow', 'grass', 'allotments'],
+                      'leisure': ['park', 'garden', 'nature_reserve']
+                  }
 
         Returns:
-        -------
-        tuple
-            A tuple containing two DataFrames: filtered green nodes and edges.
+            tuple: A tuple containing two GeoDataFrames:
+                - green_nodes (geopandas.GeoDataFrame): Filtered green nodes.
+                - green_edges (geopandas.GeoDataFrame): Filtered green edges.
+
+        Raises:
+            Exception: If an error occurs during processing, returns empty GeoDataFrames.
         """
         
         try:

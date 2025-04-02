@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>greento.utils.GeoUtils &mdash; GreenTo Documentation 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e031e9a9"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GreenTo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">greento</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GreenTo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">greento.utils.GeoUtils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for greento.utils.GeoUtils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">rasterio.warp</span> <span class="kn">import</span> <span class="n">reproject</span><span class="p">,</span> <span class="n">Resampling</span>
+
+<div class="viewcode-block" id="GeoUtils"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils">[docs]</a><span class="k">class</span> <span class="nc">GeoUtils</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to provide utility functions for geographical data.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    _calculate_travel_time(distance_meters, transport_mode):</span>
+<span class="sd">        Calculates the estimated travel time for a given distance and transport mode.</span>
+<span class="sd">    get_coordinates_from_address(address):</span>
+<span class="sd">        Gets the latitude and longitude coordinates for a given address.</span>
+<span class="sd">    get_address_from_coordinates(lat, lon):</span>
+<span class="sd">        Gets the address for given latitude and longitude coordinates.</span>
+<span class="sd">    get_coordinates_max_population(ghs_pop):</span>
+<span class="sd">        Gets the coordinates of the cell with the maximum population.</span>
+<span class="sd">    adjust_detail_level(osm, copernicus, ghs_pop):</span>
+<span class="sd">        Adjusts the detail level of the given raster datasets to match the highest resolution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_calculate_travel_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_meters</span><span class="p">,</span> <span class="n">transport_mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the estimated travel time for a given distance and transport mode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            distance_meters (float): The distance to travel in meters.</span>
+<span class="sd">            transport_mode (str): The mode of transport (e.g., &#39;walk&#39;, &#39;bike&#39;, &#39;drive&#39;, &#39;all_public&#39;, &#39;drive_service&#39;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The estimated travel time in minutes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Speed constants in km/h</span>
+        <span class="n">SPEEDS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mf">1.4</span><span class="p">,</span>  <span class="c1"># 5 km/h</span>
+            <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mf">4.17</span><span class="p">,</span>  <span class="c1"># 15 km/h</span>
+            <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mf">8.33</span><span class="p">,</span>  <span class="c1"># 30 km/h (urban)</span>
+            <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mf">8.33</span><span class="p">,</span>  <span class="c1"># 30 km/h</span>
+            <span class="s1">&#39;drive_service&#39;</span><span class="p">:</span> <span class="mf">8.33</span>  <span class="c1"># as drive</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Medium time of fixed delays in minutes</span>
+        <span class="n">FIXED_DELAYS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>  <span class="c1"># take/return bike</span>
+            <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mi">180</span><span class="p">,</span>  <span class="c1"># parking + take the car</span>
+            <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mi">420</span><span class="p">,</span>  <span class="c1"># walk to the stop (3 min) + estimated wait (4 min)</span>
+            <span class="s1">&#39;drive_service&#39;</span><span class="p">:</span> <span class="mi">180</span>  <span class="c1"># wait + call</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Delay factors depending on traffic and semaphores</span>
+        <span class="n">DELAY_FACTORS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>  <span class="c1"># semaphores for pedestrians</span>
+            <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>  <span class="c1"># semaphores and traffic</span>
+            <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span>  <span class="c1"># traffic and semaphores</span>
+            <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mf">1.10</span><span class="p">,</span>  <span class="c1"># traffic and semaphores</span>
+            <span class="s1">&#39;drive_service&#39;</span><span class="p">:</span> <span class="mf">1.25</span>  <span class="c1"># as drive</span>
+        <span class="p">}</span>
+
+        <span class="n">base_speed</span> <span class="o">=</span> <span class="n">SPEEDS</span><span class="p">[</span><span class="n">transport_mode</span><span class="p">]</span>
+        <span class="n">base_time_seconds</span> <span class="o">=</span> <span class="n">distance_meters</span> <span class="o">/</span> <span class="n">base_speed</span>
+
+        <span class="n">total_time_seconds</span> <span class="o">=</span> <span class="p">(</span><span class="n">base_time_seconds</span> <span class="o">*</span> <span class="n">DELAY_FACTORS</span><span class="p">[</span><span class="n">transport_mode</span><span class="p">])</span> <span class="o">+</span> <span class="n">FIXED_DELAYS</span><span class="p">[</span><span class="n">transport_mode</span><span class="p">]</span>
+
+        <span class="n">total_time_minutes</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_time_seconds</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">total_time_minutes</span>
+    
+<div class="viewcode-block" id="GeoUtils.get_coordinates_from_address"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils.get_coordinates_from_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_coordinates_from_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the latitude and longitude coordinates for a given address.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            address (str): The address to geocode.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the latitude and longitude coordinates.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the address is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://nominatim.openstreetmap.org/search&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">address</span><span class="p">,</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;GreenTo/1.0&quot;</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lat&quot;</span><span class="p">])</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lon&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Address not found&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeoUtils.get_address_from_coordinates"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils.get_address_from_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">get_address_from_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the address for given latitude and longitude coordinates.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lat (float): The latitude coordinate.</span>
+<span class="sd">            lon (float): The longitude coordinate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The address corresponding to the given coordinates.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the address is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://nominatim.openstreetmap.org/reverse&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span>
+            <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span>
+        <span class="p">}</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;GreenTo/1.0&quot;</span>
+        <span class="p">}</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;display_name&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;display_name&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Address not found for the given coordinates&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GeoUtils.get_coordinates_max_population"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils.get_coordinates_max_population">[docs]</a>    <span class="k">def</span> <span class="nf">get_coordinates_max_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ghs_pop</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the coordinates of the cell with the maximum population.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ghs_pop (dict): The GHS-POP data containing &#39;data&#39; and &#39;transform&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the latitude and longitude coordinates of the cell with the maximum population.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Getting coordinates of maximum population&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ghs_pop</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">ghs_pop</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+            <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Coordinates of maximum population found&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="GeoUtils.haversine_distance"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils.haversine_distance">[docs]</a>    <span class="k">def</span> <span class="nf">haversine_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lons2</span><span class="p">,</span> <span class="n">lats2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the Haversine distance between two points.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lon1 (float): Longitude of the first point.</span>
+<span class="sd">            lat1 (float): Latitude of the first point.</span>
+<span class="sd">            lons2 (float): Longitude(s) of the second point(s).</span>
+<span class="sd">            lats2 (float): Latitude(s) of the second point(s).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The Haversine distance in kilometers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="mi">6371</span>  <span class="c1"># Earth radius in km</span>
+
+
+        <span class="n">lat1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span>
+        <span class="n">lon1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon1</span><span class="p">)</span>
+        <span class="n">lats2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lats2</span><span class="p">)</span>
+        <span class="n">lons2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lons2</span><span class="p">)</span>
+
+        <span class="n">dlat</span> <span class="o">=</span> <span class="n">lats2</span> <span class="o">-</span> <span class="n">lat1</span>
+        <span class="n">dlon</span> <span class="o">=</span> <span class="n">lons2</span> <span class="o">-</span> <span class="n">lon1</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dlat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lats2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dlon</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">R</span> <span class="o">*</span> <span class="n">c</span></div>
+    
+<div class="viewcode-block" id="GeoUtils.adjust_detail_level"><a class="viewcode-back" href="../../../greento.utils.html#greento.utils.GeoUtils.GeoUtils.adjust_detail_level">[docs]</a>    <span class="k">def</span> <span class="nf">adjust_detail_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">osm</span><span class="p">,</span> <span class="n">copernicus</span><span class="p">,</span> <span class="n">ghs_pop</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adjusts the detail level of the given raster datasets to match the highest resolution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            osm (dict): The OSM data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+<span class="sd">            copernicus (dict): The Copernicus data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+<span class="sd">            ghs_pop (dict): The GHS-POP data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the adjusted raster datasets with the highest resolution.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If one or more raster datasets are None or if the shape of the target data is unexpected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">osm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">copernicus</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ghs_pop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One or more raster datasets are None. Check rasterization process.&quot;</span><span class="p">)</span>
+
+        <span class="n">area_1_pixel_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">area_2_pixel_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">osm</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">osm</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">area_3_pixel_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ghs_pop</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ghs_pop</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+
+        <span class="n">pixel_sizes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">area_1_pixel_size</span><span class="p">,</span> <span class="n">copernicus</span><span class="p">,</span> <span class="s1">&#39;copernicus&#39;</span><span class="p">),</span>
+                       <span class="p">(</span><span class="n">area_2_pixel_size</span><span class="p">,</span> <span class="n">osm</span><span class="p">,</span> <span class="s1">&#39;osm&#39;</span><span class="p">),</span>
+                       <span class="p">(</span><span class="n">area_3_pixel_size</span><span class="p">,</span> <span class="n">ghs_pop</span><span class="p">,</span> <span class="s1">&#39;ghs_pop&#39;</span><span class="p">)]</span>
+        <span class="n">pixel_sizes</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  
+
+        <span class="n">target_area</span> <span class="o">=</span> <span class="n">pixel_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">target_transform</span> <span class="o">=</span> <span class="n">target_area</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+        <span class="n">target_crs</span> <span class="o">=</span> <span class="n">target_area</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]</span>
+        <span class="n">target_shape</span> <span class="o">=</span> <span class="n">target_area</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">target_height</span><span class="p">,</span> <span class="n">target_width</span> <span class="o">=</span> <span class="n">target_shape</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">target_height</span><span class="p">,</span> <span class="n">target_width</span> <span class="o">=</span> <span class="n">target_shape</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected shape for target: </span><span class="si">{</span><span class="n">target_shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;copernicus&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;osm&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;ghs_pop&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;highest_res_area&#39;</span><span class="p">:</span> <span class="n">pixel_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>  
+        <span class="p">}</span>
+
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">pixel_sizes</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Adjusting detail level&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">area_name</span> <span class="ow">in</span> <span class="n">pixel_sizes</span><span class="p">:</span>
+                <span class="n">source_data</span> <span class="o">=</span> <span class="n">area</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+                <span class="n">source_transform</span> <span class="o">=</span> <span class="n">area</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+                <span class="n">source_crs</span> <span class="o">=</span> <span class="n">area</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">area_name</span> <span class="o">==</span> <span class="n">pixel_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">area_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">source_data</span><span class="p">,</span>
+                        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">target_transform</span><span class="p">,</span>
+                        <span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="n">target_crs</span><span class="p">,</span>
+                        <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">target_height</span><span class="p">,</span> <span class="n">target_width</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">source_resampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">target_height</span><span class="p">,</span> <span class="n">target_width</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">source_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+                    <span class="n">reproject</span><span class="p">(</span>
+                        <span class="n">source</span><span class="o">=</span><span class="n">source_data</span><span class="p">,</span>
+                        <span class="n">destination</span><span class="o">=</span><span class="n">source_resampled</span><span class="p">,</span>
+                        <span class="n">src_transform</span><span class="o">=</span><span class="n">source_transform</span><span class="p">,</span>
+                        <span class="n">src_crs</span><span class="o">=</span><span class="n">source_crs</span><span class="p">,</span>
+                        <span class="n">dst_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span>
+                        <span class="n">dst_crs</span><span class="o">=</span><span class="n">target_crs</span><span class="p">,</span>
+                        <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">bilinear</span>
+                    <span class="p">)</span>   
+
+                    <span class="n">result</span><span class="p">[</span><span class="n">area_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">source_resampled</span><span class="p">,</span>
+                        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">target_transform</span><span class="p">,</span>
+                        <span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="n">target_crs</span><span class="p">,</span>
+                        <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">target_height</span><span class="p">,</span> <span class="n">target_width</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Detail level adjusted&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, GreenTo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

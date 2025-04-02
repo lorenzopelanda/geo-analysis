@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>greento.metrics.MetricsOSM &mdash; GreenTo Documentation 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e031e9a9"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GreenTo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">greento</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GreenTo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">greento.metrics.MetricsOSM</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for greento.metrics.MetricsOSM</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">.MetricsInterface</span> <span class="kn">import</span> <span class="n">MetricsInterface</span>
+<span class="kn">from</span> <span class="nn">greento.utils.GeoUtils</span> <span class="kn">import</span> <span class="n">GeoUtils</span>
+
+<div class="viewcode-block" id="MetricsOSM"><a class="viewcode-back" href="../../../greento.metrics.html#greento.metrics.MetricsOSM.MetricsOSM">[docs]</a><span class="k">class</span> <span class="nc">MetricsOSM</span><span class="p">(</span><span class="n">MetricsInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to calculate metrics using OpenStreetMap (OSM) data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    osm_file : str</span>
+<span class="sd">        The file path to the OSM data.</span>
+<span class="sd">    vector_traffic_area : tuple</span>
+<span class="sd">        A tuple containing two GeoDataFrames: nodes and edges for traffic area.</span>
+<span class="sd">    ghs_pop_data : dict</span>
+<span class="sd">        The GHS-POP data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    green_area_per_person():</span>
+<span class="sd">        Calculates the green area per person in the given raster and population data.</span>
+<span class="sd">    get_isochrone_green(lat, lon, max_time, network_type):</span>
+<span class="sd">        Calculates the reachable green areas within a given time from a starting point.</span>
+<span class="sd">    _estimate_distance_from_time(time_seconds, transport_mode):</span>
+<span class="sd">        Estimates the distance that can be traveled in a given time for a specific transport mode.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">osm</span><span class="p">,</span> <span class="n">vector_traffic_area</span><span class="p">,</span> <span class="n">ghs_pop_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the MetricsOSM with OSM green area data, traffic area, and population data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            osm (dict): The OSM green area data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+<span class="sd">            vector_traffic_area (tuple): A tuple containing two GeoDataFrames: nodes and edges for traffic area.</span>
+<span class="sd">            ghs_pop_data (dict): The GHS-POP data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">osm_file</span> <span class="o">=</span> <span class="n">osm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span> <span class="o">=</span> <span class="n">vector_traffic_area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ghs_pop_data</span> <span class="o">=</span> <span class="n">ghs_pop_data</span>
+
+<div class="viewcode-block" id="MetricsOSM.green_area_per_person"><a class="viewcode-back" href="../../../greento.metrics.html#greento.metrics.MetricsOSM.MetricsOSM.green_area_per_person">[docs]</a>    <span class="k">def</span> <span class="nf">green_area_per_person</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the green area per person in the given raster and population data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A JSON string containing the green area per person.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Calculating OSM green area per person&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">ghspop_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ghs_pop_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">green_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm_file</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+            <span class="n">num_green_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">green_data</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">total_green_area</span> <span class="o">=</span> <span class="n">num_green_pixels</span> <span class="o">*</span> <span class="mi">100</span>  <span class="c1"># sqm</span>
+
+            <span class="n">total_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ghspop_data</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">total_population</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Finished calculating OSM green area per person&quot;</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;green_area_per_person&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">green_area_per_person</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_green_area</span> <span class="o">/</span> <span class="n">total_population</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Finished calculating OSM green area per person&quot;</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s1">&#39;green_area_per_person&#39;</span><span class="p">:</span> <span class="n">green_area_per_person</span><span class="p">})</span></div>
+    
+<div class="viewcode-block" id="MetricsOSM.get_isochrone_green"><a class="viewcode-back" href="../../../greento.metrics.html#greento.metrics.MetricsOSM.MetricsOSM.get_isochrone_green">[docs]</a>    <span class="k">def</span> <span class="nf">get_isochrone_green</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">network_type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the reachable green areas within a given time from a starting point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lat (float): The latitude of the starting point.</span>
+<span class="sd">            lon (float): The longitude of the starting point.</span>
+<span class="sd">            max_time (float): The maximum travel time in minutes.</span>
+<span class="sd">            network_type (str): The type of transport network (e.g., &#39;walk&#39;, &#39;bike&#39;, &#39;drive&#39;, &#39;all_public&#39;, &#39;drive_public&#39;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the input parameters are invalid or the traffic area is not reachable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Calculating OSM isochrone green area&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Coordinates not valid&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_time</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="n">max_time</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Max time not valid&quot;</span><span class="p">)</span>
+
+            <span class="n">valid_transport_modes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;walk&#39;</span><span class="p">,</span> <span class="s1">&#39;bike&#39;</span><span class="p">,</span> <span class="s1">&#39;drive&#39;</span><span class="p">,</span> <span class="s1">&#39;all_public&#39;</span><span class="p">,</span> <span class="s1">&#39;drive_public&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">network_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_transport_modes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transport mode not valid. Choose from: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">valid_transport_modes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;vector_traffic_area&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Traffic area not reachable&quot;</span><span class="p">)</span>
+
+            <span class="n">speed_kmh</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+                <span class="s1">&#39;drive_public&#39;</span><span class="p">:</span> <span class="mi">30</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">network_type</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+            <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span>
+            <span class="n">G</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span>  
+            <span class="n">start_node</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">nearest_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">return_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">FIXED_DELAYS</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>  <span class="c1"># take/return bike</span>
+                <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mi">180</span><span class="p">,</span>  <span class="c1"># parking + take the car</span>
+                <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mi">420</span><span class="p">,</span>  <span class="c1"># walk to the stop (3 min) + estimated wait (4 min)</span>
+                <span class="s1">&#39;drive_public&#39;</span><span class="p">:</span> <span class="mi">180</span>  <span class="c1"># wait + call</span>
+            <span class="p">}</span>
+
+            <span class="n">fixed_delay</span> <span class="o">=</span> <span class="n">FIXED_DELAYS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">network_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">travel_time_seconds</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_time</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">-</span> <span class="n">fixed_delay</span>
+
+            <span class="k">if</span> <span class="n">travel_time_seconds</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Time after delays is (</span><span class="si">{</span><span class="n">fixed_delay</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="si">}</span><span class="s2"> min) not enough to travel&quot;</span>
+                <span class="p">})</span>
+
+            <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;travel_time&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s1">&#39;length&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">length_m</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;travel_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">length_m</span> <span class="o">/</span> <span class="p">(</span><span class="n">speed_kmh</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">/</span> <span class="mi">3600</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">reachable_nodes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">queue</span> <span class="o">=</span> <span class="p">[(</span><span class="n">start_node</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> 
+
+            <span class="k">while</span> <span class="n">queue</span><span class="p">:</span>
+                <span class="n">current_node</span><span class="p">,</span> <span class="n">current_time</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">current_node</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">current_node</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">75</span><span class="p">:</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">75</span>
+                <span class="k">if</span> <span class="n">current_node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="n">node_data</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span>
+                    <span class="n">reachable_nodes</span><span class="p">[</span><span class="n">current_node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">node_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">node_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">current_time</span>
+                    <span class="p">}</span>
+
+                <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">current_node</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">neighbor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                        <span class="n">edges</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">current_node</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                        <span class="n">edge_time</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;travel_time&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">)</span>
+
+                        <span class="n">new_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">+</span> <span class="n">edge_time</span>
+
+                        <span class="k">if</span> <span class="n">new_time</span> <span class="o">&lt;=</span> <span class="n">travel_time_seconds</span><span class="p">:</span>
+                            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">neighbor</span><span class="p">,</span> <span class="n">new_time</span><span class="p">))</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">reachable_nodes</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No reachable green area for the time limit&quot;</span><span class="p">})</span>
+
+            <span class="n">reachable_coords</span> <span class="o">=</span> <span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">reachable_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm_file</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm_file</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+
+            <span class="n">total_pixels</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">green_area_pixels</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">green_accessibility</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">lat_point</span><span class="p">,</span> <span class="n">lon_point</span> <span class="ow">in</span> <span class="n">reachable_coords</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="o">~</span><span class="n">transform</span> <span class="o">*</span> <span class="p">(</span><span class="n">lon_point</span><span class="p">,</span> <span class="n">lat_point</span><span class="p">)]</span>
+
+                    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">total_pixels</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">pixel_value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">pixel_value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">green_area_pixels</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                            <span class="n">node_data</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">reachable_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lat_point</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lon_point</span><span class="p">),</span>
+                                <span class="kc">None</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_data</span><span class="p">:</span>
+                                <span class="n">time_to_node</span> <span class="o">=</span> <span class="n">node_data</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+                                <span class="n">distance_meters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_distance_from_time</span><span class="p">(</span><span class="n">time_to_node</span><span class="p">,</span> <span class="n">network_type</span><span class="p">)</span>
+                                <span class="n">travel_time</span> <span class="o">=</span> <span class="n">GeoUtils</span><span class="p">()</span><span class="o">.</span><span class="n">_calculate_travel_time</span><span class="p">(</span><span class="n">distance_meters</span><span class="p">,</span> <span class="n">network_type</span><span class="p">)</span>
+                                <span class="n">green_accessibility</span><span class="p">[</span><span class="n">node_data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+                                    <span class="s1">&#39;time_minutes&#39;</span><span class="p">:</span> <span class="n">travel_time</span><span class="p">,</span>
+                                    <span class="s1">&#39;distance_meters&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">distance_meters</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                                    <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">lat_point</span><span class="p">,</span>
+                                    <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">lon_point</span>
+                                <span class="p">}</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">green_percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">green_area_pixels</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">total_pixels</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">total_pixels</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+            <span class="n">pixel_area_sqm</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># 10m x 10m</span>
+            <span class="n">green_area_sqm</span> <span class="o">=</span> <span class="n">green_area_pixels</span> <span class="o">*</span> <span class="n">pixel_area_sqm</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;max_time&quot;</span><span class="p">:</span> <span class="n">max_time</span><span class="p">,</span>
+                <span class="s2">&quot;transport_mode&quot;</span><span class="p">:</span> <span class="n">network_type</span><span class="p">,</span>
+                <span class="s2">&quot;green_area_percentage&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_percentage</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;green_area_sqm&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_area_sqm</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;green_accessibility&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">green_accessibility</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="p">}</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">last_print_n</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Finished calculating OSM isochrone green area&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_estimate_distance_from_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_seconds</span><span class="p">,</span> <span class="n">transport_mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimates the distance that can be traveled in a given time for a specific transport mode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time_seconds (float): The time available for travel in seconds.</span>
+<span class="sd">            transport_mode (str): The type of transport network (e.g., &#39;walk&#39;, &#39;bike&#39;, &#39;drive&#39;, &#39;all_public&#39;, &#39;drive_public&#39;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The estimated distance that can be traveled in meters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Speed constants in m/s</span>
+        <span class="n">SPEEDS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mi">5</span> <span class="o">/</span> <span class="mf">3.6</span><span class="p">,</span>
+            <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mi">15</span> <span class="o">/</span> <span class="mf">3.6</span><span class="p">,</span>
+            <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mi">30</span> <span class="o">/</span> <span class="mf">3.6</span><span class="p">,</span>
+            <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mi">30</span> <span class="o">/</span> <span class="mf">3.6</span><span class="p">,</span>
+            <span class="s1">&#39;drive_public&#39;</span><span class="p">:</span> <span class="mi">30</span> <span class="o">/</span> <span class="mf">3.6</span>
+        <span class="p">}</span>
+
+        <span class="n">DELAY_FACTORS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;walk&#39;</span><span class="p">:</span> <span class="mf">1.15</span><span class="p">,</span>
+            <span class="s1">&#39;bike&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+            <span class="s1">&#39;drive&#39;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span>
+            <span class="s1">&#39;all_public&#39;</span><span class="p">:</span> <span class="mf">1.10</span><span class="p">,</span>
+            <span class="s1">&#39;drive_public&#39;</span><span class="p">:</span> <span class="mf">1.25</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Get values for the transport mode</span>
+        <span class="n">speed</span> <span class="o">=</span> <span class="n">SPEEDS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">transport_mode</span><span class="p">,</span> <span class="n">SPEEDS</span><span class="p">[</span><span class="s1">&#39;walk&#39;</span><span class="p">])</span>
+        <span class="n">delay_factor</span> <span class="o">=</span> <span class="n">DELAY_FACTORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">transport_mode</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">time_seconds</span> <span class="o">*</span> <span class="n">speed</span> <span class="o">/</span> <span class="n">delay_factor</span>
+
+        <span class="k">return</span> <span class="n">distance</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, GreenTo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

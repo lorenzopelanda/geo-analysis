@@ -35,16 +35,14 @@ class CopernicusDownloader(DownloaderInterface):
         """
         Initializes the CopernicusDownloader with optional authentication parameters.
 
-        Parameters:
-        ----------
-        client_id : str, optional
-            The client ID for authentication.
-        client_secret : str, optional
-            The client secret for authentication.
-        token_url : str, optional
-            The URL to obtain the access token.
-        use_oidc : bool, optional
-            Whether to use OpenID Connect for authentication (default is False).
+        Args:
+            client_id (str, optional): The client ID for authentication.
+            client_secret (str, optional): The client secret for authentication.
+            token_url (str, optional): The URL to obtain the access token.
+            use_oidc (bool, optional): Whether to use OpenID Connect for authentication (default is False).
+
+        Returns:
+            None
         """
         self.client_id = client_id
         self.client_secret = client_secret
@@ -57,9 +55,10 @@ class CopernicusDownloader(DownloaderInterface):
         Obtains an access token using client credentials.
 
         Raises:
-        ------
-        ValueError
-            If client ID, client secret, or token URL is not provided.
+            ValueError: If client ID, client secret, or token URL is not provided.
+
+        Returns:
+            None
         """
         if not self.client_id or not self.client_secret or not self.token_url:
             raise ValueError("Client ID, Client Secret, and Token URL must be provided for token-based authentication.")
@@ -81,9 +80,7 @@ class CopernicusDownloader(DownloaderInterface):
         Connects to the OpenEO backend.
 
         Returns:
-        -------
-        openeo.Connection
-            The connection to the OpenEO backend.
+            openeo.Connection: The connection to the OpenEO backend.
         """
         connection = openeo.connect("https://openeo.dataspace.copernicus.eu")
         if self.use_oidc:
@@ -100,15 +97,11 @@ class CopernicusDownloader(DownloaderInterface):
         """
         Downloads data for the specified bounding box.
 
-        Parameters:
-        ----------
-        bounding_box : BoundingBox
-            The bounding box for which to download data.
+        Args:
+            bounding_box (BoundingBox): The bounding box for which to download data.
 
         Returns:
-        -------
-        dict
-            A dictionary containing the downloaded data, transform, CRS, and shape.
+            dict: A dictionary containing the downloaded data, transform, CRS, and shape.
         """
         with tqdm(total=100, desc="Downloading Copernicus data", leave=False) as pbar:
             connection = self.__connect_to_openeo()

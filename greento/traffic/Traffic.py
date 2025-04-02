@@ -20,26 +20,28 @@ class Traffic:
         """
         Initializes the Traffic class with a bounding box.
 
-        Parameters:
-        ----------
-        bounding_box : BoundingBox
-            The bounding box for which to download traffic data.
+        Args:
+            bounding_box (BoundingBox): The bounding box for which to download traffic data.
+
+        Returns:
+            None
         """
         self.bounding_box = bounding_box
 
     def get_traffic_area(self, network_type):
         """
-        Downloads the OSM network data for a given bounding box and network type, and rasterizes it to a reference raster.
+        Downloads the OSM network data for a given bounding box and network type, and processes it into GeoDataFrames.
 
-        Parameters:
-        ----------
-        network_type : str
-            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all', 'all_private', 'all_public').
+        Args:
+            network_type (str): The type of transport network (e.g., 'walk', 'bike', 'drive', 'all', 'all_private', 'all_public').
 
         Returns:
-        -------
-        tuple
-            A tuple containing two GeoDataFrames: nodes and edges.
+            tuple: A tuple containing two GeoDataFrames:
+                - nodes (geopandas.GeoDataFrame): GeoDataFrame containing the nodes of the traffic network.
+                - edges (geopandas.GeoDataFrame): GeoDataFrame containing the edges of the traffic network.
+
+        Raises:
+            ValueError: If the graph creation fails or if the resulting nodes or edges are empty.
         """
         bounding_box = self.bounding_box
         aoi_box = bounding_box.to_geometry()

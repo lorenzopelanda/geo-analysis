@@ -15,9 +15,7 @@ class UtilsInterface(ABC):
         Calculates the land use percentages.
 
         Returns:
-        -------
-        Any
-            The calculated land use percentages.
+            str: A JSON string containing the land use percentages, where keys are land use types and values are percentages. 
         """
         pass
 

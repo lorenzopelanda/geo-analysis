@@ -59,12 +59,12 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Initializes the GHSPOPDownloader with the shapefile path and extracted directory.
 
-        Parameters:
-        ----------
-        shapefile : str
-            Path to the shapefile containing tile information.
-        extracted_dir : str, optional
-            Directory to store extracted files (default is "extracted_files").
+        Args:
+            shapefile (str): Path to the shapefile containing tile information.
+            extracted_dir (str, optional): Directory to store extracted files (default is "extracted_files").
+
+        Returns:
+            None
         """
         self.extracted_dir = extracted_dir
         self.shapefile_path = shapefile
@@ -72,6 +72,9 @@ class GHSPOPDownloader(DownloaderInterface):
     def __remove_existing_directory(self):
         """
         Removes the existing directory if it exists.
+
+        Returns:
+            None
         """
         if os.path.exists(self.extracted_dir):
             rmtree(self.extracted_dir)
@@ -81,9 +84,7 @@ class GHSPOPDownloader(DownloaderInterface):
         Loads the shapefile and converts it to the correct CRS.
 
         Returns:
-        -------
-        geopandas.GeoDataFrame
-            The loaded shapefile as a GeoDataFrame.
+            geopandas.GeoDataFrame: The loaded shapefile as a GeoDataFrame.
         """
         tiles_gdf = gpd.read_file(self.shapefile_path)
         if tiles_gdf.crs != "EPSG:4326":
@@ -94,17 +95,12 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Gets the tile ID for a given point.
 
-        Parameters:
-        ----------
-        tiles_gdf : geopandas.GeoDataFrame
-            GeoDataFrame containing tile information.
-        point_gdf : geopandas.GeoDataFrame
-            GeoDataFrame containing the point geometry.
+        Args:
+            tiles_gdf (geopandas.GeoDataFrame): GeoDataFrame containing tile information.
+            point_gdf (geopandas.GeoDataFrame): GeoDataFrame containing the point geometry.
 
         Returns:
-        -------
-        str or None
-            The tile ID if found, otherwise None.
+            str or None: The tile ID if found, otherwise None.
         """
         current_tile = tiles_gdf[tiles_gdf.contains(point_gdf.geometry.iloc[0])]
         if not current_tile.empty:
@@ -115,15 +111,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Downloads a tile based on the tile ID.
 
-        Parameters:
-        ----------
-        tile_id : str
-            The tile ID to download.
+        Args:
+            tile_id (str): The tile ID to download.
 
         Returns:
-        -------
-        str or None
-            The path to the downloaded zip file if successful, otherwise None.
+            str or None: The path to the downloaded zip file if successful, otherwise None.
         """
         url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_4326_3ss/V1-0/tiles/GHS_POP_E2025_GLOBE_R2023A_4326_3ss_V1_0_{tile_id}.zip"
         response = requests.get(url)
@@ -138,15 +130,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Extracts the TIF file from the downloaded zip archive.
 
-        Parameters:
-        ----------
-        zip_path : str
-            The path to the zip file.
+        Args:
+            zip_path (str): The path to the zip file.
 
         Returns:
-        -------
-        str or None
-            The path to the extracted TIF file if successful, otherwise None.
+            str or None: The path to the extracted TIF file if successful, otherwise None.
         """
         tif_path = None
         try:
@@ -172,17 +160,12 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Gets the tile IDs for the given bounding box.
 
-        Parameters:
-        ----------
-        bounds : BoundingBox
-            The bounding box for which to get tile IDs.
-        tiles_gdf : geopandas.GeoDataFrame
-            GeoDataFrame containing tile information.
+        Args:
+            bounds (BoundingBox): The bounding box for which to get tile IDs.
+            tiles_gdf (geopandas.GeoDataFrame): GeoDataFrame containing tile information.
 
         Returns:
-        -------
-        list
-            A list of tile IDs that intersect with the bounding box.
+            list: A list of tile IDs that intersect with the bounding box.
         """
         bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
 
@@ -202,10 +185,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Cleans up processed files and directories.
 
-        Parameters:
-        ----------
-        file_paths : list
-            List of file paths to clean up.
+        Args:
+            file_paths (list): List of file paths to clean up.
+
+        Returns:
+            None
         """
         for path in file_paths:
             try:
@@ -224,15 +208,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Merges multiple GHS-POP tiles into a single raster.
 
-        Parameters:
-        ----------
-        tiles : list
-            List of tuples containing tile data, transform, CRS, and shape.
+        Args:
+            tiles (list): List of tuples containing tile data, transform, CRS, and shape.
 
         Returns:
-        -------
-        tuple
-            Merged data, transform, CRS, and shape.
+            tuple: Merged data, transform, CRS, and shape.
         """
         temp_datasets = []
         for data, transform, crs, shape in tiles:
@@ -263,15 +243,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Processes a single GHS-POP tile.
 
-        Parameters:
-        ----------
-        tile_id : str
-            The tile ID to process.
+        Args:
+            tile_id (str): The tile ID to process.
 
         Returns:
-        -------
-        tuple or None
-            The tile data, transform, CRS, and shape if successful, otherwise None.
+            tuple or None: The tile data, transform, CRS, and shape if successful, otherwise None.
         """
         try:
             zip_path = self.__download_tile(tile_id)
@@ -296,20 +272,14 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Downloads and processes GHS-POP tiles based on the provided tile IDs.
 
-        Parameters:
-        ----------
-        tile_ids : list
-            List of tile IDs to download and process.
+        Args:
+            tile_ids (list): List of tile IDs to download and process.
 
         Returns:
-        -------
-        tuple
-            Merged data, transform, CRS, and shape.
+            tuple: Merged data, transform, CRS, and shape.
 
         Raises:
-        ------
-        ValueError
-            If no tile IDs are provided or no valid tiles are downloaded.
+            ValueError: If no tile IDs are provided or no valid tiles are downloaded.
         """
         if not tile_ids:
             raise ValueError("No tile IDs provided for download.")
@@ -341,19 +311,13 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Crops the given data to the specified bounding box.
 
-        Parameters:
-        ----------
-        data : numpy.ndarray
-            The data to crop.
-        transform : affine.Affine
-            The transform of the data.
-        bounds : BoundingBox
-            The bounding box to crop to.
+        Args:
+            data (numpy.ndarray): The data to crop.
+            transform (affine.Affine): The transform of the data.
+            bounds (BoundingBox): The bounding box to crop to.
 
         Returns:
-        -------
-        tuple
-            Cropped data, transform, CRS, and shape.
+            tuple: Cropped data, transform, CRS, and shape.
         """
         crs = "EPSG:4326"
         bbox = box(bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y)
@@ -382,15 +346,11 @@ class GHSPOPDownloader(DownloaderInterface):
         """
         Downloads and processes GHS-POP data for the given bounding box.
 
-        Parameters:
-        ----------
-        bounding_box : BoundingBox
-            The bounding box for which to download data.
+        Args:
+            bounding_box (BoundingBox): The bounding box for which to download data.
 
         Returns:
-        -------
-        dict
-            A dictionary containing the downloaded data, transform, CRS, and shape.
+            dict: A dictionary containing the downloaded data, transform, CRS, and shape.
         """
         steps=["Removing existing directory","Loading shapefile","Getting tiles for bounds","Downloading and processing tiles","Cropping bounds"]
         with tqdm(total=100, desc="Overall Progress", unit = "steps", leave=False) as pbar:

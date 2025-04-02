@@ -14,8 +14,43 @@ from .DistanceInterface import DistanceInterface
 ox.settings.use_cache = False
 
 class DistanceCopernicus(DistanceInterface):
+    """
+    A class to calculate distances and directions using Copernicus raster data and a traffic network graph.
+
+    Attributes:
+    ----------
+    copernicus_green : dict
+        A dictionary containing the raster data and its transform.
+    vector_traffic_area : tuple
+        A tuple containing GeoDataFrames for nodes and edges of the traffic network.
+    preprocessed_graph : networkx.Graph or None
+        A preprocessed traffic network graph for routing.
+    _green_positions_cache : dict
+        A cache for storing green positions.
+
+    Methods:
+    -------
+    get_nearest_green_position(lat, lon):
+        Finds the nearest green position from a given starting point.
+    directions(lat1, lon1, lat2, lon2, transport_mode):
+        Calculates the shortest path and estimated travel time between two points.
+    """
 
     def __init__(self, raster_data, vector_traffic_area):
+        """
+        Initializes the DistanceCopernicus class with raster data and a traffic network graph.
+
+        Args:
+            raster_data (dict): A dictionary containing the Copernicus data with the following keys:
+                - 'data': The raster data.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
+            vector_traffic_area (tuple): A tuple containing GeoDataFrames for nodes and edges of the traffic network.
+
+        Returns:
+            None
+        """
         self.copernicus_green = raster_data
         self.vector_traffic_area = vector_traffic_area
         self.preprocessed_graph = None
@@ -23,14 +58,15 @@ class DistanceCopernicus(DistanceInterface):
 
     def get_nearest_green_position(self, lat, lon,):
         """
-        Finds the nearest green area from a given starting point using a raster dataset and a traffic network graph.
+        Finds the nearest green position from a given starting point using a raster dataset and a traffic network graph.
 
         Args:
             lat (float): Latitude of the starting point.
             lon (float): Longitude of the starting point.
 
         Returns:
-            tuple: A tuple containing the latitude and longitude of the nearest green area, or None if no green areas are found.
+            tuple: A tuple containing the latitude and longitude of the nearest green position, 
+                   or None if no green areas are found.
 
         Raises:
             ValueError: If there is an error calculating the nearest green point.
@@ -108,7 +144,7 @@ class DistanceCopernicus(DistanceInterface):
 
     def directions(self, lat1, lon1, lat2, lon2, transport_mode):
         """
-        Calculate the shortest path and estimated travel time between two points using a traffic network graph.
+        Calculates the shortest path and estimated travel time between two points using a traffic network graph.
 
         Args:
             lat1 (float): Latitude of the starting point.

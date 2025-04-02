@@ -18,9 +18,7 @@ class MetricsInterface(ABC):
         Calculates the green area per person.
 
         Returns:
-        -------
-        Any
-            The calculated green area per person.
+            str: A JSON string containing the green area per person.
         """
         pass
 
@@ -29,20 +27,13 @@ class MetricsInterface(ABC):
         """
         Calculates the reachable green areas within a given time from a starting point.
 
-        Parameters:
-        ----------
-        lat : float
-            The latitude of the starting point.
-        lon : float
-            The longitude of the starting point.
-        max_time : float
-            The maximum travel time in minutes.
-        transport_mode : str
-            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+        Args:
+            lat (float): The latitude of the starting point.
+            lon (float): The longitude of the starting point.
+            max_time (float): The maximum travel time in minutes.
+            transport_mode (str): The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
 
         Returns:
-        -------
-        Any
-            The calculated reachable green areas and related metrics.
+            str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.
         """
         pass

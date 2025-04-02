@@ -31,14 +31,13 @@ class MetricsCopernicus(MetricsInterface):
         """
         Initializes the MetricsCopernicus with Copernicus green area data, traffic area, and population data.
 
-        Parameters:
-        ----------
-        raster_data : dict
-            The Copernicus green area data containing 'data', 'transform', 'crs', and 'shape'.
-        vector_traffic_area : tuple
-            A tuple containing two GeoDataFrames: nodes and edges for traffic area.
-        ghs_pop_data : dict
-            The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            raster_data (dict): The Copernicus green area data containing 'data', 'transform', 'crs', and 'shape'.
+            vector_traffic_area (tuple): A tuple containing two GeoDataFrames: nodes and edges for traffic area.
+            ghs_pop_data (dict): The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+
+        Returns:
+            None
         """
         self.copernicus_green = raster_data
         self.vector_traffic_area = vector_traffic_area
@@ -49,9 +48,7 @@ class MetricsCopernicus(MetricsInterface):
         Calculates the green area per person in the given raster and population data.
 
         Returns:
-        -------
-        str
-            A JSON string containing the green area per person.
+            str: A JSON string containing the green area per person.
         """
         with tqdm(total=100, desc="Calculating Copernicus green area per person", leave=False) as pbar:
             ghspop_data = self.ghs_pop_data['data']
@@ -81,21 +78,17 @@ class MetricsCopernicus(MetricsInterface):
         """
         Calculates the reachable green areas within a given time from a starting point.
 
-        Parameters:
-        ----------
-        lat : float
-            The latitude of the starting point.
-        lon : float
-            The longitude of the starting point.
-        max_time : float
-            The maximum travel time in minutes.
-        network_type : str
-            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+        Args:
+            lat (float): The latitude of the starting point.
+            lon (float): The longitude of the starting point.
+            max_time (float): The maximum travel time in minutes.
+            network_type (str): The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
 
         Returns:
-        -------
-        str
-            A JSON string containing the reachable green areas and related metrics.
+            str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.
+
+        Raises:
+            ValueError: If the input parameters are invalid or the traffic area is not reachable.
         """
         with tqdm(total=100, desc="Calculating Copernicus isochrone green area", unit="%", leave=False) as pbar:
             if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
@@ -241,17 +234,12 @@ class MetricsCopernicus(MetricsInterface):
         """
         Estimates the distance that can be traveled in a given time for a specific transport mode.
 
-        Parameters:
-        ----------
-        time_seconds : float
-            The time available for travel in seconds.
-        transport_mode : str
-            The type of transport network ('walk', 'bike', 'drive', 'all_public', 'drive_public').
+        Args:
+            time_seconds (float): The time available for travel in seconds.
+            transport_mode (str): The type of transport network ('walk', 'bike', 'drive', 'all_public', 'drive_public').
 
         Returns:
-        -------
-        float
-            The estimated distance that can be traveled in meters.
+            float: The estimated distance that can be traveled in meters.
         """
         # Speed constants in m/s
         SPEEDS = {

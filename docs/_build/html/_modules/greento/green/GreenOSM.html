@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>greento.green.GreenOSM &mdash; GreenTo Documentation 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e031e9a9"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GreenTo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">greento</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GreenTo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">greento.green.GreenOSM</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for greento.green.GreenOSM</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">.GreenInterface</span> <span class="kn">import</span> <span class="n">GreenInterface</span>
+
+<div class="viewcode-block" id="GreenOSM"><a class="viewcode-back" href="../../../greento.green.html#greento.green.GreenOSM.GreenOSM">[docs]</a><span class="k">class</span> <span class="nc">GreenOSM</span><span class="p">(</span><span class="n">GreenInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to process green areas using OpenStreetMap (OSM) data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    osm : tuple</span>
+<span class="sd">        A tuple containing two GeoDataFrames: nodes and edges.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_green(**kwargs):</span>
+<span class="sd">        Filters and processes green areas from the OSM data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">osm</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the GreenOSM class with OSM data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            osm (tuple): A tuple containing two GeoDataFrames: nodes and edges.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">osm</span> <span class="o">=</span> <span class="n">osm</span>    
+    
+<div class="viewcode-block" id="GreenOSM.get_green"><a class="viewcode-back" href="../../../greento.green.html#greento.green.GreenOSM.GreenOSM.get_green">[docs]</a>    <span class="k">def</span> <span class="nf">get_green</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters and processes green areas from the OSM data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional arguments to specify green tags.</span>
+<span class="sd">                - green_tags (dict, optional): A dictionary of tags to filter green areas. </span>
+<span class="sd">                  Default is:</span>
+<span class="sd">                  {</span>
+<span class="sd">                      &#39;natural&#39;: [&#39;wood&#39;, &#39;tree_row&#39;, &#39;tree&#39;, &#39;scrub&#39;, &#39;grassland&#39;,</span>
+<span class="sd">                                  &#39;heath&#39;, &#39;fell&#39;, &#39;tundra&#39;, &#39;shrubbery&#39;],</span>
+<span class="sd">                      &#39;landuse&#39;: [&#39;forest&#39;, &#39;meadow&#39;, &#39;grass&#39;, &#39;allotments&#39;],</span>
+<span class="sd">                      &#39;leisure&#39;: [&#39;park&#39;, &#39;garden&#39;, &#39;nature_reserve&#39;]</span>
+<span class="sd">                  }</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing two GeoDataFrames:</span>
+<span class="sd">                - green_nodes (geopandas.GeoDataFrame): Filtered green nodes.</span>
+<span class="sd">                - green_edges (geopandas.GeoDataFrame): Filtered green edges.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If an error occurs during processing, returns empty GeoDataFrames.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nodes_gdf</span><span class="p">,</span> <span class="n">edges_gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm</span>
+            <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">green_tags</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;natural&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;wood&#39;</span><span class="p">,</span> <span class="s1">&#39;tree_row&#39;</span><span class="p">,</span> <span class="s1">&#39;tree&#39;</span><span class="p">,</span> <span class="s1">&#39;scrub&#39;</span><span class="p">,</span> <span class="s1">&#39;grassland&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;heath&#39;</span><span class="p">,</span> <span class="s1">&#39;fell&#39;</span><span class="p">,</span> <span class="s1">&#39;tundra&#39;</span><span class="p">,</span> <span class="s1">&#39;shrubbery&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;landuse&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;forest&#39;</span><span class="p">,</span> <span class="s1">&#39;meadow&#39;</span><span class="p">,</span> <span class="s1">&#39;grass&#39;</span><span class="p">,</span><span class="s1">&#39;allotments&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;leisure&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;park&#39;</span><span class="p">,</span> <span class="s1">&#39;garden&#39;</span><span class="p">,</span> <span class="s1">&#39;nature_reserve&#39;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">green_tags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;green_tags&#39;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="s1">&#39;natural&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;wood&#39;</span><span class="p">,</span> <span class="s1">&#39;tree_row&#39;</span><span class="p">,</span> <span class="s1">&#39;tree&#39;</span><span class="p">,</span> <span class="s1">&#39;scrub&#39;</span><span class="p">,</span> <span class="s1">&#39;grassland&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;heath&#39;</span><span class="p">,</span> <span class="s1">&#39;fell&#39;</span><span class="p">,</span> <span class="s1">&#39;tundra&#39;</span><span class="p">,</span> <span class="s1">&#39;shrubbery&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;landuse&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;forest&#39;</span><span class="p">,</span> <span class="s1">&#39;meadow&#39;</span><span class="p">,</span> <span class="s1">&#39;grass&#39;</span><span class="p">,</span><span class="s1">&#39;allotments&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;leisure&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;park&#39;</span><span class="p">,</span> <span class="s1">&#39;garden&#39;</span><span class="p">,</span> <span class="s1">&#39;nature_reserve&#39;</span><span class="p">]</span>
+                <span class="p">})</span>
+
+            <span class="k">def</span> <span class="nf">filter_green</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;crs&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">green_tags</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">mask</span> <span class="o">|=</span> <span class="n">df</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;crs&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                
+                <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>  
+
+            <span class="n">green_nodes</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">())</span>
+            <span class="n">green_edges</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">([(</span><span class="n">nodes_gdf</span><span class="p">,</span> <span class="s1">&#39;nodes&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">edges_gdf</span><span class="p">,</span> <span class="s1">&#39;edges&#39;</span><span class="p">)],</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Filtering OSM green areas&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nodes&#39;</span><span class="p">:</span>
+                    <span class="n">green_nodes</span> <span class="o">=</span> <span class="n">filter_green</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">green_edges</span> <span class="o">=</span> <span class="n">filter_green</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="p">(</span><span class="n">green_nodes</span><span class="p">,</span> <span class="n">green_edges</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">empty_geo</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">())</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">empty_geo</span><span class="p">,</span> <span class="n">empty_geo</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, GreenTo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

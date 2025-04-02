@@ -14,14 +14,10 @@ class GreenInterface(ABC):
         """
         Filters and processes green areas.
 
-        Parameters:
-        ----------
-        **kwargs : dict, optional
-            Additional arguments to specify green areas.
+        Args:
+            **kwargs: Additional arguments to specify green areas.
 
         Returns:
-        -------
-        dict
-            A dictionary containing the filtered green areas, transform, CRS, and shape.
+            Any: The filtered green areas for the source selected.
         """
         pass

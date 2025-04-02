@@ -19,15 +19,16 @@ class OSMDownloader(DownloaderInterface):
         """
         Downloads and processes OSM data for the given bounding box.
 
-        Parameters:
-        ----------
-        bounding_box : BoundingBox
-            The bounding box for which to download data.
+        Args:
+            bounding_box (BoundingBox): The bounding box for which to download data.
 
         Returns:
-        -------
-        tuple
-            A tuple containing two GeoDataFrames: nodes and edges.
+            tuple: A tuple containing two GeoDataFrames:
+                - nodes (geopandas.GeoDataFrame): GeoDataFrame containing point features (e.g., nodes).
+                - edges (geopandas.GeoDataFrame): GeoDataFrame containing line and polygon features (e.g., edges).
+
+        Raises:
+            ValueError: If an error occurs during the OSM data download or processing.
         """
         steps = ["Converting bounding box to geometry", "Downloading OSM data", "Filtering data"]
         with tqdm(total=100, desc="Overall Progress", unit="step", leave=False) as pbar:

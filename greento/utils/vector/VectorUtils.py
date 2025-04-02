@@ -27,10 +27,11 @@ class VectorUtils(UtilsInterface):
         """
         Initializes the VectorUtils with OSM data.
 
-        Parameters:
-        ----------
-        osm : tuple
-            A tuple containing two GeoDataFrames: nodes and edges.
+        Args:
+            osm (tuple): A tuple containing two GeoDataFrames: nodes and edges.
+
+        Returns:
+            None
         """
         self.osm = osm
         
@@ -39,9 +40,7 @@ class VectorUtils(UtilsInterface):
         Calculates the land use percentages from the OSM data.
 
         Returns:
-        -------
-        str
-            A JSON string containing the land use percentages.
+            str: A JSON string containing the land use percentages, where keys are land use types and values are percentages.
         """
         nodes, edges = self.osm
         if nodes is None or edges is None:
@@ -55,15 +54,22 @@ class VectorUtils(UtilsInterface):
         """
         Rasterizes the OpenStreetMap vector data using a reference raster.
 
-        Parameters:
-        ----------
-        reference_raster : dict
-            Reference raster containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            reference_raster (dict): A dictionary containing the reference raster with the following keys:
+                - 'data': The raster data.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
 
         Returns:
-        -------
-        dict
-            Rasterized output with 'data', 'transform', 'crs', and 'shape'.
+            dict: A dictionary containing the rasterized output with the following keys:
+                - 'data': The rasterized data.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
+
+        Raises:
+            ValueError: If the nodes or edges are not valid GeoDataFrames or do not contain a 'geometry' column.
         """
         nodes, edges = self.osm
         ref_crs = reference_raster['crs']

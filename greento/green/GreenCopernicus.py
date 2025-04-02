@@ -19,12 +19,17 @@ class GreenCopernicus(GreenInterface):
 
     def __init__(self, copernicus):
         """
-        Initializes the GreenCopernicus with Copernicus data.
+        Initializes the GreenCopernicus class with Copernicus data.
 
-        Parameters:
-        ----------
-        copernicus : dict
-            The Copernicus data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            copernicus (dict): A dictionary containing the Copernicus data with the following keys:
+                - 'data': The raster data.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
+
+        Returns:
+            None
         """
         self.copernicus = copernicus
 
@@ -32,15 +37,17 @@ class GreenCopernicus(GreenInterface):
         """
         Filters and processes green areas from the Copernicus data.
 
-        Parameters:
-        ----------
-        **kwargs : dict, optional
-            Additional arguments to specify green areas (default is frozenset([10, 20, 30])).
+        Args:
+            **kwargs: Additional arguments to specify green areas. 
+                - green_areas (frozenset, optional): A set of values representing green areas 
+                  (default is frozenset([10, 20, 30])).
 
         Returns:
-        -------
-        dict
-            A dictionary containing the filtered green areas, transform, CRS, and shape.
+            dict: A dictionary containing the filtered green areas with the following keys:
+                - 'data': The binary raster data where green areas are marked as 1.
+                - 'transform': The affine transform of the raster.
+                - 'crs': The coordinate reference system of the raster.
+                - 'shape': The shape of the raster.
         """
         if kwargs is None:
             green_areas = frozenset([10,20, 30]) # 10: tree cover, 20: shrubland, 30: grassland

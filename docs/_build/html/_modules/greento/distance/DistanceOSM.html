@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>greento.distance.DistanceOSM &mdash; GreenTo Documentation 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e031e9a9"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            GreenTo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">greento</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GreenTo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">greento.distance.DistanceOSM</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for greento.distance.DistanceOSM</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">cKDTree</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">label</span><span class="p">,</span> <span class="n">center_of_mass</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">atan2</span>
+<span class="kn">from</span> <span class="nn">greento.utils.GeoUtils</span> <span class="kn">import</span> <span class="n">GeoUtils</span>
+<span class="kn">from</span> <span class="nn">.DistanceInterface</span> <span class="kn">import</span> <span class="n">DistanceInterface</span>
+<span class="n">ox</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DistanceOSM"><a class="viewcode-back" href="../../../greento.distance.html#greento.distance.DistanceOSM.DistanceOSM">[docs]</a><span class="k">class</span> <span class="nc">DistanceOSM</span><span class="p">(</span><span class="n">DistanceInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to calculate distances and directions using OpenStreetMap (OSM) data and a traffic network graph.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    osm_green : dict</span>
+<span class="sd">        A dictionary containing the raster data and its transform for green areas.</span>
+<span class="sd">    vector_traffic_area : tuple</span>
+<span class="sd">        A tuple containing GeoDataFrames for nodes and edges of the traffic network.</span>
+<span class="sd">    preprocessed_graph : networkx.Graph or None</span>
+<span class="sd">        A preprocessed traffic network graph for routing.</span>
+<span class="sd">    _green_positions_cache : dict</span>
+<span class="sd">        A cache for storing green positions.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_nearest_green_position(lat, lon):</span>
+<span class="sd">        Finds the nearest green position from a given starting point.</span>
+<span class="sd">    directions(lat1, lon1, lat2, lon2, transport_mode):</span>
+<span class="sd">        Calculates the shortest path and estimated travel time between two points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">osm_green</span><span class="p">,</span> <span class="n">vector_traffic_area</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the DistanceOSM class with OSM green data and a traffic network graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            osm_green (dict): A dictionary containing the raster data and its transform for green areas.</span>
+<span class="sd">            vector_traffic_area (tuple): A tuple containing GeoDataFrames for nodes and edges of the traffic network.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">osm_green</span> <span class="o">=</span> <span class="n">osm_green</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span> <span class="o">=</span> <span class="n">vector_traffic_area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_graph</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_green_positions_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="DistanceOSM.get_nearest_green_position"><a class="viewcode-back" href="../../../greento.distance.html#greento.distance.DistanceOSM.DistanceOSM.get_nearest_green_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_nearest_green_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the nearest green position from a given starting point using a raster dataset and a traffic network graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lat (float): Latitude of the starting point.</span>
+<span class="sd">            lon (float): Longitude of the starting point.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the latitude and longitude of the nearest green position, </span>
+<span class="sd">                   or None if no green areas are found.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an error calculating the nearest green point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Processing nearest green position&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span>
+            <span class="n">raster_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm_green</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">osm_green</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+
+            <span class="n">G</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span>
+            
+            <span class="n">nearest_node</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">nearest_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">lat</span><span class="p">)</span>
+            
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">structure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">labeled</span><span class="p">,</span> <span class="n">num_features</span> <span class="o">=</span> <span class="n">label</span><span class="p">(</span><span class="n">raster_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">num_features</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No green areas found in the raster&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">centroids_pixels</span> <span class="o">=</span> <span class="n">center_of_mass</span><span class="p">(</span><span class="n">raster_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">labeled</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_features</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">green_coords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">centroids_pixels</span><span class="p">:</span>
+                <span class="n">lon_pixel</span><span class="p">,</span> <span class="n">lat_pixel</span> <span class="o">=</span> <span class="n">transform</span> <span class="o">*</span> <span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">row</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">green_coords</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">lat_pixel</span><span class="p">,</span> <span class="n">lon_pixel</span><span class="p">))</span>
+
+            <span class="n">distances_euclidian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">GeoUtils</span><span class="p">()</span><span class="o">.</span><span class="n">haversine_distance</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">gp_lat</span><span class="p">,</span> <span class="n">gp_lon</span><span class="p">)</span> <span class="k">for</span> <span class="n">gp_lat</span><span class="p">,</span> <span class="n">gp_lon</span> <span class="ow">in</span> <span class="n">green_coords</span><span class="p">])</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">green_coords</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2000</span><span class="p">:</span>
+                <span class="n">max_green_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">green_coords</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">green_coords</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>
+                <span class="n">max_green_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">green_coords</span><span class="p">)</span> <span class="o">//</span> <span class="mi">5</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">max_green_points</span> <span class="o">=</span> <span class="mi">5000</span>
+
+            <span class="n">indices_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distances_euclidian</span><span class="p">)[:</span><span class="n">max_green_points</span><span class="p">]</span>
+            <span class="n">green_coords_filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">green_coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_sorted</span><span class="p">]</span>
+
+            <span class="n">node_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+            <span class="n">node_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">node_points</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">green_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">green_coords_filtered</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="n">green_coords_filtered</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">batch_size</span><span class="p">]</span>
+                <span class="n">batch_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+                <span class="n">distances_batch</span><span class="p">,</span> <span class="n">indices_batch</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">batch_points</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">distances_batch</span><span class="p">,</span> <span class="n">indices_batch</span><span class="p">)):</span>
+                    <span class="n">green_lat</span><span class="p">,</span> <span class="n">green_lon</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                    <span class="n">closest_node</span> <span class="o">=</span> <span class="n">node_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                    <span class="n">green_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">green_lat</span><span class="p">,</span> <span class="n">green_lon</span><span class="p">,</span> <span class="n">closest_node</span><span class="p">,</span> <span class="n">dist</span> <span class="o">*</span> <span class="mi">111000</span><span class="p">))</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">distances</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">single_source_dijkstra_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">nearest_node</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">NetworkXError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error calculating nearest green point&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">min_distance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+            <span class="n">closest_green_point</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">green_lat</span><span class="p">,</span> <span class="n">green_lon</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">node_dist</span> <span class="ow">in</span> <span class="n">green_nodes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">distances</span><span class="p">:</span>
+                    <span class="n">total_distance</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_dist</span>
+                    <span class="k">if</span> <span class="n">total_distance</span> <span class="o">&lt;</span> <span class="n">min_distance</span><span class="p">:</span>
+                        <span class="n">min_distance</span> <span class="o">=</span> <span class="n">total_distance</span>
+                        <span class="n">closest_green_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">green_lat</span><span class="p">,</span> <span class="n">green_lon</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Nearest green position found&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">closest_green_point</span></div>
+
+<div class="viewcode-block" id="DistanceOSM.directions"><a class="viewcode-back" href="../../../greento.distance.html#greento.distance.DistanceOSM.DistanceOSM.directions">[docs]</a>    <span class="k">def</span> <span class="nf">directions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span><span class="p">,</span> <span class="n">transport_mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the shortest path and estimated travel time between two points using a traffic network graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lat1 (float): Latitude of the starting point.</span>
+<span class="sd">            lon1 (float): Longitude of the starting point.</span>
+<span class="sd">            lat2 (float): Latitude of the destination point.</span>
+<span class="sd">            lon2 (float): Longitude of the destination point.</span>
+<span class="sd">            transport_mode (str): Mode of transport (e.g., &quot;walk&quot;, &quot;bike&quot;, &quot;drive&quot;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A JSON string containing the total distance in kilometers and the estimated travel time in minutes.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there is an error creating the graph or if the graph has no nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">tqdm</span> <span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Calculating the direction&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;preprocessed_graph&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_graph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;preprocessed_graph&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;preprocessed_graph&quot;</span><span class="p">):</span>
+                <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vector_traffic_area</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">gdf_nodes</span><span class="p">,</span> <span class="n">gdf_edges</span> <span class="o">=</span> <span class="n">G</span>
+                    <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf_nodes</span><span class="o">.</span><span class="n">columns</span> <span class="ow">or</span> <span class="s1">&#39;y&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdf_nodes</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">gdf_nodes</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_nodes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span>
+                        <span class="n">gdf_nodes</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_nodes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span>
+
+                    <span class="n">G</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">gdf_nodes</span><span class="p">,</span> <span class="n">gdf_edges</span><span class="p">)</span>
+                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">G</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to create graph from GeoDataFrames&quot;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Graph has no nodes&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected vector_traffic_area type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="n">G</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">routing</span><span class="o">.</span><span class="n">add_edge_speeds</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+                <span class="n">G</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">routing</span><span class="o">.</span><span class="n">add_edge_travel_times</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_graph</span> <span class="o">=</span> <span class="n">G</span>
+
+            <span class="k">if</span> <span class="n">pbar</span><span class="o">.</span><span class="n">n</span><span class="o">&lt;</span><span class="mi">40</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+            <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_graph</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;x&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="s2">&quot;y&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Node must have coordinates &#39;x&#39; e &#39;y&#39;&quot;</span><span class="p">)</span>
+
+            <span class="n">orig_node</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">nearest_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">lon1</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">lat1</span><span class="p">)</span>
+            <span class="n">dest_node</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">nearest_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">lon2</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">lat2</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+            <span class="n">route</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">orig_node</span><span class="p">,</span> <span class="n">dest_node</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;travel_time&quot;</span><span class="p">)</span>
+            <span class="n">total_distance</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">route</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">route</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span> <span class="o">/</span> <span class="mi">1000</span>
+            <span class="n">total_distance_meters</span> <span class="o">=</span> <span class="n">total_distance</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="n">total_time_minutes</span> <span class="o">=</span> <span class="n">GeoUtils</span><span class="p">()</span><span class="o">.</span><span class="n">_calculate_travel_time</span><span class="p">(</span><span class="n">total_distance_meters</span><span class="p">,</span> <span class="n">transport_mode</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Direction calculated&quot;</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;distance_km&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_distance</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;estimated_time_minutes&quot;</span><span class="p">:</span> <span class="n">total_time_minutes</span><span class="p">})</span></div></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, GreenTo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

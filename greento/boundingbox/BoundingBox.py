@@ -51,18 +51,15 @@ class BoundingBox:
         """
         Initializes the BoundingBox with optional coordinates and CRS.
 
-        Parameters:
-        ----------
-        min_x : float, optional
-            Minimum x-coordinate (longitude).
-        min_y : float, optional
-            Minimum y-coordinate (latitude).
-        max_x : float, optional
-            Maximum x-coordinate (longitude).
-        max_y : float, optional
-            Maximum y-coordinate (latitude).
-        crs : str, optional
-            Coordinate reference system (default is "EPSG:4326").
+        Args:
+            min_x (float, optional): Minimum x-coordinate (longitude). Defaults to None.
+            min_y (float, optional): Minimum y-coordinate (latitude). Defaults to None.
+            max_x (float, optional): Maximum x-coordinate (longitude). Defaults to None.
+            max_y (float, optional): Maximum y-coordinate (latitude). Defaults to None.
+            crs (str, optional): Coordinate reference system. Defaults to "EPSG:4326".
+
+        Returns:
+            None
         """
         self.min_x = min_x
         self.min_y = min_y
@@ -75,21 +72,14 @@ class BoundingBox:
         """
         Creates a bounding box from given coordinates.
 
-        Parameters:
-        ----------
-        min_x : float
-            Minimum x-coordinate (longitude).
-        min_y : float
-            Minimum y-coordinate (latitude).
-        max_x : float
-            Maximum x-coordinate (longitude).
-        max_y : float
-            Maximum y-coordinate (latitude).
+        Args:
+            min_x (float): Minimum x-coordinate (longitude).
+            min_y (float): Minimum y-coordinate (latitude).
+            max_x (float): Maximum x-coordinate (longitude).
+            max_y (float): Maximum y-coordinate (latitude).
 
         Returns:
-        -------
-        BoundingBox
-            The bounding box object.
+            BoundingBox: The bounding box object.
         """
         self.min_x = min_x
         self.min_y = min_y
@@ -102,19 +92,13 @@ class BoundingBox:
         """
         Creates a bounding box from a center point and radius.
 
-        Parameters:
-        ----------
-        center_x : float
-            Center x-coordinate (longitude).
-        center_y : float
-            Center y-coordinate (latitude).
-        radius_km : float
-            Radius in kilometers.
+        Args:
+            center_x (float): Center x-coordinate (longitude).
+            center_y (float): Center y-coordinate (latitude).
+            radius_km (float): Radius in kilometers.
 
         Returns:
-        -------
-        BoundingBox
-            The bounding box object.
+            BoundingBox: The bounding box object.
         """
         if radius_km is None:
             radius_km = 10
@@ -130,20 +114,14 @@ class BoundingBox:
         """
         Creates a bounding box from a GeoJSON object.
 
-        Parameters:
-        ----------
-        geojson : str or dict
-            GeoJSON string or dictionary.
+        Args:
+            geojson (str or dict): GeoJSON string or dictionary.
 
         Returns:
-        -------
-        BoundingBox
-            The bounding box object.
+            BoundingBox: The bounding box object.
 
         Raises:
-        ------
-        ValueError
-            If the GeoJSON is invalid or unsupported.
+            ValueError: If the GeoJSON is invalid or unsupported.
         """
         if isinstance(geojson, str):
             try:
@@ -205,9 +183,7 @@ class BoundingBox:
         Converts the bounding box to a Shapely geometry.
 
         Returns:
-        -------
-        shapely.geometry.Polygon
-            The polygon representation of the bounding box.
+            shapely.geometry.Polygon: The polygon representation of the bounding box.
         """
         return box(self.min_x, self.min_y, self.max_x, self.max_y)
 
@@ -216,9 +192,7 @@ class BoundingBox:
         Converts the bounding box to a GeoJSON format.
 
         Returns:
-        -------
-        dict
-            The GeoJSON representation of the bounding box.
+            dict: The GeoJSON representation of the bounding box.
         """
         if self.polygon is None:
             self.polygon = self.to_geometry()
@@ -228,15 +202,11 @@ class BoundingBox:
         """
         Transforms the bounding box to a specified CRS.
 
-        Parameters:
-        ----------
-        dst_crs : str
-            The destination coordinate reference system.
+        Args:
+            dst_crs (str): The destination coordinate reference system.
 
         Returns:
-        -------
-        BoundingBox
-            The transformed bounding box object.
+            BoundingBox: The transformed bounding box object.
         """
         with tqdm(total=100, desc="Transforming bounding box", leave=False) as pbar:
             if self.polygon is None:
@@ -260,21 +230,14 @@ class BoundingBox:
         """
         Creates a bounding box using the specified method.
 
-        Parameters:
-        ----------
-        query : str
-            The query string (address or municipality name).
-        method : str
-            The method to create the bounding box ('from_geojson', 'from_center_radius', 'from_coordinates').
-        is_address : bool, optional
-            Whether the query is an address (default is True).
-        **kwargs : dict
-            Additional arguments for the specified method.
+        Args:
+            query (str): The query string (address or municipality name).
+            method (str): The method to create the bounding box ('from_geojson', 'from_center_radius', 'from_coordinates').
+            is_address (bool, optional): Whether the query is an address (default is True).
+            **kwargs: Additional arguments for the specified method.
 
         Returns:
-        -------
-        BoundingBox
-            The created bounding box object.
+            BoundingBox: The created bounding box object.
         """
         if method == 'from_geojson':
             geojson = kwargs.get('geojson')
@@ -299,17 +262,12 @@ class BoundingBox:
         """
         Gets coordinates by geocoding an address or finding the center of a municipality.
 
-        Parameters:
-        ----------
-        query : str
-            The query string (address or municipality name).
-        is_address : bool, optional
-            Whether the query is an address (default is True).
+        Args:
+            query (str): The query string (address or municipality name).
+            is_address (bool, optional): Whether the query is an address (default is True).
 
         Returns:
-        -------
-        tuple
-            The coordinates (latitude, longitude) or None if not found.
+            tuple: The coordinates (latitude, longitude) or None if not found.
         """
         if is_address:
             gdf = gpd.tools.geocode(query, provider="nominatim", user_agent="geoData")
@@ -334,8 +292,6 @@ class BoundingBox:
         Returns a string representation of the bounding box.
 
         Returns:
-        -------
-        str
-            The string representation of the bounding box.
+            str: The string representation of the bounding box.
         """
         return f"BoundingBox({self.min_x}, {self.min_y}, {self.max_x}, {self.max_y})"

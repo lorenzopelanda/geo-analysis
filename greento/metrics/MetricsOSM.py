@@ -29,16 +29,15 @@ class MetricsOSM(MetricsInterface):
     """
     def __init__(self, osm, vector_traffic_area, ghs_pop_data):
         """
-        Initializes the MetricsOSM with OSM data, traffic area, and population data.
+        Initializes the MetricsOSM with OSM green area data, traffic area, and population data.
 
-        Parameters:
-        ----------
-        osm : str
-            The file path to the OSM data.
-        vector_traffic_area : tuple
-            A tuple containing two GeoDataFrames: nodes and edges for traffic area.
-        ghs_pop_data : dict
-            The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            osm (dict): The OSM green area data containing 'data', 'transform', 'crs', and 'shape'.
+            vector_traffic_area (tuple): A tuple containing two GeoDataFrames: nodes and edges for traffic area.
+            ghs_pop_data (dict): The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+
+        Returns:
+            None
         """
         self.osm_file = osm
         self.vector_traffic_area = vector_traffic_area
@@ -49,9 +48,7 @@ class MetricsOSM(MetricsInterface):
         Calculates the green area per person in the given raster and population data.
 
         Returns:
-        -------
-        str
-            A JSON string containing the green area per person.
+            str: A JSON string containing the green area per person.
         """
         with tqdm(total=100, desc="Calculating OSM green area per person", leave=False) as pbar:
             ghspop_data = self.ghs_pop_data['data']
@@ -80,21 +77,17 @@ class MetricsOSM(MetricsInterface):
         """
         Calculates the reachable green areas within a given time from a starting point.
 
-        Parameters:
-        ----------
-        lat : float
-            The latitude of the starting point.
-        lon : float
-            The longitude of the starting point.
-        max_time : float
-            The maximum travel time in minutes.
-        network_type : str
-            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+        Args:
+            lat (float): The latitude of the starting point.
+            lon (float): The longitude of the starting point.
+            max_time (float): The maximum travel time in minutes.
+            network_type (str): The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
 
         Returns:
-        -------
-        str
-            A JSON string containing the reachable green areas and related metrics.
+            str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.
+
+        Raises:
+            ValueError: If the input parameters are invalid or the traffic area is not reachable.
         """
         with tqdm(total=100, desc="Calculating OSM isochrone green area", unit="%", leave=False) as pbar:
             if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
@@ -240,17 +233,12 @@ class MetricsOSM(MetricsInterface):
         """
         Estimates the distance that can be traveled in a given time for a specific transport mode.
 
-        Parameters:
-        ----------
-        time_seconds : float
-            The time available for travel in seconds.
-        transport_mode : str
-            The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
+        Args:
+            time_seconds (float): The time available for travel in seconds.
+            transport_mode (str): The type of transport network (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_public').
 
         Returns:
-        -------
-        float
-            The estimated distance that can be traveled in meters.
+            float: The estimated distance that can be traveled in meters.
         """
         # Speed constants in m/s
         SPEEDS = {

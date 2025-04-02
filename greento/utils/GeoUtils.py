@@ -25,17 +25,12 @@ class GeoUtils:
         """
         Calculates the estimated travel time for a given distance and transport mode.
 
-        Parameters:
-        ----------
-        distance_meters : float
-            The distance to travel in meters.
-        transport_mode : str
-            The mode of transport (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_service').
+        Args:
+            distance_meters (float): The distance to travel in meters.
+            transport_mode (str): The mode of transport (e.g., 'walk', 'bike', 'drive', 'all_public', 'drive_service').
 
         Returns:
-        -------
-        float
-            The estimated travel time in minutes.
+            float: The estimated travel time in minutes.
         """
         # Speed constants in km/h
         SPEEDS = {
@@ -77,20 +72,14 @@ class GeoUtils:
         """
         Gets the latitude and longitude coordinates for a given address.
 
-        Parameters:
-        ----------
-        address : str
-            The address to geocode.
+        Args:
+            address (str): The address to geocode.
 
         Returns:
-        -------
-        tuple
-            A tuple containing the latitude and longitude coordinates.
+            tuple: A tuple containing the latitude and longitude coordinates.
 
         Raises:
-        ------
-        ValueError
-            If the address is not found.
+            ValueError: If the address is not found.
         """
         url = "https://nominatim.openstreetmap.org/search"
         params = {
@@ -116,22 +105,15 @@ class GeoUtils:
         """
         Gets the address for given latitude and longitude coordinates.
 
-        Parameters:
-        ----------
-        lat : float
-            The latitude coordinate.
-        lon : float
-            The longitude coordinate.
+        Args:
+            lat (float): The latitude coordinate.
+            lon (float): The longitude coordinate.
 
         Returns:
-        -------
-        str
-            The address corresponding to the given coordinates.
+            str: The address corresponding to the given coordinates.
 
         Raises:
-        ------
-        ValueError
-            If the address is not found.
+            ValueError: If the address is not found.
         """
         url = "https://nominatim.openstreetmap.org/reverse"
         params = {
@@ -156,15 +138,11 @@ class GeoUtils:
         """
         Gets the coordinates of the cell with the maximum population.
 
-        Parameters:
-        ----------
-        ghs_pop : dict
-            The GHS-POP data containing 'data' and 'transform'.
+        Args:
+            ghs_pop (dict): The GHS-POP data containing 'data' and 'transform'.
 
         Returns:
-        -------
-        tuple
-            A tuple containing the latitude and longitude coordinates of the cell with the maximum population.
+            tuple: A tuple containing the latitude and longitude coordinates of the cell with the maximum population.
         """
         with tqdm(total=100, desc="Getting coordinates of maximum population", leave=False) as pbar:
             data = ghs_pop['data']
@@ -180,55 +158,47 @@ class GeoUtils:
     
 
     def haversine_distance(self, lon1, lat1, lons2, lats2):
-            """
-            Calculate the Haversine distance between two points.
+        """
+        Calculates the Haversine distance between two points.
 
-            Args:
-                lon1 (float): Longitude of the first point.
-                lat1 (float): Latitude of the first point.
-                lons2 (float): Longitudes of the second points.
-                lats2 (float): Latitudes of the second points.
+        Args:
+            lon1 (float): Longitude of the first point.
+            lat1 (float): Latitude of the first point.
+            lons2 (float): Longitude(s) of the second point(s).
+            lats2 (float): Latitude(s) of the second point(s).
 
-            Returns:
-                float: The Haversine distance in kilometers.
-            """
-            R = 6371  # Earth radius in km
+        Returns:
+            float: The Haversine distance in kilometers.
+        """
+        R = 6371  # Earth radius in km
 
 
-            lat1 = np.radians(lat1)
-            lon1 = np.radians(lon1)
-            lats2 = np.radians(lats2)
-            lons2 = np.radians(lons2)
+        lat1 = np.radians(lat1)
+        lon1 = np.radians(lon1)
+        lats2 = np.radians(lats2)
+        lons2 = np.radians(lons2)
 
-            dlat = lats2 - lat1
-            dlon = lons2 - lon1
-            a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
-            c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+        dlat = lats2 - lat1
+        dlon = lons2 - lon1
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
+        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
-            return R * c
+        return R * c
     
     def adjust_detail_level(self, osm, copernicus, ghs_pop):
         """
         Adjusts the detail level of the given raster datasets to match the highest resolution.
 
-        Parameters:
-        ----------
-        osm : dict
-            The OSM data containing 'data', 'transform', 'crs', and 'shape'.
-        copernicus : dict
-            The Copernicus data containing 'data', 'transform', 'crs', and 'shape'.
-        ghs_pop : dict
-            The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
+        Args:
+            osm (dict): The OSM data containing 'data', 'transform', 'crs', and 'shape'.
+            copernicus (dict): The Copernicus data containing 'data', 'transform', 'crs', and 'shape'.
+            ghs_pop (dict): The GHS-POP data containing 'data', 'transform', 'crs', and 'shape'.
 
         Returns:
-        -------
-        dict
-            A dictionary containing the adjusted raster datasets with the highest resolution.
-        
+            dict: A dictionary containing the adjusted raster datasets with the highest resolution.
+
         Raises:
-        ------
-        ValueError
-            If one or more raster datasets are None or if the shape of the target data is unexpected.
+            ValueError: If one or more raster datasets are None or if the shape of the target data is unexpected.
         """
         if osm is None or copernicus is None or ghs_pop is None:
             raise ValueError("One or more raster datasets are None. Check rasterization process.")

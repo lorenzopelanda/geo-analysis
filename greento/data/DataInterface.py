@@ -13,14 +13,10 @@ class DownloaderInterface(ABC):
         """
         Downloads and processes data for the given bounding box.
 
-        Parameters:
-        ----------
-        bounding_box : BoundingBox
-            The bounding box for which to download data.
+        Args:
+            bounding_box (BoundingBox): The bounding box for which to download data.
 
         Returns:
-        -------
-        Any
-            The downloaded and processed data.
+            Any: The downloaded and processed data.
         """
         pass

@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>greento.utils.raster.RasterUtils &mdash; GreenTo Documentation 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=e031e9a9"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GreenTo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">greento</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GreenTo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">greento.utils.raster.RasterUtils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for greento.utils.raster.RasterUtils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">rasterio.transform</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">rasterio.warp</span> <span class="kn">import</span> <span class="n">calculate_default_transform</span><span class="p">,</span> <span class="n">reproject</span><span class="p">,</span> <span class="n">Resampling</span>
+<span class="kn">from</span> <span class="nn">greento.utils.UtilsInterface</span> <span class="kn">import</span> <span class="n">UtilsInterface</span>
+
+<div class="viewcode-block" id="RasterUtils"><a class="viewcode-back" href="../../../../greento.utils.raster.html#greento.utils.raster.RasterUtils.RasterUtils">[docs]</a><span class="k">class</span> <span class="nc">RasterUtils</span><span class="p">(</span><span class="n">UtilsInterface</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to provide utility functions for processing raster data.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    copernicus : dict</span>
+<span class="sd">        The Copernicus data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    -------</span>
+<span class="sd">    filter_copernicus_with_osm(copernicus_green):</span>
+<span class="sd">        Filters the Copernicus data using OSM green data.</span>
+<span class="sd">    get_land_use_percentages():</span>
+<span class="sd">        Calculates the land use percentages from the Copernicus data.</span>
+<span class="sd">    raster_to_crs(dst_crs):</span>
+<span class="sd">        Transforms a raster to a new CRS with a different resolution and extent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">copernicus</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the RasterUtils with Copernicus data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            copernicus (dict): The Copernicus data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span> <span class="o">=</span> <span class="n">copernicus</span>
+
+<div class="viewcode-block" id="RasterUtils.filter_with_osm"><a class="viewcode-back" href="../../../../greento.utils.raster.html#greento.utils.raster.RasterUtils.RasterUtils.filter_with_osm">[docs]</a>    <span class="k">def</span> <span class="nf">filter_with_osm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">copernicus_green</span><span class="p">,</span> <span class="n">osm_green</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters the Copernicus data using OSM green data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            copernicus_green (dict): The Copernicus green area data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+<span class="sd">            osm_green (dict): The OSM green area data containing &#39;data&#39;, &#39;transform&#39;, &#39;crs&#39;, and &#39;shape&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The filtered raster data containing:</span>
+<span class="sd">                - &#39;data&#39;: The filtered raster data.</span>
+<span class="sd">                - &#39;transform&#39;: The affine transform of the raster.</span>
+<span class="sd">                - &#39;crs&#39;: The coordinate reference system of the raster.</span>
+<span class="sd">                - &#39;shape&#39;: The shape of the raster.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the raster shapes do not match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">copernicus_data</span> <span class="o">=</span> <span class="n">copernicus_green</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="n">osm_data</span> <span class="o">=</span> <span class="n">osm_green</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">copernicus_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">osm_data</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Raster shapes do not match&quot;</span><span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">osm_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">copernicus_data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">filtered_raster</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">filtered_data</span><span class="p">,</span>
+            <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">copernicus_green</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">copernicus_green</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;shape&#39;</span><span class="p">:</span><span class="n">copernicus_green</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">filtered_raster</span></div>
+
+<div class="viewcode-block" id="RasterUtils.get_land_use_percentages"><a class="viewcode-back" href="../../../../greento.utils.raster.html#greento.utils.raster.RasterUtils.RasterUtils.get_land_use_percentages">[docs]</a>    <span class="k">def</span> <span class="nf">get_land_use_percentages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the land use percentages from the Copernicus data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A JSON string containing the land use percentages, where keys are land use types and values are percentages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">10</span><span class="p">:</span> <span class="s2">&quot;Forest and trees&quot;</span><span class="p">,</span>
+            <span class="mi">20</span><span class="p">:</span> <span class="s2">&quot;Shrubs&quot;</span><span class="p">,</span>
+            <span class="mi">30</span><span class="p">:</span> <span class="s2">&quot;Grassland&quot;</span><span class="p">,</span>
+            <span class="mi">40</span><span class="p">:</span> <span class="s2">&quot;Cropland&quot;</span><span class="p">,</span>
+            <span class="mi">50</span><span class="p">:</span> <span class="s2">&quot;Buildings&quot;</span><span class="p">,</span>
+            <span class="mi">60</span><span class="p">:</span> <span class="s2">&quot;Sparse vegetation&quot;</span><span class="p">,</span>
+            <span class="mi">70</span><span class="p">:</span> <span class="s2">&quot;Snow and Ice&quot;</span><span class="p">,</span>
+            <span class="mi">80</span><span class="p">:</span> <span class="s2">&quot;Permanent water bodies&quot;</span><span class="p">,</span>
+            <span class="mi">90</span><span class="p">:</span> <span class="s2">&quot;Herbaceous wetland&quot;</span><span class="p">,</span>
+            <span class="mi">95</span><span class="p">:</span> <span class="s2">&quot;Mangroves&quot;</span><span class="p">,</span>
+            <span class="mi">100</span><span class="p">:</span> <span class="s2">&quot;Moss and lichen&quot;</span>
+        <span class="p">}</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+        
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="k">if</span> <span class="n">elapsed_time</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> 
+            <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Processing Land Use Percentages&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> 
+
+        <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">land_use_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">unique</span><span class="p">,</span> <span class="n">counts</span><span class="p">))</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">land_use_types</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">percentages</span> <span class="o">=</span> <span class="p">{</span><span class="n">labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">land_use</span><span class="p">,</span> <span class="n">land_use</span><span class="p">):</span> <span class="nb">round</span><span class="p">((</span><span class="n">count</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">land_use</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span>
+                    <span class="n">land_use_types</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">land_use</span> <span class="ow">in</span> <span class="n">values</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>  
+
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> 
+
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="RasterUtils.raster_to_crs"><a class="viewcode-back" href="../../../../greento.utils.raster.html#greento.utils.raster.RasterUtils.RasterUtils.raster_to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">raster_to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dst_crs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transforms a raster to a new CRS with a different resolution and extent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dst_crs (str): The destination coordinate reference system.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The transformed raster data containing:</span>
+<span class="sd">                - &#39;data&#39;: The reprojected raster data.</span>
+<span class="sd">                - &#39;crs&#39;: The destination coordinate reference system.</span>
+<span class="sd">                - &#39;transform&#39;: The affine transform of the reprojected raster.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the shape of the data is incorrect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="n">src_transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+        <span class="n">src_crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copernicus</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">shape</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">count</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shape of the data incorrect!&quot;</span><span class="p">)</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">array_bounds</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">src_transform</span><span class="p">)</span>
+
+        <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">calculate_default_transform</span><span class="p">(</span>
+            <span class="n">src_crs</span><span class="p">,</span>
+            <span class="n">dst_crs</span><span class="p">,</span>
+            <span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">bounds</span>
+        <span class="p">)</span>
+
+        <span class="n">dst_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">count</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">height</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">src_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Reprojecting raster data&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+                <span class="n">reproject</span><span class="p">(</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">src_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">src_data</span><span class="p">,</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">dst_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">dst_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">src_transform</span><span class="o">=</span><span class="n">src_transform</span><span class="p">,</span>
+                    <span class="n">src_crs</span><span class="o">=</span><span class="n">src_crs</span><span class="p">,</span>
+                    <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                    <span class="n">dst_crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
+                    <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span>
+                <span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Reprojected raster data&quot;</span><span class="p">)</span>    
+            <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>    
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">dst_data</span><span class="p">,</span>
+                <span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="n">dst_crs</span><span class="p">,</span>
+                <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">transform</span>
+            <span class="p">}</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, GreenTo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
