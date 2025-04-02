@@ -12,20 +12,17 @@ Installation
 
 To install the GreenTo package, follow these steps:
 
-1. Clone the repository:
-   .. code-block:: bash
+1. Clone the repository::
 
-       git clone https://github.com/lorenzopelanda/geo-analysis.git
-       cd geo-analysis
+      git clone https://github.com/lorenzopelanda/geo-analysis.git
+      cd geo-analysis
 
-2. Create a virtual environment (optional but recommended):
-   .. code-block:: bash
+2. Create a virtual environment (optional but recommended)::
 
-       python3 -m venv venv
-       source venv/bin/activate
+      python3 -m venv venv
+      source venv/bin/activate
 
-3. Install the package and its dependencies:
-   .. code-block:: bash
+3. Install the package and its dependencies::
 
-       pip install .
+      pip install .
 
