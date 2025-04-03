@@ -1,11 +1,4 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 import os
 import sys
 
@@ -17,29 +10,40 @@ author = 'GreenTo'
 release = '0.1'
 
 # -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.todo", "sphinx.ext.viewcode"]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
-
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
 html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 html_title = "GreenTo"
 
-html_theme_options = { 
-    "icon_links": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/lorenzopelanda/geo-analysis",
-            "icon": "fab fa-github", 
-        }
-    ],
+html_context = {
+    "github_user": "lorenzopelanda",
+    "github_repo": "geo-analysis",
+    "github_version": "main",  
 }
+
+html_show_sourcelink = False
+html_copy_source = False
+html_sourcelink_suffix = ''
+
+html_theme_options = { 
+    "navbar_align": "left",
+    "show_toc_level": 2,
+    "show_source_link": False,
+    "use_source_button": False,
+    "source_link_position": "none",
+    "source_repository": "",  
+    "source_branch": "",      
+    "source_directory": "",   
+}
+
+html_css_files = [
+    'css/custom.css',
+]
+
+templates_path = ['_templates']

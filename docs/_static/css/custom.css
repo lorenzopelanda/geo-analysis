@@ -1,0 +1,145 @@
+:root {
+    --greenTo-primary: #5ab0c7;
+    --greenTo-primary-hover: #7ecbdf;
+    --greenTo-button-bg: #4a4e56;
+    --greenTo-button-hover: #5ab0c7;
+}
+
+html[data-theme="light"] {
+    --card-bg: #f8f9fa;
+    --card-border: #e1e4e8;
+    --card-text: #24292e;
+    --card-title: #0366d6;
+    --button-text: #ffffff;
+    --main-text: #24292e;
+    --link-color: #0366d6;
+    --link-hover: #035fc7;
+    --btn-border: #e1e4e8;
+    --icon-color: #0366d6;
+}
+
+html[data-theme="dark"] {
+    --card-bg: #272c36;
+    --card-border: #2d333b;
+    --card-text: #c9d1d9;
+    --card-title: #5ab0c7;
+    --button-text: #f8f9fa;
+    --main-text: #f8f9fa;
+    --link-color: #5ab0c7;
+    --link-hover: #7ecbdf;  
+    --btn-border: #2d333b;
+    --icon-color: #5ab0c7;
+}
+
+h1:first-of-type {
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--main-text);
+}
+
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+.container .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    box-shadow: none;
+    transition: transform 0.2s;
+    height: 100%;
+    margin-bottom: 30px;
+}
+
+.container .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.container .card-body {
+    padding: 1.5rem;
+}
+
+.container .card-title {
+    color: var(--card-title);
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.container .card-text {
+    color: var(--card-text);
+    font-size: 0.95rem;
+}
+
+.container .btn-primary {
+    background-color: var(--greenTo-button-bg);
+    border-color: var(--btn-border);
+    color: var(--button-text);
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+}
+
+.container .btn-primary:hover {
+    background-color: var(--greenTo-button-hover);
+    border-color: var(--greenTo-primary);
+}
+
+.container .card i {
+    color: var(--icon-color);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.version-info, .download-info, .description {
+    margin-bottom: 1.5rem;
+    color: var(--main-text);
+}
+
+.useful-links {
+    margin-bottom: 1.5rem;
+    color: var(--main-text);
+}
+
+.useful-links a {
+    color: var(--link-color);
+    margin-right: 0.5rem;
+}
+
+.useful-links a:not(:last-child):after {
+    content: " | ";
+    color: var(--card-text);
+    margin-left: 0.5rem;
+}
+
+.description {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: var(--card-bg);
+}
+
+th, td {
+    padding: 0.75rem;
+    border: 1px solid var(--card-border);
+    color: var(--card-text);
+}
+
+th {
+    background-color: var(--card-border);
+}
+

@@ -1,0 +1,46 @@
+/* Custom styles to match the pandas documentation layout */
+.card {
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+    border: 1px solid rgba(0, 140, 170, 0.2);
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #008caa;
+    margin-bottom: 20px;
+}
+
+.card i {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #008caa;
+}
+
+.btn-primary {
+    background-color: #79b8ca;
+    border-color: #008caa;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+}
+
+.btn-primary:hover {
+    background-color: #008caa;
+    border-color: #007a91;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.container {
+    margin-top: 40px;
+}
