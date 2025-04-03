@@ -39,7 +39,7 @@ html_theme_options = {
     "source_link_position": "none",
     "source_repository": "",  
     "source_branch": "",      
-    "source_directory": "",   
+    "source_directory": "",
 }
 
 html_css_files = [

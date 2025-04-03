@@ -9,7 +9,7 @@ html[data-theme="light"] {
     --card-bg: #f8f9fa;
     --card-border: #e1e4e8;
     --card-text: #24292e;
-    --card-title: #0366d6;
+    --card-title: #56996b;
     --button-text: #ffffff;
     --main-text: #24292e;
     --link-color: #0366d6;
@@ -22,7 +22,7 @@ html[data-theme="dark"] {
     --card-bg: #272c36;
     --card-border: #2d333b;
     --card-text: #c9d1d9;
-    --card-title: #5ab0c7;
+    --card-title: #56996b;
     --button-text: #f8f9fa;
     --main-text: #f8f9fa;
     --link-color: #5ab0c7;
@@ -141,5 +141,12 @@ th, td {
 
 th {
     background-color: var(--card-border);
+}
+
+h1:first-of-type {
+    font-size: 2.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #56996b;
 }
 
