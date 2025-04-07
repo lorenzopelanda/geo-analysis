@@ -8,7 +8,7 @@ GreenTo documentation
 
 Date: April 3, 2025  Version: 0.1
 
-Project and idea by the `University of Turin <https://www.unito.it>`_
+Project and idea by the `University of Turin <https://www.unito.it>`_ under MIT License.
 
 Useful links: `Source Repository <https://github.com/lorenzopelanda/geo-analysis>`_ | `Issues & Ideas <https://github.com/lorenzopelanda/geo-analysis/issues>`_
 
