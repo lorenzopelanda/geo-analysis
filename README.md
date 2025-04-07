@@ -31,3 +31,6 @@ To install the GreenTo package, follow these steps:
 
 For detailed usage examples, refer to the examples [here](EXAMPLES.md).
 
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) for details.
+
