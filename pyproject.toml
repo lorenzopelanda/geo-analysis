@@ -27,7 +27,8 @@ dependencies = [
     "tqdm",
     "geopandas",
     "networkx",
-    "scipy"
+    "scipy",
+    "pydata-sphinx-theme"
 ]
 
 [project.urls]
