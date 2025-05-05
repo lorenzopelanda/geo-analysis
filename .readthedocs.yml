@@ -9,8 +9,6 @@ python:
   install:
     - method: pip
       path: .
-    - method: pip
-      file: pyproject.toml
 
 sphinx:
   configuration: docs/conf.py
