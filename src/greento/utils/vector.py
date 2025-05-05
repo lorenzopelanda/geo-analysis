@@ -5,8 +5,9 @@ import numpy as np
 import geopandas as gpd
 import logging
 from tqdm import tqdm
+from typing import Tuple
 from rasterio.features import rasterize 
-from src.greento.utils.interface import interface
+from greento.utils.interface import interface
 
 class vector(interface):
     """
@@ -24,7 +25,7 @@ class vector(interface):
     to_raster(reference_raster: dict) -> dict
         Rasterizes the OpenStreetMap vector data using a reference raster.
     """
-    def __init__(self, osm: tuple) -> None:
+    def __init__(self, osm: Tuple) -> None:
         """
         Initializes the VectorUtils with OSM data.
 

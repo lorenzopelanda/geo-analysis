@@ -4,10 +4,10 @@ greento.traffic package
 Submodules
 ----------
 
-greento.traffic.Traffic module
+greento.traffic.traffic module
 ------------------------------
 
-.. automodule:: greento.traffic.Traffic
+.. automodule:: greento.traffic.traffic
    :members:
    :undoc-members:
    :show-inheritance:

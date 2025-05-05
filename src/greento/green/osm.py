@@ -1,6 +1,7 @@
 import pandas as pd
 from tqdm import tqdm
 import geopandas as gpd
+from typing import Tuple
 from .interface import interface
 
 class osm(interface):
@@ -32,7 +33,7 @@ class osm(interface):
         """
         self.osm = osm    
     
-    def get_green(self, **kwargs) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_green(self, **kwargs) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """
         Filters and processes green areas from the OSM data.
 

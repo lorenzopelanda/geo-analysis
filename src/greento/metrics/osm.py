@@ -3,8 +3,9 @@ import numpy as np
 import logging
 import osmnx as ox
 from tqdm import tqdm
+from typing import Tuple
 from .interface import interface
-from src.greento.utils.geo import geo
+from greento.utils.geo import geo
 
 class osm(interface):
     """
@@ -28,7 +29,7 @@ class osm(interface):
     _estimate_distance_from_time(time_seconds: float, transport_mode: str) -> float
         Estimates the distance that can be traveled in a given time for a specific transport mode.
     """
-    def __init__(self, osm: dict, vector_traffic_area: tuple, ghs_pop_data: dict) -> None:
+    def __init__(self, osm: dict, vector_traffic_area: Tuple, ghs_pop_data: dict) -> None:
         """
         Initializes the MetricsOSM class with OSM green area data, traffic area, and population data.
 

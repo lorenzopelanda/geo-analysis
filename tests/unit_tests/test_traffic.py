@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import geopandas as gpd
 from shapely.geometry import Polygon, Point, LineString
-from src.greento.traffic import traffic
-from src.greento.boundingbox import boundingbox
+from greento.traffic import traffic
+from greento.boundingbox import boundingbox
 
 class test_traffic(unittest.TestCase):
 
@@ -12,9 +12,9 @@ class test_traffic(unittest.TestCase):
         self.bounding_box = boundingbox(min_x=0, min_y=0, max_x=1, max_y=1)
         self.traffic = traffic(self.bounding_box)
 
-    @patch("src.greento.traffic.ox.graph_from_polygon")
-    @patch("src.greento.traffic.ox.graph_to_gdfs")
-    @patch("src.greento.traffic.gpd.clip")
+    @patch("greento.traffic.ox.graph_from_polygon")
+    @patch("greento.traffic.ox.graph_to_gdfs")
+    @patch("greento.traffic.gpd.clip")
     def test_get_traffic_area_success(self, mock_clip, mock_graph_to_gdfs, mock_graph_from_polygon):
         """Test get_traffic_area with valid data."""
         mock_graph = MagicMock()
@@ -43,7 +43,7 @@ class test_traffic(unittest.TestCase):
         mock_graph_to_gdfs.assert_called_once()
         mock_clip.assert_called()
 
-    @patch("src.greento.traffic.ox.graph_from_polygon")
+    @patch("greento.traffic.ox.graph_from_polygon")
     def test_get_traffic_area_no_graph(self, mock_graph_from_polygon):
         """Test get_traffic_area when graph creation fails."""
         mock_graph_from_polygon.return_value = None
@@ -53,8 +53,8 @@ class test_traffic(unittest.TestCase):
         self.assertIsNone(result)
         mock_graph_from_polygon.assert_called_once()
 
-    @patch("src.greento.traffic.ox.graph_from_polygon")
-    @patch("src.greento.traffic.ox.graph_to_gdfs")
+    @patch("greento.traffic.ox.graph_from_polygon")
+    @patch("greento.traffic.ox.graph_to_gdfs")
     def test_get_traffic_area_empty_data(self, mock_graph_to_gdfs, mock_graph_from_polygon):
         """Test get_traffic_area when nodes or edges are empty."""
         mock_graph = MagicMock()
@@ -70,7 +70,7 @@ class test_traffic(unittest.TestCase):
         mock_graph_from_polygon.assert_called_once()
         mock_graph_to_gdfs.assert_called_once()
 
-    @patch("src.greento.traffic.ox.graph_from_polygon")
+    @patch("greento.traffic.ox.graph_from_polygon")
     def test_get_traffic_area_invalid_network_type(self, mock_graph_from_polygon):
         """Test get_traffic_area with an invalid network type."""
         mock_graph_from_polygon.side_effect = ValueError("Invalid network type")

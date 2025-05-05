@@ -2,7 +2,8 @@ import osmnx as ox
 import geopandas as gpd
 import logging
 from tqdm import tqdm
-from src.greento.boundingbox import boundingbox
+from typing import Tuple
+from greento.boundingbox import boundingbox
 
 class traffic:
     """
@@ -33,7 +34,7 @@ class traffic:
         """
         self.bounding_box = bounding_box
 
-    def get_traffic_area(self, network_type: str) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_traffic_area(self, network_type: str) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """
         Downloads the OSM network data for a given bounding box and network type, and processes it into GeoDataFrames.
 

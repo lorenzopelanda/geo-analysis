@@ -1,23 +1,45 @@
 greento.data package
 ====================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   greento.data.copernicus
-   greento.data.ghspop
-   greento.data.osm
-
 Submodules
 ----------
 
-greento.data.DataInterface module
----------------------------------
+greento.data.copernicus module
+------------------------------
 
-.. automodule:: greento.data.DataInterface
+.. automodule:: greento.data.copernicus
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+greento.data.ghspop module
+--------------------------
+
+.. automodule:: greento.data.ghspop
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+greento.data.ghspop\_io module
+------------------------------
+
+.. automodule:: greento.data.ghspop_io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+greento.data.interface module
+-----------------------------
+
+.. automodule:: greento.data.interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+greento.data.osm module
+-----------------------
+
+.. automodule:: greento.data.osm
    :members:
    :undoc-members:
    :show-inheritance:

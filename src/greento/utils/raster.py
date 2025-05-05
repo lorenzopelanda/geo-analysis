@@ -6,7 +6,7 @@ import time
 import logging
 from tqdm import tqdm
 from rasterio.warp import calculate_default_transform, reproject, Resampling
-from src.greento.utils.interface import interface
+from greento.utils.interface import interface
 
 class raster(interface):
     """

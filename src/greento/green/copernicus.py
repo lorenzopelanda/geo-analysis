@@ -1,6 +1,6 @@
 import numpy as np
 from tqdm import tqdm
-from src.greento.green.interface import interface
+from greento.green.interface import interface
 
 class copernicus(interface):
     """

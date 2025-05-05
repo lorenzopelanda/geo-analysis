@@ -28,7 +28,9 @@ dependencies = [
     "geopandas",
     "networkx",
     "scipy",
-    "pydata-sphinx-theme"
+    "pydata-sphinx-theme",
+    "sphinx-autodoc-typehints", 
+    "sphinx-copybutton" 
 ]
 
 [project.urls]

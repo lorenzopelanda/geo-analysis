@@ -4,26 +4,26 @@ greento.green package
 Submodules
 ----------
 
-greento.green.GreenCopernicus module
-------------------------------------
+greento.green.copernicus module
+-------------------------------
 
-.. automodule:: greento.green.GreenCopernicus
+.. automodule:: greento.green.copernicus
    :members:
    :undoc-members:
    :show-inheritance:
 
-greento.green.GreenInterface module
------------------------------------
+greento.green.interface module
+------------------------------
 
-.. automodule:: greento.green.GreenInterface
+.. automodule:: greento.green.interface
    :members:
    :undoc-members:
    :show-inheritance:
 
-greento.green.GreenOSM module
------------------------------
+greento.green.osm module
+------------------------
 
-.. automodule:: greento.green.GreenOSM
+.. automodule:: greento.green.osm
    :members:
    :undoc-members:
    :show-inheritance:

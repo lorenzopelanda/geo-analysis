@@ -6,8 +6,8 @@ import logging
 from tqdm import tqdm
 from typing import Dict
 from openeo.rest.connection import Connection
-from src.greento.boundingbox import boundingbox
-from src.greento.data.interface import interface
+from greento.boundingbox import boundingbox
+from greento.data.interface import interface
 
 class copernicus(interface):
     """

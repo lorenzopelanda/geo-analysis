@@ -15,9 +15,9 @@ from affine import Affine
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
 from shapely.geometry import box
-from src.greento.boundingbox import boundingbox
+from greento.boundingbox import boundingbox
 from greento.data.ghspop_io import ghspop_io
-from src.greento.data.interface import interface
+from greento.data.interface import interface
 from tqdm import tqdm
 
 ox.settings.use_cache = True

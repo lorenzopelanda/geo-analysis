@@ -3,9 +3,10 @@ import geopandas as gpd
 import warnings
 import logging
 from tqdm import tqdm
+from typing import Tuple
 from shapely.geometry import Point, LineString, MultiLineString, Polygon, MultiPolygon
-from src.greento.boundingbox import boundingbox
-from src.greento.data.interface import interface
+from greento.boundingbox import boundingbox
+from greento.data.interface import interface
 
 class osm(interface):
     """
@@ -17,7 +18,7 @@ class osm(interface):
         Downloads and processes OSM data for the given bounding box.
     """
 
-    def get_data(self, bounding_box: "boundingbox") -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_data(self, bounding_box: "boundingbox") -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """
         Downloads and processes OSM data for the given bounding box.
 

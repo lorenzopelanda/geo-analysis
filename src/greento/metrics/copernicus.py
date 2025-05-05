@@ -3,7 +3,8 @@ import osmnx as ox
 import numpy as np
 import logging
 from tqdm import tqdm
-from src.greento.utils.geo import geo
+from typing import Tuple
+from greento.utils.geo import geo
 from .interface import interface
 class copernicus(interface):
     """
@@ -28,7 +29,7 @@ class copernicus(interface):
         Estimates the distance that can be traveled in a given time for a specific transport mode.
     """
 
-    def __init__(self, raster_data: dict, vector_traffic_area: tuple, ghs_pop_data: dict) -> None: 
+    def __init__(self, raster_data: dict, vector_traffic_area: Tuple, ghs_pop_data: dict) -> None: 
         """
         Initializes the MetricsCopernicus class with Copernicus green area data, traffic area, and population data.
 

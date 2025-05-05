@@ -1,7 +1,7 @@
 import unittest
 import geopandas as gpd
 from shapely.geometry import Point, LineString
-from src.greento.green.osm import osm
+from greento.green.osm import osm
 
 class test_green_osm(unittest.TestCase):
 

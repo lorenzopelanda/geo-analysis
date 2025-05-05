@@ -5,12 +5,13 @@ import json
 import osmnx as ox
 import numpy as np
 import geopandas as gpd
+from typing import Tuple
 from shapely.geometry import Point
 import networkx as nx
 from tqdm import tqdm
 from scipy.spatial import cKDTree
 from math import radians, sin, cos, sqrt, atan2
-from src.greento.utils.geo import geo
+from greento.utils.geo import geo
 from .interface import interface
 ox.settings.use_cache = False
 
@@ -37,7 +38,7 @@ class copernicus(interface):
         Calculates the shortest path and estimated travel time between two points.
     """
 
-    def __init__(self, raster_data: dict, vector_traffic_area: tuple) -> None:
+    def __init__(self, raster_data: dict, vector_traffic_area: Tuple) -> None:
         """
         Initializes the DistanceCopernicus class with raster data and a traffic network graph.
 
@@ -61,7 +62,7 @@ class copernicus(interface):
         self.preprocessed_graph = None
         self._green_positions_cache = {}    
 
-    def get_nearest_green_position(self, lat: float, lon: float) -> tuple[float, float]:
+    def get_nearest_green_position(self, lat: float, lon: float) -> Tuple[float, float]:
         """
         Finds the nearest green position from a given starting point using a raster dataset and a traffic network graph.
 

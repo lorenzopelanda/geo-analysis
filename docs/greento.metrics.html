@@ -104,7 +104,7 @@
   </label>
   
   
-  <div class=" navbar-header-items__start">
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
 
@@ -123,7 +123,7 @@
     
   </div>
   
-  <div class=" navbar-header-items">
+  <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
@@ -308,44 +308,14 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="greento.html">greento package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="greento.boundingbox.html">greento.boundingbox package</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="greento.data.html">greento.data package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="greento.data.ghspop.html">greento.data.ghspop package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="greento.data.html">greento.data package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="greento.distance.html">greento.distance package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="greento.green.html">greento.green package</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">greento.metrics package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="greento.traffic.html">greento.traffic package</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="greento.utils.html">greento.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="greento.utils.html">greento.utils package</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="greento.boundingbox.html">greento.boundingbox package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.data.ghspop.html">greento.data.ghspop package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="greento.data.html">greento.data package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="greento.data.copernicus.html">greento.data.copernicus package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="greento.data.ghspop.html">greento.data.ghspop package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="greento.data.osm.html">greento.data.osm package</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="greento.distance.html">greento.distance package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.green.html">greento.green package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.traffic.html">greento.traffic package</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="greento.utils.html">greento.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="greento.utils.raster.html">greento.utils.raster package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="greento.utils.vector.html">greento.utils.vector package</a></li>
 </ul>
 </div>
 </nav></div>
@@ -411,165 +381,297 @@ document.write(`
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
 </section>
-<section id="module-greento.metrics.MetricsCopernicus">
-<span id="greento-metrics-metricscopernicus-module"></span><h2>greento.metrics.MetricsCopernicus module<a class="headerlink" href="#module-greento.metrics.MetricsCopernicus" title="Permalink to this heading">#</a></h2>
+<section id="module-greento.metrics.copernicus">
+<span id="greento-metrics-copernicus-module"></span><h2>greento.metrics.copernicus module<a class="headerlink" href="#module-greento.metrics.copernicus" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="greento.metrics.MetricsCopernicus.MetricsCopernicus">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.MetricsCopernicus.</span></span><span class="sig-name descname"><span class="pre">MetricsCopernicus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raster_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsCopernicus.html#MetricsCopernicus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#greento.metrics.MetricsInterface.MetricsInterface" title="greento.metrics.MetricsInterface.MetricsInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsInterface</span></code></a></p>
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.copernicus.</span></span><span class="sig-name descname"><span class="pre">copernicus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raster_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.copernicus.copernicus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#greento.metrics.interface.interface" title="greento.metrics.interface.interface"><code class="xref py py-class docutils literal notranslate"><span class="pre">interface</span></code></a></p>
 <p>A class to calculate metrics using Copernicus data.</p>
-<section id="attributes">
-<h3>Attributes:<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
-<dl class="simple">
-<dt>copernicus_green<span class="classifier">dict</span></dt><dd><p>The Copernicus green area data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
-</dd>
-<dt>vector_traffic_area<span class="classifier">tuple</span></dt><dd><p>A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p>
-</dd>
-<dt>ghs_pop_data<span class="classifier">dict</span></dt><dd><p>The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
-</dd>
-</dl>
-</section>
-<section id="methods">
-<h3>Methods:<a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h3>
-<dl class="simple">
-<dt>green_area_per_person():</dt><dd><p>Calculates the green area per person in the given raster and population data.</p>
-</dd>
-<dt>get_isochrone_green(lat, lon, max_time, network_type):</dt><dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
-</dd>
-<dt>_estimate_distance_from_time(time_seconds, transport_mode):</dt><dd><p>Estimates the distance that can be traveled in a given time for a specific transport mode.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.copernicus_green">
+<span class="sig-name descname"><span class="pre">copernicus_green</span></span><a class="headerlink" href="#greento.metrics.copernicus.copernicus.copernicus_green" title="Permalink to this definition">#</a></dt>
+<dd><p>The Copernicus green area data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsCopernicus.MetricsCopernicus.get_isochrone_green">
-<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsCopernicus.html#MetricsCopernicus.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus.get_isochrone_green" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>lat (float): The latitude of the starting point.
-lon (float): The longitude of the starting point.
-max_time (float): The maximum travel time in minutes.
-network_type (str): The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.vector_traffic_area">
+<span class="sig-name descname"><span class="pre">vector_traffic_area</span></span><a class="headerlink" href="#greento.metrics.copernicus.copernicus.vector_traffic_area" title="Permalink to this definition">#</a></dt>
+<dd><p>A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
-<dt>Returns:</dt><dd><p>str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
-</dd>
-<dt>Raises:</dt><dd><p>ValueError: If the input parameters are invalid or the traffic area is not reachable.</p>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.ghs_pop_data">
+<span class="sig-name descname"><span class="pre">ghs_pop_data</span></span><a class="headerlink" href="#greento.metrics.copernicus.copernicus.ghs_pop_data" title="Permalink to this definition">#</a></dt>
+<dd><p>The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsCopernicus.MetricsCopernicus.green_area_per_person">
-<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsCopernicus.html#MetricsCopernicus.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus.green_area_per_person" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.green_area_per_person">
+<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.copernicus.copernicus.green_area_per_person" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculates the green area per person in the given raster and population data.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>str: A JSON string containing the green area per person.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.get_isochrone_green">
+<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.copernicus.copernicus.get_isochrone_green" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus._estimate_distance_from_time">
+<span class="sig-name descname"><span class="pre">_estimate_distance_from_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus._estimate_distance_from_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.copernicus.copernicus._estimate_distance_from_time" title="Permalink to this definition">#</a></dt>
+<dd><p>Estimates the distance that can be traveled in a given time for a specific transport mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.copernicus.copernicus.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raster_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.copernicus.copernicus.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initializes the MetricsCopernicus class with Copernicus green area data, traffic area, and population data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>raster_data</strong> (<em>dict</em>) – The Copernicus green area data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p></li>
+<li><p><strong>vector_traffic_area</strong> (<em>tuple</em>) – A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p></li>
+<li><p><strong>ghs_pop_data</strong> (<em>dict</em>) – The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – The latitude of the starting point.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – The longitude of the starting point.</p></li>
+<li><p><strong>max_time</strong> (<em>float</em>) – The maximum travel time in minutes.</p></li>
+<li><p><strong>network_type</strong> (<em>str</em>) – The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the input parameters are invalid or the traffic area is not reachable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/copernicus.html#copernicus.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the green area per person in the given raster and population data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A JSON string containing the green area per person.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
-<section id="module-greento.metrics.MetricsInterface">
-<span id="greento-metrics-metricsinterface-module"></span><h2>greento.metrics.MetricsInterface module<a class="headerlink" href="#module-greento.metrics.MetricsInterface" title="Permalink to this heading">#</a></h2>
+<section id="module-greento.metrics.interface">
+<span id="greento-metrics-interface-module"></span><h2>greento.metrics.interface module<a class="headerlink" href="#module-greento.metrics.interface" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="greento.metrics.MetricsInterface.MetricsInterface">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.MetricsInterface.</span></span><span class="sig-name descname"><span class="pre">MetricsInterface</span></span><a class="reference internal" href="_modules/greento/metrics/MetricsInterface.html#MetricsInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsInterface.MetricsInterface" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="greento.metrics.interface.interface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.interface.</span></span><span class="sig-name descname"><span class="pre">interface</span></span><a class="reference internal" href="_modules/greento/metrics/interface.html#interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.interface.interface" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>An abstract base class for calculating metrics using geographical data.</p>
-<section id="id1">
-<h3>Methods:<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
-<dl class="simple">
-<dt>green_area_per_person():</dt><dd><p>Abstract method to calculate the green area per person.</p>
-</dd>
-<dt>get_isochrone_green(lat, lon, max_time, transport_mode):</dt><dd><p>Abstract method to calculate the reachable green areas within a given time from a starting point.</p>
-</dd>
-</dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsInterface.MetricsInterface.get_isochrone_green">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsInterface.html#MetricsInterface.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsInterface.MetricsInterface.get_isochrone_green" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="greento.metrics.interface.interface.green_area_per_person">
+<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/interface.html#interface.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.interface.interface.green_area_per_person" title="Permalink to this definition">#</a></dt>
+<dd><p>Abstract method to calculate the green area per person.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.interface.interface.get_isochrone_green">
+<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/interface.html#interface.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.interface.interface.get_isochrone_green" title="Permalink to this definition">#</a></dt>
+<dd><p>Abstract method to calculate the reachable green areas within a given time from a starting point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/interface.html#interface.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>lat (float): The latitude of the starting point.
-lon (float): The longitude of the starting point.
-max_time (float): The maximum travel time in minutes.
-transport_mode (str): The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – The latitude of the starting point.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – The longitude of the starting point.</p></li>
+<li><p><strong>max_time</strong> (<em>float</em>) – The maximum travel time in minutes.</p></li>
+<li><p><strong>transport_mode</strong> (<em>str</em>) – The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsInterface.MetricsInterface.green_area_per_person">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsInterface.html#MetricsInterface.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsInterface.MetricsInterface.green_area_per_person" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="id3">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/interface.html#interface.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculates the green area per person.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>str: A JSON string containing the green area per person.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A JSON string containing the green area per person.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
 </dd></dl>
 
 </section>
-<section id="module-greento.metrics.MetricsOSM">
-<span id="greento-metrics-metricsosm-module"></span><h2>greento.metrics.MetricsOSM module<a class="headerlink" href="#module-greento.metrics.MetricsOSM" title="Permalink to this heading">#</a></h2>
+<section id="module-greento.metrics.osm">
+<span id="greento-metrics-osm-module"></span><h2>greento.metrics.osm module<a class="headerlink" href="#module-greento.metrics.osm" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="greento.metrics.MetricsOSM.MetricsOSM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.MetricsOSM.</span></span><span class="sig-name descname"><span class="pre">MetricsOSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">osm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsOSM.html#MetricsOSM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsOSM.MetricsOSM" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#greento.metrics.MetricsInterface.MetricsInterface" title="greento.metrics.MetricsInterface.MetricsInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsInterface</span></code></a></p>
+<dt class="sig sig-object py" id="greento.metrics.osm.osm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">greento.metrics.osm.</span></span><span class="sig-name descname"><span class="pre">osm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">osm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.osm.osm" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#greento.metrics.interface.interface" title="greento.metrics.interface.interface"><code class="xref py py-class docutils literal notranslate"><span class="pre">interface</span></code></a></p>
 <p>A class to calculate metrics using OpenStreetMap (OSM) data.</p>
-<section id="id2">
-<h3>Attributes:<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
-<dl class="simple">
-<dt>osm_file<span class="classifier">str</span></dt><dd><p>The file path to the OSM data.</p>
-</dd>
-<dt>vector_traffic_area<span class="classifier">tuple</span></dt><dd><p>A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p>
-</dd>
-<dt>ghs_pop_data<span class="classifier">dict</span></dt><dd><p>The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
-</dd>
-</dl>
-</section>
-<section id="id3">
-<h3>Methods:<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
-<dl class="simple">
-<dt>green_area_per_person():</dt><dd><p>Calculates the green area per person in the given raster and population data.</p>
-</dd>
-<dt>get_isochrone_green(lat, lon, max_time, network_type):</dt><dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
-</dd>
-<dt>_estimate_distance_from_time(time_seconds, transport_mode):</dt><dd><p>Estimates the distance that can be traveled in a given time for a specific transport mode.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.osm_file">
+<span class="sig-name descname"><span class="pre">osm_file</span></span><a class="headerlink" href="#greento.metrics.osm.osm.osm_file" title="Permalink to this definition">#</a></dt>
+<dd><p>The OSM green area data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsOSM.MetricsOSM.get_isochrone_green">
-<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsOSM.html#MetricsOSM.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsOSM.MetricsOSM.get_isochrone_green" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>lat (float): The latitude of the starting point.
-lon (float): The longitude of the starting point.
-max_time (float): The maximum travel time in minutes.
-network_type (str): The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.vector_traffic_area">
+<span class="sig-name descname"><span class="pre">vector_traffic_area</span></span><a class="headerlink" href="#greento.metrics.osm.osm.vector_traffic_area" title="Permalink to this definition">#</a></dt>
+<dd><p>A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
-<dt>Returns:</dt><dd><p>str: A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
-</dd>
-<dt>Raises:</dt><dd><p>ValueError: If the input parameters are invalid or the traffic area is not reachable.</p>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.ghs_pop_data">
+<span class="sig-name descname"><span class="pre">ghs_pop_data</span></span><a class="headerlink" href="#greento.metrics.osm.osm.ghs_pop_data" title="Permalink to this definition">#</a></dt>
+<dd><p>The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="greento.metrics.MetricsOSM.MetricsOSM.green_area_per_person">
-<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/greento/metrics/MetricsOSM.html#MetricsOSM.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.MetricsOSM.MetricsOSM.green_area_per_person" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.green_area_per_person">
+<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.osm.osm.green_area_per_person" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculates the green area per person in the given raster and population data.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>str: A JSON string containing the green area per person.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.get_isochrone_green">
+<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.osm.osm.get_isochrone_green" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm._estimate_distance_from_time">
+<span class="sig-name descname"><span class="pre">_estimate_distance_from_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm._estimate_distance_from_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.osm.osm._estimate_distance_from_time" title="Permalink to this definition">#</a></dt>
+<dd><p>Estimates the distance that can be traveled in a given time for a specific transport mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="greento.metrics.osm.osm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">osm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_traffic_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ghs_pop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#greento.metrics.osm.osm.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initializes the MetricsOSM class with OSM green area data, traffic area, and population data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>osm</strong> (<em>dict</em>) – The OSM green area data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p></li>
+<li><p><strong>vector_traffic_area</strong> (<em>tuple</em>) – A tuple containing two GeoDataFrames: nodes and edges for traffic area.</p></li>
+<li><p><strong>ghs_pop_data</strong> (<em>dict</em>) – The GHS-POP data containing ‘data’, ‘transform’, ‘crs’, and ‘shape’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">get_isochrone_green</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm.get_isochrone_green"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the reachable green areas within a given time from a starting point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – The latitude of the starting point.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – The longitude of the starting point.</p></li>
+<li><p><strong>max_time</strong> (<em>float</em>) – The maximum travel time in minutes.</p></li>
+<li><p><strong>network_type</strong> (<em>str</em>) – The type of transport network (e.g., ‘walk’, ‘bike’, ‘drive’, ‘all_public’, ‘drive_public’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A JSON string containing the reachable green areas in the selected max time with the selected transport mode.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the input parameters are invalid or the traffic area is not reachable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">green_area_per_person</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/greento/metrics/osm.html#osm.green_area_per_person"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the green area per person in the given raster and population data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A JSON string containing the green area per person.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -623,26 +725,42 @@ network_type (str): The type of transport network (e.g., ‘walk’, ‘bike’,
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.MetricsCopernicus">greento.metrics.MetricsCopernicus module</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus"><code class="docutils literal notranslate"><span class="pre">MetricsCopernicus</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">MetricsCopernicus.get_isochrone_green()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsCopernicus.MetricsCopernicus.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">MetricsCopernicus.green_area_per_person()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.copernicus">greento.metrics.copernicus module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus"><code class="docutils literal notranslate"><span class="pre">copernicus</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.copernicus_green"><code class="docutils literal notranslate"><span class="pre">copernicus.copernicus_green</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.vector_traffic_area"><code class="docutils literal notranslate"><span class="pre">copernicus.vector_traffic_area</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.ghs_pop_data"><code class="docutils literal notranslate"><span class="pre">copernicus.ghs_pop_data</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">copernicus.green_area_per_person()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">copernicus.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus._estimate_distance_from_time"><code class="docutils literal notranslate"><span class="pre">copernicus._estimate_distance_from_time()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.copernicus.copernicus.__init__"><code class="docutils literal notranslate"><span class="pre">copernicus.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">copernicus.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">copernicus.green_area_per_person()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.MetricsInterface">greento.metrics.MetricsInterface module</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsInterface.MetricsInterface"><code class="docutils literal notranslate"><span class="pre">MetricsInterface</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsInterface.MetricsInterface.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">MetricsInterface.get_isochrone_green()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsInterface.MetricsInterface.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">MetricsInterface.green_area_per_person()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.interface">greento.metrics.interface module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.interface.interface"><code class="docutils literal notranslate"><span class="pre">interface</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.interface.interface.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">interface.green_area_per_person()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.interface.interface.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">interface.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">interface.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3"><code class="docutils literal notranslate"><span class="pre">interface.green_area_per_person()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.MetricsOSM">greento.metrics.MetricsOSM module</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsOSM.MetricsOSM"><code class="docutils literal notranslate"><span class="pre">MetricsOSM</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsOSM.MetricsOSM.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">MetricsOSM.get_isochrone_green()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.MetricsOSM.MetricsOSM.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">MetricsOSM.green_area_per_person()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-greento.metrics.osm">greento.metrics.osm module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm"><code class="docutils literal notranslate"><span class="pre">osm</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.osm_file"><code class="docutils literal notranslate"><span class="pre">osm.osm_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.vector_traffic_area"><code class="docutils literal notranslate"><span class="pre">osm.vector_traffic_area</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.ghs_pop_data"><code class="docutils literal notranslate"><span class="pre">osm.ghs_pop_data</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.green_area_per_person"><code class="docutils literal notranslate"><span class="pre">osm.green_area_per_person()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.get_isochrone_green"><code class="docutils literal notranslate"><span class="pre">osm.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm._estimate_distance_from_time"><code class="docutils literal notranslate"><span class="pre">osm._estimate_distance_from_time()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#greento.metrics.osm.osm.__init__"><code class="docutils literal notranslate"><span class="pre">osm.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4"><code class="docutils literal notranslate"><span class="pre">osm.get_isochrone_green()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5"><code class="docutils literal notranslate"><span class="pre">osm.green_area_per_person()</span></code></a></li>
 </ul>
 </li>
 </ul>

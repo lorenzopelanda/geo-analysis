@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from src.greento.data.copernicus import copernicus
+from greento.data.copernicus import copernicus
 from shapely.geometry import box
 import rasterio
 
 class test_data_copernicus(unittest.TestCase):
 
-    @patch("src.greento.data.copernicus.requests.post")
+    @patch("greento.data.copernicus.requests.post")
     def test_get_token_success(self, mock_post):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -22,7 +22,7 @@ class test_data_copernicus(unittest.TestCase):
             data={"grant_type": "client_credentials", "client_id": "test_id", "client_secret": "test_secret"}
         )
 
-    @patch("src.greento.data.copernicus.requests.post")
+    @patch("greento.data.copernicus.requests.post")
     def test_get_token_failure(self, mock_post):
         mock_response = MagicMock()
         mock_response.status_code = 400
@@ -33,7 +33,7 @@ class test_data_copernicus(unittest.TestCase):
 
         self.assertIsNone(downloader.access_token)
 
-    @patch("src.greento.data.copernicus.openeo.connect")
+    @patch("greento.data.copernicus.openeo.connect")
     def test_connect_to_openeo(self, mock_connect):
         mock_connection = MagicMock()
         mock_connect.return_value = mock_connection
@@ -45,10 +45,10 @@ class test_data_copernicus(unittest.TestCase):
         self.assertEqual(connection, mock_connection)
         mock_connect.assert_called_once_with("https://openeo.dataspace.copernicus.eu")
 
-    @patch("src.greento.data.copernicus.copernicus._copernicus__get_token")
-    @patch("src.greento.data.copernicus.openeo.connect")
-    @patch("src.greento.data.copernicus.tempfile.NamedTemporaryFile")
-    @patch("src.greento.data.copernicus.rasterio.open")
+    @patch("greento.data.copernicus.copernicus._copernicus__get_token")
+    @patch("greento.data.copernicus.openeo.connect")
+    @patch("greento.data.copernicus.tempfile.NamedTemporaryFile")
+    @patch("greento.data.copernicus.rasterio.open")
     def test_get_data(self, mock_rasterio_open, mock_tempfile, mock_connect, mock_get_token):
         mock_get_token.return_value = None
 

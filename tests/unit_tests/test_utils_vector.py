@@ -6,7 +6,7 @@ import json
 import pandas as pd
 from shapely.geometry import Point, LineString
 from rasterio.transform import Affine
-from src.greento.utils.vector import vector
+from greento.utils.vector import vector
 
 class test_utils_vector(unittest.TestCase):
 

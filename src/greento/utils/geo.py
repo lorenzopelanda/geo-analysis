@@ -3,6 +3,7 @@ import rasterio
 import numpy as np
 import logging
 from tqdm import tqdm
+from typing import Tuple
 from rasterio.warp import reproject, Resampling
 
 class geo:
@@ -76,7 +77,7 @@ class geo:
 
         return total_time_minutes
     
-    def get_coordinates_from_address(self, address: str) -> tuple[float, float]:
+    def get_coordinates_from_address(self, address: str) -> Tuple[float, float]:
         """
         Gets the latitude and longitude coordinates for a given address.
 
@@ -159,7 +160,7 @@ class geo:
             logger.error(f"Address not found for coordinates: {lat}, {lon}")
             return None
 
-    def get_coordinates_max_population(self, ghs_pop: dict) -> tuple[float, float]:
+    def get_coordinates_max_population(self, ghs_pop: dict) -> Tuple[float, float]:
         """
         Gets the coordinates of the cell with the maximum population.
 

@@ -6,8 +6,8 @@ import geopandas as gpd
 from shapely.geometry import Point, LineString
 import json
 import rasterio
-from src.greento.distance.copernicus import copernicus
-from src.greento.utils.geo import geo
+from greento.distance.copernicus import copernicus
+from greento.utils.geo import geo
 
 class test_distance_copernicus(unittest.TestCase):
     def setUp(self):
@@ -59,11 +59,11 @@ class test_distance_copernicus(unittest.TestCase):
             self.mock_vector_traffic_area
         )
 
-    @patch('src.greento.distance.copernicus.ox')
-    @patch('src.greento.distance.copernicus.geo')
-    @patch('src.greento.distance.copernicus.cKDTree')
-    @patch('src.greento.distance.copernicus.nx')
-    @patch('src.greento.distance.copernicus.tqdm')
+    @patch('greento.distance.copernicus.ox')
+    @patch('greento.distance.copernicus.geo')
+    @patch('greento.distance.copernicus.cKDTree')
+    @patch('greento.distance.copernicus.nx')
+    @patch('greento.distance.copernicus.tqdm')
     def test_get_nearest_green_position(self, mock_tqdm, mock_nx, mock_cKDTree, mock_geo, mock_ox):
         """Test the get_nearest_green_position method."""
         mock_progress = MagicMock()
@@ -88,8 +88,8 @@ class test_distance_copernicus(unittest.TestCase):
                 
                 self.assertEqual(result, (50.3, 10.3))
         
-    @patch('src.greento.distance.copernicus.ox')
-    @patch('src.greento.distance.copernicus.tqdm')
+    @patch('greento.distance.copernicus.ox')
+    @patch('greento.distance.copernicus.tqdm')
     def test_directions(self, mock_tqdm, mock_ox):
         """Test the directions method."""
         mock_progress = MagicMock()

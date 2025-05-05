@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.greento.green.copernicus import copernicus
+from greento.green.copernicus import copernicus
 
 class test_green_copernicus(unittest.TestCase):
 

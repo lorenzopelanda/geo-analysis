@@ -4,26 +4,26 @@ greento.distance package
 Submodules
 ----------
 
-greento.distance.DistanceCopernicus module
-------------------------------------------
+greento.distance.copernicus module
+----------------------------------
 
-.. automodule:: greento.distance.DistanceCopernicus
+.. automodule:: greento.distance.copernicus
    :members:
    :undoc-members:
    :show-inheritance:
 
-greento.distance.DistanceInterface module
------------------------------------------
+greento.distance.interface module
+---------------------------------
 
-.. automodule:: greento.distance.DistanceInterface
+.. automodule:: greento.distance.interface
    :members:
    :undoc-members:
    :show-inheritance:
 
-greento.distance.DistanceOSM module
------------------------------------
+greento.distance.osm module
+---------------------------
 
-.. automodule:: greento.distance.DistanceOSM
+.. automodule:: greento.distance.osm
    :members:
    :undoc-members:
    :show-inheritance:

@@ -6,8 +6,8 @@ import geopandas as gpd
 from shapely.geometry import Point, LineString
 import json
 import rasterio
-from src.greento.distance.osm import osm
-from src.greento.utils.geo import geo
+from greento.distance.osm import osm
+from greento.utils.geo import geo
 
 class test_distance_osm(unittest.TestCase):
     def setUp(self):
@@ -59,11 +59,11 @@ class test_distance_osm(unittest.TestCase):
             self.mock_vector_traffic_area
         )
 
-    @patch('src.greento.distance.osm.ox')
-    @patch('src.greento.distance.osm.geo')
-    @patch('src.greento.distance.osm.cKDTree')
-    @patch('src.greento.distance.osm.nx')
-    @patch('src.greento.distance.osm.tqdm')
+    @patch('greento.distance.osm.ox')
+    @patch('greento.distance.osm.geo')
+    @patch('greento.distance.osm.cKDTree')
+    @patch('greento.distance.osm.nx')
+    @patch('greento.distance.osm.tqdm')
     def test_get_nearest_green_position(self, mock_tqdm, mock_nx, mock_cKDTree, mock_geo, mock_ox):
         """Test the get_nearest_green_position method."""
         mock_progress = MagicMock()
@@ -88,8 +88,8 @@ class test_distance_osm(unittest.TestCase):
                 
                 self.assertEqual(result, (50.3, 10.3))
         
-    @patch('src.greento.distance.osm.ox')
-    @patch('src.greento.distance.osm.tqdm')
+    @patch('greento.distance.osm.ox')
+    @patch('greento.distance.osm.tqdm')
     def test_directions(self, mock_tqdm, mock_ox):
         """Test the directions method."""
         mock_progress = MagicMock()

@@ -2,7 +2,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../src'))
+
+print("Python sys.path:", sys.path)
 
 project = 'GreenTo'
 copyright = '2025, GreenTo'
@@ -38,8 +40,6 @@ html_copy_source = False
 html_sourcelink_suffix = ''
 
 html_theme_options = { 
-    "navbar_align": "left",
-    "show_toc_level": 2,
     "show_source_link": False,
     "use_source_button": False,
     "source_link_position": "none",

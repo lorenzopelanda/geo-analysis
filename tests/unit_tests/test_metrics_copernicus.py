@@ -3,8 +3,8 @@ from unittest.mock import patch, MagicMock, PropertyMock
 import numpy as np
 import json
 import osmnx as ox
-from src.greento.utils.geo import geo
-from src.greento.metrics.copernicus import copernicus
+from greento.utils.geo import geo
+from greento.metrics.copernicus import copernicus
 
 class test_metrics_copernicus(unittest.TestCase):
     
@@ -29,7 +29,7 @@ class test_metrics_copernicus(unittest.TestCase):
         
         self.metrics = copernicus(self.mock_raster_data, self.mock_vector_traffic_area, self.mock_ghs_pop_data)
 
-    @patch('src.greento.metrics.copernicus.tqdm')
+    @patch('greento.metrics.copernicus.tqdm')
     def test_green_area_per_person(self, mock_tqdm):
         mock_progress = MagicMock()
         mock_tqdm.return_value.__enter__.return_value = mock_progress
@@ -42,7 +42,7 @@ class test_metrics_copernicus(unittest.TestCase):
             
         mock_tqdm.assert_called()
     
-    @patch('src.greento.metrics.copernicus.tqdm')
+    @patch('greento.metrics.copernicus.tqdm')
     def test_green_area_per_person_zero_population(self, mock_tqdm):
         mock_progress = MagicMock()
         mock_tqdm.return_value.__enter__.return_value = mock_progress
@@ -60,9 +60,9 @@ class test_metrics_copernicus(unittest.TestCase):
         self.assertIn('green_area_per_person', result_dict)
         self.assertEqual(result_dict['green_area_per_person'], float('inf'))
     
-    @patch('src.greento.metrics.copernicus.tqdm')
-    @patch('src.greento.metrics.copernicus.ox.graph_from_gdfs')
-    @patch('src.greento.metrics.copernicus.ox.distance.nearest_nodes')
+    @patch('greento.metrics.copernicus.tqdm')
+    @patch('greento.metrics.copernicus.ox.graph_from_gdfs')
+    @patch('greento.metrics.copernicus.ox.distance.nearest_nodes')
     def test_get_isochrone_green_basic(self, mock_nearest_nodes, mock_graph_from_gdfs, mock_tqdm):
         mock_progress = MagicMock()
         type(mock_progress).n = PropertyMock(return_value=50)
@@ -115,7 +115,7 @@ class test_metrics_copernicus(unittest.TestCase):
         except Exception as e:
             self.fail(f"Test not possible: {str(e)}")
 
-    @patch('src.greento.metrics.copernicus.tqdm')
+    @patch('greento.metrics.copernicus.tqdm')
     def test_get_isochrone_green_invalid_params(self, mock_tqdm):
         mock_progress = MagicMock()
         mock_tqdm.return_value.__enter__.return_value = mock_progress

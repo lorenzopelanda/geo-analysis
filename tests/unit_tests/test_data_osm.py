@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
-from src.greento.data.osm import osm
-from src.greento.boundingbox import boundingbox
+from greento.data.osm import osm
+from greento.boundingbox import boundingbox
 
 class Testosm(unittest.TestCase):
 
@@ -12,7 +12,7 @@ class Testosm(unittest.TestCase):
         self.bounding_box = boundingbox(min_x=0, min_y=0, max_x=1, max_y=1)
         self.osm_downloader = osm()
 
-    @patch("src.greento.data.osm.ox.features_from_polygon")
+    @patch("greento.data.osm.ox.features_from_polygon")
     def test_get_data_success(self, mock_features_from_polygon):
         """Test get_data with valid OSM data."""
         mock_features = gpd.GeoDataFrame({
@@ -29,7 +29,7 @@ class Testosm(unittest.TestCase):
         self.assertEqual(len(edges), 1)  
         mock_features_from_polygon.assert_called_once()
 
-    @patch("src.greento.data.osm.ox.features_from_polygon")
+    @patch("greento.data.osm.ox.features_from_polygon")
     def test_get_data_empty(self, mock_features_from_polygon):
         """Test get_data with no OSM data."""
         mock_features = gpd.GeoDataFrame(geometry=[], crs="EPSG:4326")
@@ -41,7 +41,7 @@ class Testosm(unittest.TestCase):
         self.assertTrue(edges.empty)
         mock_features_from_polygon.assert_called_once()
 
-    @patch("src.greento.data.osm.ox.features_from_polygon")
+    @patch("greento.data.osm.ox.features_from_polygon")
     def test_get_data_exception(self, mock_features_from_polygon):
         """Test get_data when an exception occurs."""
         mock_features_from_polygon.side_effect = Exception("Mocked exception")

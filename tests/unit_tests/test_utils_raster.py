@@ -4,7 +4,7 @@ import numpy as np
 import json
 import rasterio
 from rasterio.transform import Affine
-from src.greento.utils.raster import raster
+from greento.utils.raster import raster
 
 class test_utils_raster(unittest.TestCase):
 
@@ -84,9 +84,9 @@ class test_utils_raster(unittest.TestCase):
         for key, value in expected_percentages.items():
             self.assertAlmostEqual(result_dict[key], value, places=4)
 
-    @patch("src.greento.utils.raster.tqdm")
-    @patch("src.greento.utils.raster.reproject")
-    @patch("src.greento.utils.raster.calculate_default_transform")
+    @patch("greento.utils.raster.tqdm")
+    @patch("greento.utils.raster.reproject")
+    @patch("greento.utils.raster.calculate_default_transform")
     def test_raster_to_crs(self, mock_calculate_transform, mock_reproject, mock_tqdm):
         """Test raster_to_crs with valid data."""
         mock_transform = rasterio.transform.from_origin(0, 0, 1, 1)  

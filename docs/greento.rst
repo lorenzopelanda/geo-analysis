@@ -5,15 +5,26 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 6
 
-   greento.boundingbox
    greento.data
    greento.distance
    greento.green
    greento.metrics
    greento.traffic
    greento.utils
+
+Submodules
+----------
+
+greento.boundingbox module
+--------------------------
+
+.. automodule:: greento.boundingbox
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :noindex:
 
 Module contents
 ---------------

@@ -1,5 +1,5 @@
 import unittest
-from src.greento.boundingbox import boundingbox
+from greento.boundingbox import boundingbox
 from shapely.geometry import Polygon
 
 class test_boundingbox(unittest.TestCase):

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock, mock_open
 import os
-from src.greento.data.ghspop import ghspop
-from src.greento.boundingbox import boundingbox
+from greento.data.ghspop import ghspop
+from greento.boundingbox import boundingbox
 from shapely.geometry import box
 import numpy as np
 import numpy.testing as npt
@@ -14,7 +14,7 @@ class test_data_ghspop(unittest.TestCase):
         self.mock_shapefile = "mock_shapefile.shp"
         self.downloader = ghspop(shapefile=self.mock_shapefile)
 
-    @patch("src.greento.data.ghspop.gpd.read_file")
+    @patch("greento.data.ghspop.gpd.read_file")
     def test_load_shapefile(self, mock_read_file):
         mock_gdf = MagicMock()
         mock_gdf.crs = "EPSG:4326"
@@ -25,7 +25,7 @@ class test_data_ghspop(unittest.TestCase):
         self.assertEqual(result, mock_gdf)
         mock_read_file.assert_called_once_with(self.mock_shapefile)
 
-    @patch("src.greento.data.ghspop.requests.get")
+    @patch("greento.data.ghspop.requests.get")
     def test_download_tile_failure(self, mock_get):
         mock_response = MagicMock()
         mock_response.status_code = 404
@@ -36,9 +36,9 @@ class test_data_ghspop(unittest.TestCase):
         self.assertIsNone(result)
         mock_get.assert_called_once()
 
-    @patch("src.greento.data.ghspop.os.path.exists")
-    @patch("src.greento.data.ghspop.os.remove")
-    @patch("src.greento.data.ghspop.zipfile.ZipFile")
+    @patch("greento.data.ghspop.os.path.exists")
+    @patch("greento.data.ghspop.os.remove")
+    @patch("greento.data.ghspop.zipfile.ZipFile")
     def test_extract_tif_file(self, mock_zipfile, mock_remove, mock_exists):
         mock_zip = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip
@@ -53,8 +53,8 @@ class test_data_ghspop(unittest.TestCase):
         mock_zipfile.assert_called_once_with("mock_zip_path", "r")
         mock_zip.extract.assert_called_once_with("mock_file.tif", "extracted_files")
 
-    @patch("src.greento.data.ghspop.box")
-    @patch("src.greento.data.ghspop.gpd.GeoDataFrame")
+    @patch("greento.data.ghspop.box")
+    @patch("greento.data.ghspop.gpd.GeoDataFrame")
     def test_get_tiles_for_bounds(self, mock_gdf, mock_box):
         bounds = boundingbox(min_x=0, min_y=0, max_x=1, max_y=1)
         
@@ -83,8 +83,8 @@ class test_data_ghspop(unittest.TestCase):
         
         self.assertEqual(result, ["tile_1"])
 
-    @patch("src.greento.data.ghspop.os.path.exists")
-    @patch("src.greento.data.ghspop.rasterio.open")
+    @patch("greento.data.ghspop.os.path.exists")
+    @patch("greento.data.ghspop.rasterio.open")
     def test_process_single_tile(self, mock_rasterio_open, mock_exists):
         with patch.object(self.downloader, '_ghspop__download_tile') as mock_download_tile:
             with patch.object(self.downloader, '_ghspop__extract_tif_file') as mock_extract_tif:

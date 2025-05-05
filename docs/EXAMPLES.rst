@@ -44,9 +44,9 @@ This example demonstrates how to create a bounding box from specific coordinates
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(
        query=None,
        method="from_coordinates",
@@ -66,9 +66,9 @@ This example demonstrates how to create a bounding box from a center point and r
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(
        query="Piazza Castello, Torino",
        method="from_center_radius",
@@ -89,7 +89,7 @@ This example demonstrates how to create a bounding box from a GeoJSON object.
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
    geojson = {
        "type": "Polygon",
@@ -104,7 +104,7 @@ This example demonstrates how to create a bounding box from a GeoJSON object.
        ]
    }
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(
        query=None,
        method="from_geojson",
@@ -124,25 +124,25 @@ Downloading OSM Data
 
 This example demonstrates how to download OpenStreetMap data for a specific bounding box
 
-Create a bounding box using the ``BoundingBox`` class:
+Create a bounding box using the ``boundingbox`` class:
 ------------------------------------------------------
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
    print(bounding_box)
 
-Download OSM data using the ``OSMDownloader`` class:
+Download OSM data using the ``data.osm`` class:
 ----------------------------------------------------
 
 .. code-block:: python
 
-   from greento.data.osm.OSMDownloader import OSMDownloader
+   from greento.data.osm import osm
 
-   osm_downloader = OSMDownloader()
+   osm_downloader = osm()
    osm_area = osm_downloader.get_data(bounding_box)
 
 .. raw:: html
@@ -157,27 +157,27 @@ Downloading Copernicus Data
 
 This example demonstrates how to download Copernicus raster data for a specific bounding box
 
-Create a bounding box using the ``BoundingBox`` class:
+Create a bounding box using the ``boundingbox`` class:
 ------------------------------------------------------
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
    print(bounding_box)
 
-Download Copernicus data using the ``CopernicusDownloader`` class:
+Download Copernicus data using the ``data.copernicus`` class:
 ------------------------------------------------------------------
 
 You can choose between using the refresh token like in the example, or ``use_oidc=True`` to use the authentication in the browser.
 
 .. code-block:: python
 
-   from greento.data.copernicus.CopernicusDownloader import CopernicusDownloader
+   from greento.data.copernicus import copernicus
 
-   copernicus_downloader = CopernicusDownloader(
+   copernicus_downloader = copernicus(
            client_id="CLIENT-ID",
            client_secret="CLIENT-SECRET",
            token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token',
@@ -198,28 +198,28 @@ Downloading GHS-POP Data
 
 This example demonstrates how to download Global Human Settlement Population (GHS-POP) raster data for a specific bounding box
 
-Create a bounding box using the ``BoundingBox`` class:
+Create a bounding box using the ``boundingbox`` class:
 ------------------------------------------------------
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
    print(bounding_box)
 
-Download GHS-POP data using the ``GHSPOPDownloader`` class:
+Download GHS-POP data using the ``data.ghspop`` class:
 ------------------------------------------------------------
 
 You have to pass an attribute containing the path for the shapefile, in the folder ``tiling_schema`` there's a ``.shp``, this file path should be passed to the class.
 
 .. code-block:: python
 
-   from greento.data.ghspop.GHSPOPDownloader import GHSPOPDownloader
+   from greento.data.ghspop import ghspop
 
    shapefile_path = "/your-path/tiling_schema/WGS84_tile_schema.shp"
-   ghspop_data = GHSPOPDownloader(shapefile_path)
+   ghspop_data = ghspop(shapefile_path)
 
    ghspop = ghspop_downloader.get_data(bounding_box)
 
@@ -234,14 +234,14 @@ Obtaining green areas for OSM
 =============================
 
 This example demonstrates how to filter the downloaded data from OpenStreetMap to get only the green areas for a bounding box using ``GreenOSM`` class.
-It's supposed you already have downloaded the data from the ``OSMDownloader`` class.
+It's supposed you already have downloaded the data from the ``data.osm`` class.
 We use the function ``get_green()``, you can pass some green areas of your choise in a dictionary way using the tags from OpenStreetMap unless it uses some default type of green areas.
 
 .. code-block:: python
 
-   from greento.green.GreenOSM import GreenOSM
+   from greento.green.osm import osm
 
-   green = GreenOSM(osm_area) #the one downloaded from OSMDownloader
+   green = osm(osm_area) #the one downloaded from OSMDownloader
    green_area = green.get_green()
 
 .. raw:: html
@@ -255,14 +255,14 @@ Obtaining green areas for Copernicus
 ====================================
 
 This example demonstrates how to filter the downloaded data from Copernicus to get only the green areas for a bounding box using ``GreenCopernicus`` class.
-It's supposed you already have downloaded the data from the ``CopernicusDownloader`` class.
+It's supposed you already have downloaded the data from the ``data.copernicus`` class.
 We use the function ``get_green()``, you can pass some green areas of your choise in a set in the number format of the specified satellites system unless it uses some default type of green areas.
 
 .. code-block:: python
 
-   from greento.green.GreenCopernicus import GreenCopernicus
+   from greento.green.copernicus import copernicus
 
-   green = GreenCopernicus(copernicus_area) #the one downloaded from CopernicusDownloader
+   green = copernicus(copernicus_area) #the one downloaded from CopernicusDownloader
    green_area = green.get_green()
 
 .. raw:: html
@@ -277,27 +277,27 @@ Obtaining the traffic network
 
 This example demonstrates how to get the traffic network map of the bounding box selected using the ``Traffic`` class.
 
-Create a bounding box using the ``BoundingBox`` class:
+Create a bounding box using the ``boundigbox`` class:
 ------------------------------------------------------
 
 .. code-block:: python
 
-   from greento.boundingbox.BoundingBox import BoundingBox
+   from greento.boundingbox import boundingbox
 
-   bbox = BoundingBox()
+   bbox = boundingbox()
    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
    print(bounding_box)
 
-Get the traffic network with ``Traffic`` class
+Get the traffic network with ``traffic`` class
 ----------------------------------------------
 
 You have to pass a vehicle used to move like: ``walk, bike, drive, all_public, all_private, all``.
 
 .. code-block:: python
 
-   from greento.traffic.Traffic import Traffic
+   from greento.traffic.traffic import traffic
 
-   traffic = Traffic(bounding_box)
+   traffic = traffic(bounding_box)
    traffic_area = traffic.get_traffic_area("walk")
 
 .. raw:: html
@@ -322,25 +322,25 @@ Get the OSM green metrics
 ``green_area_per_person()``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This function calculates the square meters of green areas in the bounding box per person using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector.VectorUtils``.
+This function calculates the square meters of green areas in the bounding box per person using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector``.
 
 .. code-block:: python
 
-   from greento.metrics.MetricsOSM import MetricsOSM
+   from greento.metrics.osm import osm
 
-   metrics_osm = MetricsOSM(osm_green, traffic_network, ghspop)
+   metrics_osm = osm(osm_green, traffic_network, ghspop)
    green_are_per_person = metrics_osm.green_area_per_person()
 
 ``green_isochrone_green(lat, lon, max_time, network_type)``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This function calculates from a starting point the max reachable green areas with a time limit and a network type. Using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector.VectorUtils``.
+This function calculates from a starting point the max reachable green areas with a time limit and a network type. Using the data from OpenStreetMap with only the green areas and in raster form and the data from GHS-POP. The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector``.
 
 .. code-block:: python
 
-   from greento.metrics.MetricsOSM import MetricsOSM
+   from greento.metrics.osm import osm
 
-   metrics_osm = MetricsOSM(osm_green, traffic_network, ghspop)
+   metrics_osm = osm(osm_green, traffic_network, ghspop)
    max_reachable_green = metrics_osm.green_isochrone_green(45.0628, 7.6781, 12, "walk")
 
 .. raw:: html
@@ -358,9 +358,9 @@ This function calculates the square meters of green areas in the bounding box pe
 
 .. code-block:: python
 
-   from greento.metrics.MetricsCopernicus import MetricsCopernicus
+   from greento.metrics.copernicus import copernicus
 
-   metrics_copernicus = MetricsCopernicus(copernicus_green, traffic_network, ghspop)
+   metrics_copernicus = copernicus(copernicus_green, traffic_network, ghspop)
    green_are_per_person = metrics_copernicus.green_area_per_person()
 
 ``green_isochrone_green(lat, lon, max_time, network_type)``
@@ -370,9 +370,9 @@ This function calculates from a starting point the max reachable green areas wit
 
 .. code-block:: python
 
-   from greento.metrics.MetricsCopernicus import MetricsCopernicus
+   from greento.metrics.copernicus import copernicus
 
-   metrics_copernicus = MetricsCopernicus(copernicus_green, traffic_network, ghspop)
+   metrics_copernicus = copernicus(copernicus_green, traffic_network, ghspop)
    max_reachable_green = metrics_copernicus.green_isochrone_green(45.0628, 7.6781, 12, "walk")
 
 .. raw:: html
@@ -398,14 +398,14 @@ Distance to nearest green area for OSM data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This function calculate the coordinates of the nearest green area for the OSM data and the traffic area downloaded before.
-The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector.VectorUtils``.
+The green data must be in raster form, so you have to rasterize them using ``to_raster(reference_raster)`` function in ``utils.vector``.
 The functions returns a tuple with the nearest green latitude and longitude.
 
 .. code-block:: python
 
-   from greento.distance.DistanceOSM import DistanceOSM
+   from greento.distance.osm import osm
 
-   distance_osm = DistanceOSM(green_osm_raster, traffic_area)
+   distance_osm = osm(green_osm_raster, traffic_area)
    green_lat, green_lon = distance_osm.get_nearest_green_position(lat, lon)
 
 ``directions(lat1, lon1, lat2, lon2, transport_mode)``
@@ -416,9 +416,9 @@ This function returns a json response containing the distance in km and the nces
 
 .. code-block:: python
 
-   from greento.distance.DistanceOSM import DistanceOSM
+   from greento.distance.osm import osm
 
-   distance_osm = DistanceOSM(green_osm_raster, traffic_area)
+   distance_osm = osm(green_osm_raster, traffic_area)
    green_lat, green_lon = distance_osm.get_nearest_green_position(lat, lon)
    distance = distance_osm.directions(lat, lon, green_lat, green_lon, "walk")
    print(f"Distance \n {distance} ")
@@ -440,9 +440,9 @@ The functions returns a tuple with the nearest green latitude and longitude.
 
 .. code-block:: python
 
-   from greento.distance.DistanceCopernicus import DistanceCopernicus
+   from greento.distance.copernicus import copernicus
 
-   distance_copernicus = DistanceCopernicus(green_copernicus, traffic_area)
+   distance_copernicus = copernicus(green_copernicus, traffic_area)
    green_lat, green_lon = distance_copernicus.get_nearest_green_position(lat, lon)
 
 ``directions(lat1, lon1, lat2, lon2, transport_mode)``
@@ -453,9 +453,9 @@ This function returns a json response containing the distance in km and the nces
 
 .. code-block:: python
 
-   from greento.distance.DistanceCopernicus import DistanceCopernicus
+   from greento.distance.copernicus import copernicus
 
-   distance_copernicus = DistanceCopernicus(green_copernicus, traffic_area)
+   distance_copernicus = copernicus(green_copernicus, traffic_area)
    green_lat, green_lon = distance_copernicus.get_nearest_green_position(lat, lon)
    distance = distance_copernicus.directions(lat, lon, green_lat, green_lon, "walk")
    print(f"Distance \n {distance} ")
@@ -473,6 +473,7 @@ Utils functions
 This example shows how some functions in the ``utils`` package work.
 
 .. raw:: html
+
    <a id="raster-functions"></a>
 
 ``raster`` functions
@@ -486,9 +487,9 @@ The function returns a json object with all the informations.
 
 .. code-block:: python
 
-   from greento.utils.raster.RasterUtils import RasterUtils
+   from greento.utils.raster import raster
 
-   utils = RasterUtils(copernicus_area)
+   utils = raster(copernicus_area)
    land_use_percentages = utils.get_land_use_percentages()
 
 Transform the CRS of raster data with ``raster_to_crs()``
@@ -498,9 +499,9 @@ The raster data have to be already downloaded.
 
 .. code-block:: python
 
-   from greento.utils.raster.RasterUtils import RasterUtils
+   from greento.utils.raster import raster
 
-   utils = RasterUtils(copernicus_area)
+   utils = raster(copernicus_area)
    raster_new = utils.raster_to_crs("EPSG:3857")
 
 Filter the Copernicus green data with the OSM green ones using ``filter_with_osm()``
@@ -512,9 +513,9 @@ This function combinates the two datasets to have a more appropriate green cover
 
 .. code-block:: python
 
-   from greento.utils.raster.RasterUtils import RasterUtils
+   from greento.utils.raster import raster
 
-   utils = RasterUtils(copernicus_area)
+   utils = raster(copernicus_area)
    copernicus_filtered = utils.filter_with_osm(copernicus_green, osm_green)
 
 .. raw:: html
@@ -524,16 +525,16 @@ This function combinates the two datasets to have a more appropriate green cover
 --------------------
 
 Get the land usage percentages for the OSM data using ``get_land_use_percentages()``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It is supposed that the OpenStreetMap data are already downloaded for the interested area.
 The function returns a json object with all the informations.
 
 .. code-block:: python
 
-   from greento.utils.vector.VectorUtils import VectorUtils
+   from greento.utils.vector import vector
 
-   utils = VectorUtils(osm_area)
+   utils = vector(osm_area)
    land_use_percentages = utils.get_land_use_percentages()
 
 Convert the vector data in raster format using ``to_raster()``
@@ -545,9 +546,9 @@ In this example are used the data from Copernicus
 
 .. code-block:: python
 
-   from greento.utils.vector.VectorUtils import VectorUtils
+   from greento.utils.vector import vector
 
-   utils = VectorUtils(osm_area)
+   utils = vector(osm_area)
    raster_data = utils.to_raster(copernicus_area)
 
 .. raw:: html
@@ -566,9 +567,9 @@ This function calculate the estimated time for a specific vehicle and a specifie
 
 .. code-block:: python
 
-   from greento.utils.GeoUtils import GeoUtils
+   from greento.utils.geo import geo
 
-   utils = GeoUtils()
+   utils = geo()
    utils._calculate_travel_time(600, "walk")
 
 ``get_coordinates_from_address(address)``
@@ -578,9 +579,9 @@ This function converts the given address in coordinates returning a tuple with l
 
 .. code-block:: python
 
-   from greento.utils.GeoUtils import GeoUtils
+   from greento.utils.geo import geo
 
-   utils = GeoUtils()
+   utils = geo()
    utils.get_coordinates_from_address("Via Garibaldi 5, Torino")
 
 ``get_address_from_coordinates(latitude, longitude)``
@@ -590,9 +591,9 @@ This function converts the given coordinates returning an address corresponding.
 
 .. code-block:: python
 
-   from greento.utils.GeoUtils import GeoUtils
+   from greento.utils.geo import geo
 
-   utils = GeoUtils()
+   utils = geo()
    utils.get_address_from_coordinates(45.0705, 7.6936)
 
 ``get_coordinates_max_population(ghs_pop)``
@@ -603,9 +604,9 @@ It returns a tuple with latitude, longitude.
 
 .. code-block:: python
 
-   from greento.utils.GeoUtils import GeoUtils
+   from greento.utils.geo import geo
 
-   utils = GeoUtils()
+   utils = geo()
    utils.get_coordinates_max_population(ghs_pop)
 
 ``haversine_distance(lon1, lat1, lons2, lats2)``
@@ -615,9 +616,9 @@ This function calculate the euclidean distance from two points giving the latitu
 
 .. code-block:: python
 
-   from greento.utils.GeoUtils import GeoUtils
+   from greento.utils.geo import geo
 
-   utils = GeoUtils()
+   utils = geo()
    utils.haversine_distance(lon1, lat1, 7.6784, 45.0637)
 
 ``adjust_detail_level(osm, copernicus, ghs_pop)``
@@ -627,7 +628,8 @@ This function need three raster datasets.
 It returns the two of them with the lowest resolution upscaled.
 
 .. code-block:: python
-   from greento.utils.GeoUtils import GeoUtils
 
-   utils = GeoUtils()
+   from greento.utils.geo import geo
+
+   utils = geo()
    utils.adjust_detail_level(osm, copernicus, ghs_pop)
