@@ -39,14 +39,6 @@ html_show_sourcelink = False
 html_copy_source = False
 html_sourcelink_suffix = ''
 
-html_theme_options = { 
-    "show_source_link": False,
-    "use_source_button": False,
-    "source_link_position": "none",
-    "source_repository": "",  
-    "source_branch": "",      
-    "source_directory": "",
-}
 
 html_css_files = [
     'css/custom.css',
