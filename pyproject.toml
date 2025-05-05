@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "greento"
+version = "0.1"
+description = "Spatial accessibility metrics for green areas"
+authors = [
+    { name = "Lorenzo Pelanda", email = "lorenzo.pelanda@edu.unito.it" },
+    { name = "Rossano Schifanella", email = "rossano.schifanella@unito.it" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "requests",
+    "shapely",
+    "pyproj",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "osmnx",
+    "openeo",
+    "rasterio",
+    "tqdm",
+    "geopandas",
+    "networkx",
+    "scipy"
+]
+
+[project.urls]
+homepage = "https://github.com/lorenzopelanda/geo-analysis"
+documentation = "https://github.com/lorenzopelanda/geo-analysis/docs"

@@ -1,0 +1,16 @@
+version: 0.1
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.10"
+
+python:
+  install:
+    - method: pip
+      path: .
+    - method: pip
+      file: pyproject.toml
+
+sphinx:
+  configuration: docs/conf.py
