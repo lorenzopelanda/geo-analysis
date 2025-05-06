@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class interface(ABC):
     """
     An abstract base class for calculating metrics using geographical data.
@@ -13,7 +14,7 @@ class interface(ABC):
     """
 
     @abstractmethod
-    def green_area_per_person(self):
+    def green_area_per_person(self) -> str:
         """
         Calculates the green area per person.
 
@@ -25,7 +26,9 @@ class interface(ABC):
         pass
 
     @abstractmethod
-    def get_isochrone_green(self, lat, lon, max_time, transport_mode):
+    def get_isochrone_green(
+        self, lat: float, lon: float, max_time: float, transport_mode: str
+    ) -> str:        
         """
         Calculates the reachable green areas within a given time from a starting point.
 

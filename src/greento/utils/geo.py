@@ -3,8 +3,9 @@ import rasterio
 import numpy as np
 import logging
 from tqdm import tqdm
-from typing import Tuple
+from typing import Tuple, Optional, Dict, Any
 from rasterio.warp import reproject, Resampling
+
 
 class geo:
     """
@@ -25,7 +26,10 @@ class geo:
     adjust_detail_level(osm: dict, copernicus: dict, ghs_pop: dict) -> dict
         Adjusts the detail level of the given raster datasets to match the highest resolution.
     """
-    def _calculate_travel_time(self, distance_meters: float, transport_mode: str) -> float:
+
+    def _calculate_travel_time(
+        self, distance_meters: float, transport_mode: str
+    ) -> float:
         """
         Calculates the estimated travel time for a given distance and transport mode.
 
@@ -43,41 +47,45 @@ class geo:
         """
         # Speed constants in km/h
         SPEEDS = {
-            'walk': 1.4,  # 5 km/h
-            'bike': 4.17,  # 15 km/h
-            'drive': 8.33,  # 30 km/h (urban)
-            'all_public': 8.33,  # 30 km/h
-            'drive_service': 8.33  # as drive
+            "walk": 1.4,  # 5 km/h
+            "bike": 4.17,  # 15 km/h
+            "drive": 8.33,  # 30 km/h (urban)
+            "all_public": 8.33,  # 30 km/h
+            "drive_service": 8.33,  # as drive
         }
 
         # Medium time of fixed delays in minutes
         FIXED_DELAYS = {
-            'walk': 0,
-            'bike': 30,  # take/return bike
-            'drive': 180,  # parking + take the car
-            'all_public': 420,  # walk to the stop (3 min) + estimated wait (4 min)
-            'drive_service': 180  # wait + call
+            "walk": 0,
+            "bike": 30,  # take/return bike
+            "drive": 180,  # parking + take the car
+            "all_public": 420,  # walk to the stop (3 min) + estimated wait (4 min)
+            "drive_service": 180,  # wait + call
         }
 
         # Delay factors depending on traffic and semaphores
         DELAY_FACTORS = {
-            'walk': 1.15,  # semaphores for pedestrians
-            'bike': 1.2,  # semaphores and traffic
-            'drive': 1.25,  # traffic and semaphores
-            'all_public': 1.10,  # traffic and semaphores
-            'drive_service': 1.25  # as drive
+            "walk": 1.15,  # semaphores for pedestrians
+            "bike": 1.2,  # semaphores and traffic
+            "drive": 1.25,  # traffic and semaphores
+            "all_public": 1.10,  # traffic and semaphores
+            "drive_service": 1.25,  # as drive
         }
 
         base_speed = SPEEDS[transport_mode]
         base_time_seconds = distance_meters / base_speed
 
-        total_time_seconds = (base_time_seconds * DELAY_FACTORS[transport_mode]) + FIXED_DELAYS[transport_mode]
+        total_time_seconds = (
+            base_time_seconds * DELAY_FACTORS[transport_mode]
+        ) + FIXED_DELAYS[transport_mode]
 
         total_time_minutes = round(total_time_seconds / 60, 1)
 
         return total_time_minutes
-    
-    def get_coordinates_from_address(self, address: str) -> Tuple[float, float]:
+
+    def get_coordinates_from_address(
+        self, address: str
+    ) -> Optional[Tuple[float, float]]:
         """
         Gets the latitude and longitude coordinates for a given address.
 
@@ -97,14 +105,8 @@ class geo:
             If the address is not found.
         """
         url = "https://nominatim.openstreetmap.org/search"
-        params = {
-            "q": address,
-            "format": "json",
-            "limit": 1
-        }
-        headers = {
-            "User-Agent": "GreenTo/1.0"
-        }
+        params = {"q": address, "format": "json", "limit": 1}
+        headers = {"User-Agent": "GreenTo/1.0"}
         response = requests.get(url, params=params, headers=headers, timeout=10)
         response.raise_for_status()
 
@@ -116,9 +118,9 @@ class geo:
         else:
             logger = logging.getLogger(__name__)
             logger.error(f"Address not found: {address}")
-            return None, None
+            return None
 
-    def get_address_from_coordinates(self, lat: float, lon: float) -> str:
+    def get_address_from_coordinates(self, lat: float, lon: float) -> Optional[str]:
         """
         Gets the address for given latitude and longitude coordinates.
 
@@ -140,27 +142,21 @@ class geo:
             If the address is not found.
         """
         url = "https://nominatim.openstreetmap.org/reverse"
-        params = {
-            "lat": lat,
-            "lon": lon,
-            "format": "json"
-        }
-        headers = {
-            "User-Agent": "GreenTo/1.0"
-        }
+        params = {"lat": lat, "lon": lon, "format": "json"}
+        headers = {"User-Agent": "GreenTo/1.0"}
 
         response = requests.get(url, params=params, headers=headers, timeout=10)
         response.raise_for_status()
 
         data = response.json()
         if "display_name" in data:
-            return data["display_name"]
+            return str(data["display_name"])
         else:
             logger = logging.getLogger(__name__)
             logger.error(f"Address not found for coordinates: {lat}, {lon}")
             return None
 
-    def get_coordinates_max_population(self, ghs_pop: dict) -> Tuple[float, float]:
+    def get_coordinates_max_population(self, ghs_pop: Dict[str, Any]) -> Tuple[float, float]:
         """
         Gets the coordinates of the cell with the maximum population.
 
@@ -174,9 +170,11 @@ class geo:
         tuple
             A tuple containing the latitude and longitude coordinates of the cell with the maximum population.
         """
-        with tqdm(total=100, desc="Getting coordinates of maximum population", leave=False) as pbar:
-            data = ghs_pop['data']
-            transform = ghs_pop['transform']
+        with tqdm(
+            total=100, desc="Getting coordinates of maximum population", leave=False
+        ) as pbar:
+            data = ghs_pop["data"]
+            transform = ghs_pop["transform"]
             pbar.update(30)
             idx = np.unravel_index(np.argmax(data, axis=None), data.shape)
             pbar.update(50)
@@ -185,9 +183,10 @@ class geo:
             pbar.set_description("Coordinates of maximum population found")
             pbar.close()
         return (lat, lon)
-    
 
-    def haversine_distance(self, lon1: float, lat1: float, lons2: float, lats2: float) -> float:
+    def haversine_distance(
+        self, lon1: float, lat1: float, lons2: float, lats2: float
+    ) -> float:
         """
         Calculates the Haversine distance between two points.
 
@@ -209,7 +208,6 @@ class geo:
         """
         R = 6371  # Earth radius in km
 
-
         lat1 = np.radians(lat1)
         lon1 = np.radians(lon1)
         lats2 = np.radians(lats2)
@@ -220,9 +218,11 @@ class geo:
         a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lats2) * np.sin(dlon / 2) ** 2
         c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
-        return R * c
-    
-    def adjust_detail_level(self, osm: dict, copernicus: dict, ghs_pop: dict) -> dict:
+        return float(R * c)
+
+    def adjust_detail_level(
+        self, osm: Dict[str, Any], copernicus: Dict[str, Any], ghs_pop: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """
         Adjusts the detail level of the given raster datasets to match the highest resolution.
 
@@ -247,23 +247,27 @@ class geo:
         """
         if osm is None or copernicus is None or ghs_pop is None:
             logger = logging.getLogger(__name__)
-            logger.error("One or more raster datasets are None. Check rasterization process.")
+            logger.error(
+                "One or more raster datasets are None. Check rasterization process."
+            )
             return None
 
-        area_1_pixel_size = abs(copernicus['transform'][0] * copernicus['transform'][4])
-        area_2_pixel_size = abs(osm['transform'][0] * osm['transform'][4])
-        area_3_pixel_size = abs(ghs_pop['transform'][0] * ghs_pop['transform'][4])
+        area_1_pixel_size = abs(copernicus["transform"][0] * copernicus["transform"][4])
+        area_2_pixel_size = abs(osm["transform"][0] * osm["transform"][4])
+        area_3_pixel_size = abs(ghs_pop["transform"][0] * ghs_pop["transform"][4])
 
-        pixel_sizes = [(area_1_pixel_size, copernicus, 'copernicus'),
-                       (area_2_pixel_size, osm, 'osm'),
-                       (area_3_pixel_size, ghs_pop, 'ghs_pop')]
-        pixel_sizes.sort(key=lambda x: x[0])  
+        pixel_sizes = [
+            (area_1_pixel_size, copernicus, "copernicus"),
+            (area_2_pixel_size, osm, "osm"),
+            (area_3_pixel_size, ghs_pop, "ghs_pop"),
+        ]
+        pixel_sizes.sort(key=lambda x: x[0])
 
         target_area = pixel_sizes[0][1]
 
-        target_transform = target_area['transform']
-        target_crs = target_area['crs']
-        target_shape = target_area['shape']
+        target_transform = target_area["transform"]
+        target_crs = target_area["crs"]
+        target_shape = target_area["shape"]
 
         if len(target_shape) == 2:
             target_height, target_width = target_shape
@@ -274,28 +278,32 @@ class geo:
             logger.error(f"Unexpected shape for target: {target_shape}")
             return None
 
-        result = {
-            'copernicus': None,
-            'osm': None,
-            'ghs_pop': None,
-            'highest_res_area': pixel_sizes[0][2]  
+        result: Dict[str, Any] = {
+            "copernicus": None,
+            "osm": None,
+            "ghs_pop": None,
+            "highest_res_area": pixel_sizes[0][2],
         }
 
-        with tqdm(total=len(pixel_sizes), desc="Adjusting detail level", leave=False) as pbar:
+        with tqdm(
+            total=len(pixel_sizes), desc="Adjusting detail level", leave=False
+        ) as pbar:
             for pixel_size, area, area_name in pixel_sizes:
-                source_data = area['data']
-                source_transform = area['transform']
-                source_crs = area['crs']
+                source_data = area["data"]
+                source_transform = area["transform"]
+                source_crs = area["crs"]
 
                 if area_name == pixel_sizes[0][2]:
                     result[area_name] = {
                         "data": source_data,
                         "transform": target_transform,
                         "crs": target_crs,
-                        "shape": (target_height, target_width)
+                        "shape": (target_height, target_width),
                     }
                 else:
-                    source_resampled = np.empty((target_height, target_width), dtype=source_data.dtype)
+                    source_resampled = np.empty(
+                        (target_height, target_width), dtype=source_data.dtype
+                    )
 
                     reproject(
                         source=source_data,
@@ -304,16 +312,16 @@ class geo:
                         src_crs=source_crs,
                         dst_transform=target_transform,
                         dst_crs=target_crs,
-                        resampling=Resampling.bilinear
-                    )   
+                        resampling=Resampling.bilinear,
+                    )
 
                     result[area_name] = {
                         "data": source_resampled,
                         "transform": target_transform,
                         "crs": target_crs,
-                        "shape": (target_height, target_width)
+                        "shape": (target_height, target_width),
                     }
-                pbar.update(1)    
+                pbar.update(1)
             pbar.set_description("Detail level adjusted")
             pbar.close()
         return result

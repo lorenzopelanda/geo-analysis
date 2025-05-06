@@ -4,10 +4,11 @@ import tempfile
 import rasterio
 import logging
 from tqdm import tqdm
-from typing import Dict
+from typing import Dict, Optional, Any
 from openeo.rest.connection import Connection
 from greento.boundingbox import boundingbox
 from greento.data.interface import interface
+
 
 class copernicus(interface):
     """
@@ -46,7 +47,14 @@ class copernicus(interface):
     get_data(bounding_box)
         Downloads data for the specified bounding box.
     """
-    def __init__(self, client_id:str =None, client_secret:str =None, token_url: str=None, use_oidc: bool =False) -> None:
+
+    def __init__(
+        self,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        token_url: Optional[str] = None,
+        use_oidc: bool = False,
+    ) -> None:
         """
         Initializes the CopernicusDownloader with optional authentication parameters.
 
@@ -86,18 +94,20 @@ class copernicus(interface):
         """
         if not self.client_id or not self.client_secret or not self.token_url:
             logger = logging.getLogger(__name__)
-            logger.warning("Could not download: Client ID, Client Secret, and Token URL must be provided for token-based authentication.")
+            logger.warning(
+                "Could not download: Client ID, Client Secret, and Token URL must be provided for token-based authentication."
+            )
             return
 
         data = {
-            'grant_type': 'client_credentials',
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
+            "grant_type": "client_credentials",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
         }
 
         response = requests.post(self.token_url, data=data)
         if response.status_code == 200:
-            self.access_token = response.json()['access_token']
+            self.access_token = response.json()["access_token"]
         else:
             self.access_token = None
 
@@ -121,7 +131,7 @@ class copernicus(interface):
                 connection.authenticate_oidc()
         return connection
 
-    def get_data(self, bounding_box: "boundingbox") -> Dict:
+    def get_data(self, bounding_box: "boundingbox") -> Dict[str,Any]:
         """
         Downloads data for the specified bounding box.
 
@@ -149,9 +159,7 @@ class copernicus(interface):
             pbar.update(10)
 
             datacube = connection.load_collection(
-                "ESA_WORLDCOVER_10M_2021_V2",
-                spatial_extent=aoi_geojson,
-                bands=["MAP"]
+                "ESA_WORLDCOVER_10M_2021_V2", spatial_extent=aoi_geojson, bands=["MAP"]
             )
             pbar.update(30)
 
@@ -172,7 +180,5 @@ class copernicus(interface):
             "data": data,
             "transform": copernicus_transform,
             "crs": copernicus_crs,
-            "shape": copernicus_shape
+            "shape": copernicus_shape,
         }
-
-

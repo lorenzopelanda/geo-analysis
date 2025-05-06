@@ -7,7 +7,7 @@ build:
   jobs:
     pre_build:
       - pip install -e .
-      - pip install sphinx==5.0 pydata-sphinx-theme==0.13.3 sphinx-autodoc-typehints sphinx-copybutton
+      - pip install sphinx==5.0 pydata-sphinx-theme==0.13.3 sphinx-autodoc-typehints sphinx-copybutton myst-parser
 
 sphinx:
   configuration: docs/conf.py

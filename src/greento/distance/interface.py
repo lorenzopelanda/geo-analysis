@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Any
+
+
 class interface(ABC):
     """
     An abstract base class for calculating distances and directions.
@@ -12,7 +15,9 @@ class interface(ABC):
     """
 
     @abstractmethod
-    def directions(self, lat, lon,start_lat, start_lon, transport_mode):
+    def directions(
+        self, lat: float, lon: float, start_lat: float, start_lon: float, transport_mode: str
+    ) -> Any:
         """
         Calculates the shortest path and estimated travel time between two points.
 
@@ -35,8 +40,9 @@ class interface(ABC):
             The calculated directions and travel time.
         """
         pass
+
     @abstractmethod
-    def get_nearest_green_position(self, lat, lon):
+    def get_nearest_green_position(self, lat: float, lon: float) -> Any:
         """
         Finds the nearest green area from a given starting point.
 

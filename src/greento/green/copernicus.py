@@ -1,6 +1,8 @@
 import numpy as np
 from tqdm import tqdm
+from typing import Dict, Any
 from greento.green.interface import interface
+
 
 class copernicus(interface):
     """
@@ -17,7 +19,7 @@ class copernicus(interface):
         Filters and processes green areas from the Copernicus data.
     """
 
-    def __init__(self, copernicus: dict) -> None:
+    def __init__(self, copernicus: Dict[str, Any]) -> None:
         """
         Initializes the GreenCopernicus class with Copernicus data.
 
@@ -36,7 +38,7 @@ class copernicus(interface):
         """
         self.copernicus = copernicus
 
-    def get_green(self, **kwargs) -> dict:
+    def get_green(self, **kwargs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Filters and processes green areas from the Copernicus data.
 
@@ -44,8 +46,8 @@ class copernicus(interface):
         ----------
         **kwargs : dict, optional
             Additional arguments to specify green areas.
-            - green_areas (frozenset, optional): A set of values representing green areas 
-              (default is frozenset([10, 20, 30])).
+            - green_areas (frozenset, optional): A set of values representing green areas
+            (default is frozenset([10, 20, 30])).
 
         Returns
         -------
@@ -61,16 +63,20 @@ class copernicus(interface):
         The method uses the `numpy` library to filter raster data and the `tqdm` library to display progress.
         """
         if kwargs is None:
-            green_areas = frozenset([10,20, 30]) # 10: tree cover, 20: shrubland, 30: grassland
+            green_areas = frozenset(
+                [10, 20, 30]
+            )  # 10: tree cover, 20: shrubland, 30: grassland
         else:
-            green_areas = kwargs.get('green_areas', frozenset([10, 20, 30]))
+            green_areas = kwargs.get("green_areas", frozenset([10, 20, 30]))
 
-        data = self.copernicus['data']
-        transform = self.copernicus['transform']
-        copernicus_crs = self.copernicus['crs']
-        copernicus_shape = self.copernicus['shape']
+        data = self.copernicus["data"]
+        transform = self.copernicus["transform"]
+        copernicus_crs = self.copernicus["crs"]
+        copernicus_shape = self.copernicus["shape"]
 
-        with tqdm(total=100, desc="Filtering Copernicus green areas", leave=False) as pbar:
+        with tqdm(
+            total=100, desc="Filtering Copernicus green areas", leave=False
+        ) as pbar:
             green_mask = np.isin(data, list(green_areas))
             pbar.update(50)
             raster = np.zeros_like(data, dtype=np.uint8)
@@ -82,6 +88,6 @@ class copernicus(interface):
                 "data": raster,
                 "transform": transform,
                 "crs": copernicus_crs,
-                "shape": copernicus_shape
+                "shape": copernicus_shape,
             }
             return result

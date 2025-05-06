@@ -37,7 +37,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon"  
+    "sphinx.ext.napoleon",
+    "myst_parser",
+    "sphinx_copybutton",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.inheritance_diagram",
 ]
 
 
@@ -79,3 +83,9 @@ napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
+
+# -- MyST-Parser configuration ---------------------------------------------
+myst_enable_extensions = [
+    "colon_fence",                 
+    "deflist",                     
+]

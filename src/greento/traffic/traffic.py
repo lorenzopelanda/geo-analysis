@@ -2,8 +2,9 @@ import osmnx as ox
 import geopandas as gpd
 import logging
 from tqdm import tqdm
-from typing import Tuple
+from typing import Tuple, Optional
 from greento.boundingbox import boundingbox
+
 
 class traffic:
     """
@@ -19,6 +20,7 @@ class traffic:
     get_traffic_area(network_type: str) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]
         Downloads the OSM network data for a given bounding box and network type, and processes it into GeoDataFrames.
     """
+
     def __init__(self, bounding_box: "boundingbox") -> None:
         """
         Initializes the Traffic class with a bounding box.
@@ -34,7 +36,9 @@ class traffic:
         """
         self.bounding_box = bounding_box
 
-    def get_traffic_area(self, network_type: str) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_traffic_area(
+        self, network_type: str
+    ) -> Optional[Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]]:
         """
         Downloads the OSM network data for a given bounding box and network type, and processes it into GeoDataFrames.
 
@@ -61,9 +65,11 @@ class traffic:
         """
         bounding_box = self.bounding_box
         aoi_box = bounding_box.to_geometry()
-        with tqdm(total = 100, desc= "Downloading traffic data", leave=False) as pbar:
+        with tqdm(total=100, desc="Downloading traffic data", leave=False) as pbar:
             pbar.update(10)
-            graph = ox.graph_from_polygon(aoi_box, network_type=network_type, simplify=True)
+            graph = ox.graph_from_polygon(
+                aoi_box, network_type=network_type, simplify=True
+            )
             pbar.update(40)
             pbar.set_description("Processing traffic data")
 
@@ -79,14 +85,14 @@ class traffic:
             edges = gpd.clip(edges, aoi_box)
             pbar.update(10)
 
-            nodes['x'] = nodes.geometry.x
-            nodes['y'] = nodes.geometry.y
+            nodes["x"] = nodes.geometry.x
+            nodes["y"] = nodes.geometry.y
 
             if nodes.empty or edges.empty:
                 logger = logging.getLogger(__name__)
                 logger.warning("Empty nodes or edges after processing")
                 return None
-            
+
             pbar.update(10)
             pbar.set_description("Finished obtaining traffic data")
             pbar.close()

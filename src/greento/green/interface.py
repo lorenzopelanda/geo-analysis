@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict
 
 class interface(ABC):
     """
@@ -11,7 +12,7 @@ class interface(ABC):
     """
 
     @abstractmethod
-    def get_green(self, **kwargs):
+    def get_green(self, **kwargs: Dict[str, Any]) -> Any:
         """
         Filters and processes green areas.
 

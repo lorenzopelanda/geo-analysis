@@ -3,10 +3,11 @@ import geopandas as gpd
 import osmnx as ox
 import pyproj
 import logging
-from typing import Tuple, Union, Dict
+from typing import Tuple, Union, Dict, Optional, List, Any
 from pyproj import Transformer
 from tqdm import tqdm
 from shapely.geometry import box, Point, mapping, Polygon
+
 
 class boundingbox:
     """
@@ -49,7 +50,14 @@ class boundingbox:
         Returns a string representation of the bounding box.
     """
 
-    def __init__(self, min_x: float =None, min_y: float =None, max_x: float =None, max_y: float =None, crs: str ="EPSG:4326") -> None:
+    def __init__(
+        self,
+        min_x: Optional[float] = None,
+        min_y: Optional[float] = None,
+        max_x: Optional[float] = None,
+        max_y: Optional[float] = None,
+        crs: str = "EPSG:4326",
+    ) -> None:
         """
         Initializes the bounding box with optional coordinates and CRS.
 
@@ -77,7 +85,9 @@ class boundingbox:
         self.polygon = None
         self.crs = crs
 
-    def __from_coordinates(self, min_x: float, min_y: float, max_x:float, max_y:float) -> "boundingbox":
+    def __from_coordinates(
+        self, min_x: float, min_y: float, max_x: float, max_y: float
+    ) -> "boundingbox":
         """
         Creates a bounding box from given coordinates.
 
@@ -104,7 +114,9 @@ class boundingbox:
         self.polygon = self.to_geometry()
         return self
 
-    def __from_center_radius(self, center_x:float, center_y: float, radius_km: float) -> "boundingbox":
+    def __from_center_radius(
+        self, center_x: float, center_y: float, radius_km: float
+    ) -> "boundingbox":
         """
         Creates a bounding box from a center point and radius.
 
@@ -132,7 +144,7 @@ class boundingbox:
         self.polygon = self.to_geometry()
         return self
 
-    def __from_geojson(self, geojson: Union[str, Dict]) -> "boundingbox":
+    def __from_geojson(self, geojson: Union[str, Dict[Any, Any]]) -> Optional["boundingbox"]:
         """
         Creates a bounding box from a GeoJSON object.
 
@@ -164,9 +176,14 @@ class boundingbox:
             logger.error("GeoJSON must be either a valid JSON string or a dictionary")
             return None
 
-        min_x, min_y, max_x, max_y = float('inf'), float('inf'), float('-inf'), float('-inf')
+        min_x, min_y, max_x, max_y = (
+            float("inf"),
+            float("inf"),
+            float("-inf"),
+            float("-inf"),
+        )
 
-        def update_min_max(coords):
+        def update_min_max(coords: List[Tuple[float, float]]) -> None:
             nonlocal min_x, min_y, max_x, max_y
             for x, y in coords:
                 min_x = min(min_x, x)
@@ -175,17 +192,17 @@ class boundingbox:
                 max_y = max(max_y, y)
 
         try:
-            if geojson.get('type') == 'FeatureCollection':
-                for feature in geojson['features']:
-                    if feature['geometry']['type'] == 'Polygon':
-                        for ring in feature['geometry']['coordinates']:
+            if geojson.get("type") == "FeatureCollection":
+                for feature in geojson["features"]:
+                    if feature["geometry"]["type"] == "Polygon":
+                        for ring in feature["geometry"]["coordinates"]:
                             update_min_max(ring)
-            elif geojson.get('type') == 'Feature':
-                if geojson['geometry']['type'] == 'Polygon':
-                    for ring in geojson['geometry']['coordinates']:
+            elif geojson.get("type") == "Feature":
+                if geojson["geometry"]["type"] == "Polygon":
+                    for ring in geojson["geometry"]["coordinates"]:
                         update_min_max(ring)
-            elif geojson.get('type') == 'Polygon':
-                for ring in geojson['coordinates']:
+            elif geojson.get("type") == "Polygon":
+                for ring in geojson["coordinates"]:
                     update_min_max(ring)
             else:
                 logger = logging.getLogger(__name__)
@@ -197,7 +214,12 @@ class boundingbox:
             logger.error(f"Invalid GeoJSON structure: missing key {str(e)}")
             return None
 
-        if min_x == float('inf') or min_y == float('inf') or max_x == float('-inf') or max_y == float('-inf'):
+        if (
+            min_x == float("inf")
+            or min_y == float("inf")
+            or max_x == float("-inf")
+            or max_y == float("-inf")
+        ):
             logger = logging.getLogger(__name__)
             logger.error("No valid coordinates found in GeoJSON")
             return None
@@ -207,16 +229,18 @@ class boundingbox:
         self.max_x = max_x
         self.max_y = max_y
 
-        self.polygon = Polygon([
-            (self.min_x, self.min_y),
-            (self.max_x, self.min_y),
-            (self.max_x, self.max_y),
-            (self.min_x, self.max_y)
-        ])
+        self.polygon = Polygon(
+            [
+                (self.min_x, self.min_y),
+                (self.max_x, self.min_y),
+                (self.max_x, self.max_y),
+                (self.min_x, self.max_y),
+            ]
+        )
 
         return self
 
-    def to_geometry(self) -> Polygon:
+    def to_geometry(self) -> Optional[Polygon]:
         """
         Converts the bounding box to a Shapely geometry.
 
@@ -225,13 +249,18 @@ class boundingbox:
         shapely.geometry.Polygon
             The polygon representation of the bounding box.
         """
-        if self.min_x is None or self.min_y is None or self.max_x is None or self.max_y is None:
+        if (
+            self.min_x is None
+            or self.min_y is None
+            or self.max_x is None
+            or self.max_y is None
+        ):
             logger = logging.getLogger(__name__)
             logger.error("Bounding box coordinates are not set.")
             return None
         return box(self.min_x, self.min_y, self.max_x, self.max_y)
 
-    def to_geojson(self) -> Dict:
+    def to_geojson(self) -> Optional[Dict[str, Any]]:
         """
         Converts the bounding box to a GeoJSON format.
 
@@ -273,14 +302,18 @@ class boundingbox:
             max_x, max_y = transformer.transform(self.max_x, self.max_y)
             pbar.update(60)
 
-            result = boundingbox(min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y, crs=dst_crs)
+            result = boundingbox(
+                min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y, crs=dst_crs
+            )
             result.polygon = result.to_geometry()
             pbar.update(20)
             pbar.set_description("Bounding box transformed")
             pbar.close()
         return result
 
-    def get_bounding_box(self, query:str, method: str, is_address: bool =True, **kwargs) -> "boundingbox":
+    def get_bounding_box(
+        self, query: str, method: str, is_address: bool = True, **kwargs
+    ) -> Optional["boundingbox"]:
         """
         Creates a bounding box using the specified method.
 
@@ -300,26 +333,34 @@ class boundingbox:
         boundingbox
             The created bounding box object.
         """
-        if method == 'from_geojson':
-            geojson = kwargs.get('geojson')
-            return self.__from_geojson(geojson)
+        if method == "from_geojson":
+            geojson = kwargs.get("geojson")
+            if geojson is not None:
+                return self.__from_geojson(geojson)
 
-        if method == 'from_center_radius':
+        if method == "from_center_radius":
             coords = self.__get_coordinates(query, is_address=is_address)
             if coords is None:
                 return None
             center_point = Point(coords[1], coords[0])
-            radius_km = kwargs.get('radius_km', 10)
+            radius_km = kwargs.get("radius_km", 10)
             return self.__from_center_radius(center_point.x, center_point.y, radius_km)
 
-        elif method == 'from_coordinates':
-            min_x = kwargs.get('min_x')
-            min_y = kwargs.get('min_y')
-            max_x = kwargs.get('max_x')
-            max_y = kwargs.get('max_y')
-            return self.__from_coordinates(min_x, min_y, max_x, max_y)
+        elif method == "from_coordinates":
+            min_x = kwargs.get("min_x")
+            min_y = kwargs.get("min_y")
+            max_x = kwargs.get("max_x")
+            max_y = kwargs.get("max_y")
+            if None not in (min_x, min_y, max_x, max_y):
+                return self.__from_coordinates(min_x, min_y, max_x, max_y)
+            else:
+                logger = logging.getLogger(__name__)
+                logger.error("Coordinates for bounding box are not set.")
+                return None
 
-    def __get_coordinates(self, query: str, is_address: bool=True) -> Tuple[float, float]: 
+    def __get_coordinates(
+        self, query: str, is_address: bool = True
+    ) -> Optional[Tuple[float, float]]:
         """
         Gets coordinates by geocoding an address or finding the center of a municipality.
 
@@ -347,11 +388,15 @@ class boundingbox:
             if not gdf.empty:
                 gdf_projected = gdf.to_crs(epsg=3857)
                 center_projected = gdf_projected.geometry.centroid.iloc[0]
-                center = gpd.GeoSeries([center_projected], crs="EPSG:3857").to_crs(epsg=4326).iloc[0]
+                center = (
+                    gpd.GeoSeries([center_projected], crs="EPSG:3857")
+                    .to_crs(epsg=4326)
+                    .iloc[0]
+                )
                 return center.y, center.x
             else:
                 return None
-
+        return None    
 
     def __repr__(self) -> str:
         """

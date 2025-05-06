@@ -3,10 +3,11 @@ import geopandas as gpd
 import warnings
 import logging
 from tqdm import tqdm
-from typing import Tuple
+from typing import Tuple, Optional
 from shapely.geometry import Point, LineString, MultiLineString, Polygon, MultiPolygon
 from greento.boundingbox import boundingbox
 from greento.data.interface import interface
+
 
 class osm(interface):
     """
@@ -18,7 +19,9 @@ class osm(interface):
         Downloads and processes OSM data for the given bounding box.
     """
 
-    def get_data(self, bounding_box: "boundingbox") -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_data(
+        self, bounding_box: "boundingbox"
+    ) -> Optional[Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]]:
         """
         Downloads and processes OSM data for the given bounding box.
 
@@ -43,7 +46,11 @@ class osm(interface):
         -----
         The method uses the `osmnx` library to fetch OSM data and filters it into nodes and edges based on geometry types.
         """
-        steps = ["Converting bounding box to geometry", "Downloading OSM data", "Filtering data"]
+        steps = [
+            "Converting bounding box to geometry",
+            "Downloading OSM data",
+            "Filtering data",
+        ]
         with tqdm(total=100, desc="Overall Progress", unit="step", leave=False) as pbar:
             pbar.set_description(steps[0])
             aoi_box = bounding_box.to_geometry()
@@ -51,9 +58,7 @@ class osm(interface):
 
             with warnings.catch_warnings():
                 warnings.filterwarnings(
-                    'ignore',
-                    category=DeprecationWarning,
-                    message='.*iloc.*'
+                    "ignore", category=DeprecationWarning, message=".*iloc.*"
                 )
 
                 logger = logging.getLogger(__name__)
@@ -68,16 +73,18 @@ class osm(interface):
                             "highway": True,
                             "building": True,
                             "waterway": True,
-                            "water": True
-                        }
+                            "water": True,
+                        },
                     )
                     pbar.update(50)
                     if features.empty:
                         return (gpd.GeoDataFrame(), gpd.GeoDataFrame())
-                    
+
                     point_mask = features.geometry.apply(lambda g: isinstance(g, Point))
                     poly_mask = features.geometry.apply(
-                        lambda g: isinstance(g, (LineString, MultiLineString, Polygon, MultiPolygon))
+                        lambda g: isinstance(
+                            g, (LineString, MultiLineString, Polygon, MultiPolygon)
+                        )
                     )
 
                     nodes_gdf = features.loc[point_mask].copy()
@@ -89,7 +96,4 @@ class osm(interface):
 
                 except Exception as e:
                     logger.error(f"Error during OSM data download: {str(e)}")
-
-
-
-
+                    return None

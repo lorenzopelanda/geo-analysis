@@ -10,3 +10,6 @@ cache/
 greento.egg-info/
 examples/cache/
 tile_download.zip
+.ruff_cache/
+.mypy_cache/
+src/.mypy_cache/

@@ -3,10 +3,8 @@ import requests
 import zipfile
 import os
 import logging
-from typing import List
-from rasterio.merge import merge
-from shapely.geometry import box
-from tqdm import tqdm
+from typing import List, Optional
+
 
 class ghspop_io:
     """
@@ -21,7 +19,22 @@ class ghspop_io:
     __cleanup_files(file_paths: List[str]) -> None
         Cleans up temporary files and directories created during processing.
     """
-    def __download_tile(self, tile_id: str) -> str:
+    def __init__(self, extracted_dir: str = "extracted_files") -> None:
+        """
+        Initializes the GHS-POP IO class with a directory for extracted files.
+
+        Parameters
+        ----------
+        extracted_dir : str
+            The directory where extracted files will be stored.
+
+        Returns
+        -------
+        None
+        """
+        self.extracted_dir = extracted_dir
+        
+    def __download_tile(self, tile_id: str) -> Optional[str]:
         """
         Downloads a GHS-POP tile as a ZIP file from the specified URL.
 
@@ -38,13 +51,13 @@ class ghspop_io:
         url = f"https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2025_GLOBE_R2023A_4326_3ss/V1-0/tiles/GHS_POP_E2025_GLOBE_R2023A_4326_3ss_V1_0_{tile_id}.zip"
         response = requests.get(url)
         if response.status_code == 200:
-            zip_path = 'tile_download.zip'
-            with open(zip_path, 'wb') as file:
+            zip_path = "tile_download.zip"
+            with open(zip_path, "wb") as file:
                 file.write(response.content)
             return zip_path
         return None
 
-    def __extract_tif_file(self, zip_path: str) -> str:
+    def __extract_tif_file(self, zip_path: str) -> Optional[str]:
         """
         Extracts the TIF file from a downloaded ZIP file.
 
@@ -66,9 +79,9 @@ class ghspop_io:
         logger = logging.getLogger(__name__)
         tif_path = None
         try:
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
                 for file in zip_ref.namelist():
-                    if file.endswith('.tif'):
+                    if file.endswith(".tif"):
                         zip_ref.extract(file, self.extracted_dir)
                         tif_path = os.path.join(self.extracted_dir, file)
                         if not os.path.exists(tif_path):
@@ -83,7 +96,7 @@ class ghspop_io:
         except Exception as e:
             logger.error(f"Error during TIF extraction: {str(e)}")
             return None
-    
+
     def __cleanup_files(self, file_paths: List[str]) -> None:
         """
         Cleans up temporary files and directories created during processing.
@@ -112,7 +125,9 @@ class ghspop_io:
                 return None
 
         try:
-            if os.path.exists(self.extracted_dir) and not os.listdir(self.extracted_dir):
+            if os.path.exists(self.extracted_dir) and not os.listdir(
+                self.extracted_dir
+            ):
                 shutil.rmtree(self.extracted_dir)
         except Exception as e:
             logger.error(f"Error removing directory {self.extracted_dir}: {str(e)}")

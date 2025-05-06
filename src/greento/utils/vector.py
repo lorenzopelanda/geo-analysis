@@ -1,13 +1,12 @@
 import json
-import osmnx as ox
-import pandas as pd
 import numpy as np
 import geopandas as gpd
 import logging
 from tqdm import tqdm
-from typing import Tuple
-from rasterio.features import rasterize 
+from typing import Tuple, Optional, Dict, Any
+from rasterio.features import rasterize
 from greento.utils.interface import interface
+
 
 class vector(interface):
     """
@@ -25,7 +24,8 @@ class vector(interface):
     to_raster(reference_raster: dict) -> dict
         Rasterizes the OpenStreetMap vector data using a reference raster.
     """
-    def __init__(self, osm: Tuple) -> None:
+
+    def __init__(self, osm: Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]) -> None:
         """
         Initializes the VectorUtils with OSM data.
 
@@ -39,7 +39,7 @@ class vector(interface):
         None
         """
         self.osm = osm
-        
+
     def get_land_use_percentages(self) -> str:
         """
         Calculates the land use percentages from the OSM data.
@@ -54,17 +54,26 @@ class vector(interface):
         ValueError
             If the OSM data is not available or does not contain the required columns.
         """
+        logger = logging.getLogger(__name__)
         nodes, edges = self.osm
+
         if nodes is None or edges is None:
-            logger = logging.getLogger(__name__)
             logger.error("OSM data is not available.")
-            return None
-        land_use_types = nodes['natural'].value_counts().to_dict()
+            return json.dumps({"error": "OSM data is not available."})
+
+        if "natural" not in nodes.columns:
+            logger.error("The 'natural' column is missing in the nodes GeoDataFrame.")
+            return json.dumps({"error": "The 'natural' column is missing in the nodes GeoDataFrame."})
+
+        land_use_types = nodes["natural"].value_counts().to_dict()
         total = sum(land_use_types.values())
-        percentages = {key: round((count / total) * 100, 4) for key, count in land_use_types.items()}
+        percentages = {
+            key: round((count / total) * 100, 4)
+            for key, count in land_use_types.items()
+        }
         return json.dumps(percentages)
-    
-    def to_raster(self, reference_raster: dict) -> dict:
+
+    def to_raster(self, reference_raster: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
         Rasterizes the OpenStreetMap vector data using a reference raster.
 
@@ -92,13 +101,13 @@ class vector(interface):
             If the nodes or edges are not valid GeoDataFrames or do not contain a 'geometry' column.
         """
         nodes, edges = self.osm
-        ref_crs = reference_raster['crs']
+        ref_crs = reference_raster["crs"]
 
-        if not isinstance(nodes, gpd.GeoDataFrame) or 'geometry' not in nodes.columns:
+        if not isinstance(nodes, gpd.GeoDataFrame) or "geometry" not in nodes.columns:
             logger = logging.getLogger(__name__)
             logger.error("Nodes must be a GeoDataFrame and contain a 'geometry' column")
             return None
-        if not isinstance(edges, gpd.GeoDataFrame) or 'geometry' not in edges.columns:
+        if not isinstance(edges, gpd.GeoDataFrame) or "geometry" not in edges.columns:
             logger = logging.getLogger(__name__)
             logger.error("Edges must be a GeoDataFrame and contain a 'geometry' column")
             return None
@@ -107,32 +116,32 @@ class vector(interface):
             node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]
             node_rasterized = rasterize(
                 shapes=node_shapes,
-                out_shape=reference_raster['shape'],
-                transform=reference_raster['transform'],
+                out_shape=reference_raster["shape"],
+                transform=reference_raster["transform"],
                 fill=0,
                 dtype=np.uint8,
-                all_touched=True
+                all_touched=True,
             )
             pbar.update(40)
 
             edge_shapes = [(geom, 1) for geom in edges.geometry if geom is not None]
             edge_rasterized = rasterize(
                 shapes=edge_shapes,
-                out_shape=reference_raster['shape'],
-                transform=reference_raster['transform'],
+                out_shape=reference_raster["shape"],
+                transform=reference_raster["transform"],
                 fill=0,
                 dtype=np.uint8,
-                all_touched=True
+                all_touched=True,
             )
             pbar.update(40)
 
-            combined_raster = np.maximum(node_rasterized, edge_rasterized)  
+            combined_raster = np.maximum(node_rasterized, edge_rasterized)
             pbar.update(20)
             pbar.set_description("Finished rasterizing OSM data")
             pbar.close()
             return {
                 "data": combined_raster,
-                "transform": reference_raster['transform'],
+                "transform": reference_raster["transform"],
                 "crs": ref_crs,
-                "shape": reference_raster['shape']
+                "shape": reference_raster["shape"],
             }
