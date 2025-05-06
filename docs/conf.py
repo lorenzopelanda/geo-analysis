@@ -1,6 +1,7 @@
 # -- Project information -----------------------------------------------------
 import os
 import sys
+import pydata_sphinx_theme
 
 sys.path.insert(0, os.path.abspath('../src'))
 
