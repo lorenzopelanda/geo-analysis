@@ -1,11 +1,31 @@
 # -- Project information -----------------------------------------------------
 import os
 import sys
+import sphinx
 import pydata_sphinx_theme
 
 sys.path.insert(0, os.path.abspath('../src'))
 
 print("Python sys.path:", sys.path)
+print("Python version:", sys.version)
+print("Sphinx version:", sphinx.__version__)
+print("Theme version:", pydata_sphinx_theme.__version__)
+print("Current directory:", os.getcwd())
+print("Directory contents:", os.listdir("."))
+if os.path.exists("_static"):
+    print("_static contents:", os.listdir("_static"))
+
+
+html_static_path = [os.path.abspath(os.path.join(os.path.dirname(__file__), '_static'))]
+
+# Crea la directory _static se non esiste
+os.makedirs(os.path.join(os.path.dirname(__file__), '_static', 'css'), exist_ok=True)
+
+# Crea un file CSS minimo se non esiste
+css_file = os.path.join(os.path.dirname(__file__), '_static', 'css', 'custom.css')
+if not os.path.exists(css_file):
+    with open(css_file, 'w') as f:
+        f.write("/* Custom CSS */\n")
 
 project = 'GreenTo'
 copyright = '2025, GreenTo'
@@ -25,8 +45,10 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = 'pydata_sphinx_theme'
-html_static_path = ['_static']
+#html_theme = 'pydata_sphinx_theme'
+#html_static_path = ['_static']
+
+html_theme = 'sphinx_rtd_theme' 
 
 html_title = "GreenTo"
 

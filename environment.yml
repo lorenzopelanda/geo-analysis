@@ -1,0 +1,25 @@
+name: greento-docs
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - sphinx>=4.0.0
+    - pydata-sphinx-theme==0.13.3 
+    - sphinx-autodoc-typehints
+    - sphinx-copybutton
+    - requests
+    - shapely
+    - pyproj
+    - pandas
+    - numpy
+    - matplotlib
+    - osmnx
+    - openeo
+    - rasterio
+    - tqdm
+    - geopandas
+    - networkx
+    - scipy
