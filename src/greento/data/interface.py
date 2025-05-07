@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 from greento.boundingbox import boundingbox
 
+
 class interface(ABC):
     """
     An abstract base class for data downloaders.

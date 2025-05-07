@@ -131,7 +131,7 @@ class copernicus(interface):
                 connection.authenticate_oidc()
         return connection
 
-    def get_data(self, bounding_box: "boundingbox") -> Dict[str,Any]:
+    def get_data(self, bounding_box: "boundingbox") -> Dict[str, Any]:
         """
         Downloads data for the specified bounding box.
 

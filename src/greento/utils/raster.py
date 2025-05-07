@@ -29,7 +29,7 @@ class raster(interface):
         Transforms a raster to a new CRS with a different resolution and extent.
     """
 
-    def __init__(self, copernicus: Dict[str,Any]) -> None:
+    def __init__(self, copernicus: Dict[str, Any]) -> None:
         """
         Initializes the RasterUtils with Copernicus data.
 
@@ -77,7 +77,7 @@ class raster(interface):
         if copernicus_data.shape != osm_data.shape:
             logger = logging.getLogger(__name__)
             logger.error("Raster shapes do not match")
-            return None
+            raise ValueError("Raster shapes do not match")
 
         filtered_data = np.where((osm_data == 1) & (copernicus_data == 1), 1, 0)
 
@@ -176,7 +176,7 @@ class raster(interface):
         else:
             logger = logging.getLogger(__name__)
             logger.error("Shape of the data incorrect")
-            return None
+            raise ValueError("Shape of the data incorrect")
 
         bounds = rasterio.transform.array_bounds(height, width, src_transform)
 

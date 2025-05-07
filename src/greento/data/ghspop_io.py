@@ -19,6 +19,7 @@ class ghspop_io:
     __cleanup_files(file_paths: List[str]) -> None
         Cleans up temporary files and directories created during processing.
     """
+
     def __init__(self, extracted_dir: str = "extracted_files") -> None:
         """
         Initializes the GHS-POP IO class with a directory for extracted files.
@@ -33,8 +34,8 @@ class ghspop_io:
         None
         """
         self.extracted_dir = extracted_dir
-        
-    def __download_tile(self, tile_id: str) -> Optional[str]:
+
+    def _download_tile(self, tile_id: str) -> Optional[str]:
         """
         Downloads a GHS-POP tile as a ZIP file from the specified URL.
 
@@ -57,7 +58,7 @@ class ghspop_io:
             return zip_path
         return None
 
-    def __extract_tif_file(self, zip_path: str) -> Optional[str]:
+    def _extract_tif_file(self, zip_path: str) -> Optional[str]:
         """
         Extracts the TIF file from a downloaded ZIP file.
 

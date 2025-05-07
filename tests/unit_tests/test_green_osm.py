@@ -1,82 +1,82 @@
-import unittest
+import pytest
 import geopandas as gpd
 from shapely.geometry import Point, LineString
 from greento.green.osm import osm
 
-class test_green_osm(unittest.TestCase):
+@pytest.fixture
+def mock_osm_data():
+    """Fixture per creare dati mock per osm."""
+    mock_nodes = gpd.GeoDataFrame({
+        'id': [1, 2, 3],
+        'natural': ['wood', 'tree', 'rock'],
+        'geometry': [Point(0, 0), Point(1, 1), Point(2, 2)]
+    }, crs="EPSG:4326")
 
-    def setUp(self):
-        """Set up test fixtures before each test method."""
+    mock_edges = gpd.GeoDataFrame({
+        'id': [1, 2],
+        'landuse': ['forest', 'industrial'],
+        'geometry': [LineString([(0, 0), (1, 1)]), LineString([(1, 1), (2, 2)])]
+    }, crs="EPSG:4326")
 
-        self.mock_nodes = gpd.GeoDataFrame({
-            'id': [1, 2, 3],
-            'natural': ['wood', 'tree', 'rock'],
-            'geometry': [Point(0, 0), Point(1, 1), Point(2, 2)]
-        }, crs="EPSG:4326")
+    return mock_nodes, mock_edges
 
-        self.mock_edges = gpd.GeoDataFrame({
-            'id': [1, 2],
-            'landuse': ['forest', 'industrial'],
-            'geometry': [LineString([(0, 0), (1, 1)]), LineString([(1, 1), (2, 2)])]
-        }, crs="EPSG:4326")
+@pytest.fixture
+def green_osm(mock_osm_data):
+    """Fixture per creare un'istanza di osm."""
+    return osm(mock_osm_data)
 
-        self.green_osm = osm((self.mock_nodes, self.mock_edges))
+def test_get_green_default(green_osm):
+    """Test get_green con tag verdi predefiniti."""
+    result_nodes, result_edges = green_osm.get_green()
 
-    def test_get_green_default(self):
-        """Test get_green with default green tags."""
-        result_nodes, result_edges = self.green_osm.get_green()
+    expected_nodes = gpd.GeoDataFrame({
+        'id': [1, 2],
+        'natural': ['wood', 'tree'],
+        'geometry': [Point(0, 0), Point(1, 1)]
+    }, crs="EPSG:4326")
 
-        expected_nodes = gpd.GeoDataFrame({
-            'id': [1, 2],
-            'natural': ['wood', 'tree'],
-            'geometry': [Point(0, 0), Point(1, 1)]
-        }, crs="EPSG:4326")
+    expected_edges = gpd.GeoDataFrame({
+        'id': [1],
+        'landuse': ['forest'],
+        'geometry': [LineString([(0, 0), (1, 1)])]
+    }, crs="EPSG:4326")
 
-        expected_edges = gpd.GeoDataFrame({
-            'id': [1],
-            'landuse': ['forest'],
-            'geometry': [LineString([(0, 0), (1, 1)])]
-        }, crs="EPSG:4326")
+    assert result_nodes.equals(expected_nodes)
+    assert result_edges.equals(expected_edges)
 
-        self.assertTrue(result_nodes.equals(expected_nodes))
-        self.assertTrue(result_edges.equals(expected_edges))
+def test_get_green_custom_tags(green_osm):
+    """Test get_green con tag verdi personalizzati."""
+    custom_tags = {
+        'natural': ['rock'],
+        'landuse': ['industrial']
+    }
+    result_nodes, result_edges = green_osm.get_green(green_tags=custom_tags)
 
-    def test_get_green_custom_tags(self):
-        """Test get_green with custom green tags."""
-        custom_tags = {
-            'natural': ['rock'],
-            'landuse': ['industrial']
-        }
-        result_nodes, result_edges = self.green_osm.get_green(green_tags=custom_tags)
+    expected_nodes = gpd.GeoDataFrame({
+        'id': [3],
+        'natural': ['rock'],
+        'geometry': [Point(2, 2)]
+    }, crs="EPSG:4326")
 
-        expected_nodes = gpd.GeoDataFrame({
-            'id': [3],
-            'natural': ['rock'],
-            'geometry': [Point(2, 2)]
-        }, crs="EPSG:4326")
+    expected_edges = gpd.GeoDataFrame({
+        'id': [2],
+        'landuse': ['industrial'],
+        'geometry': [LineString([(1, 1), (2, 2)])]
+    }, crs="EPSG:4326")
 
-        expected_edges = gpd.GeoDataFrame({
-            'id': [2],
-            'landuse': ['industrial'],
-            'geometry': [LineString([(1, 1), (2, 2)])]
-        }, crs="EPSG:4326")
+    result_nodes = result_nodes.sort_values(by="id").reset_index(drop=True)
+    expected_nodes = expected_nodes.sort_values(by="id").reset_index(drop=True)
+    result_edges = result_edges.sort_values(by="id").reset_index(drop=True)
+    expected_edges = expected_edges.sort_values(by="id").reset_index(drop=True)
 
-        result_nodes = result_nodes.sort_values(by="id").reset_index(drop=True)
-        expected_nodes = expected_nodes.sort_values(by="id").reset_index(drop=True)
-        result_edges = result_edges.sort_values(by="id").reset_index(drop=True)
-        expected_edges = expected_edges.sort_values(by="id").reset_index(drop=True)
+    assert result_nodes.equals(expected_nodes)
+    assert result_edges.equals(expected_edges)
 
-        self.assertTrue(result_nodes.equals(expected_nodes))
-        self.assertTrue(result_edges.equals(expected_edges))
+def test_get_green_empty_data():
+    """Test get_green con GeoDataFrame vuoti."""
+    empty_osm = (gpd.GeoDataFrame(geometry=[]), gpd.GeoDataFrame(geometry=[]))
+    green_osm = osm(empty_osm)
+    result_nodes, result_edges = green_osm.get_green()
 
-    def test_get_green_empty_data(self):
-        """Test get_green with empty GeoDataFrames."""
-        empty_osm = (gpd.GeoDataFrame(geometry=[]), gpd.GeoDataFrame(geometry=[]))
-        green_osm = osm(empty_osm)
-        result_nodes, result_edges = green_osm.get_green()
-
-        self.assertTrue(result_nodes.empty)
-        self.assertTrue(result_edges.empty)
-
-if __name__ == "__main__":
-    unittest.main()
+    assert result_nodes.empty
+    assert result_edges.empty

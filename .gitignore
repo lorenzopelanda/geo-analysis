@@ -13,3 +13,7 @@ tile_download.zip
 .ruff_cache/
 .mypy_cache/
 src/.mypy_cache/
+.pytest_cache/
+.vscode/
+.nox/
+build/

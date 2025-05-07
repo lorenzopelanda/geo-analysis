@@ -156,7 +156,9 @@ class geo:
             logger.error(f"Address not found for coordinates: {lat}, {lon}")
             return None
 
-    def get_coordinates_max_population(self, ghs_pop: Dict[str, Any]) -> Tuple[float, float]:
+    def get_coordinates_max_population(
+        self, ghs_pop: Dict[str, Any]
+    ) -> Tuple[float, float]:
         """
         Gets the coordinates of the cell with the maximum population.
 

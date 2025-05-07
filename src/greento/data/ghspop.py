@@ -163,9 +163,9 @@ class ghspop(interface):
 
         return (merged_data[0], merged_transform, tiles[0][2], merged_data.shape[1:])
 
-    def __process_single_tile(
+    def _process_single_tile(
         self, tile_id: str
-    ) -> Optional[Tuple[np.ndarray[Any, np.dtype[np.float32]], Affine, str, Tuple[int, int]]]:
+    ) -> Optional[Tuple[np.ndarray, Affine, str, Tuple[int, int]]]:
         """
         Downloads and processes a single tile by extracting its raster data.
 
@@ -186,12 +186,12 @@ class ghspop(interface):
         ghs_io = ghspop_io()
         logger = logging.getLogger(__name__)
         try:
-            zip_path = ghs_io.__download_tile(tile_id)
+            zip_path = ghs_io._download_tile(tile_id)
             if not zip_path:
                 logger.warning(f"Failed to download tile {tile_id}")
                 return None
 
-            tif_path = ghs_io.__extract_tif_file(zip_path)
+            tif_path = ghs_io._extract_tif_file(zip_path)
             if tif_path is None:
                 logger.warning(f"Failed to extract TIF file from {zip_path}")
                 return None
@@ -206,7 +206,7 @@ class ghspop(interface):
 
     def __download_and_process_tiles(
         self, tile_ids: List[str]
-    ) -> Tuple[np.ndarray[Any, np.dtype[np.float32]], Affine, str, Tuple[int, int]]:
+    ) -> Tuple[np.ndarray, Affine, str, Tuple[int, int]]:
         """
         Downloads and processes multiple tiles by merging their raster data.
 
@@ -233,7 +233,7 @@ class ghspop(interface):
         logger = logging.getLogger(__name__)
         try:
             for tile_id in tile_ids:
-                tile_data = self.__process_single_tile(tile_id)
+                tile_data = self._process_single_tile(tile_id)
                 if tile_data:
                     downloaded_tiles.append(tile_data)
                     processed_paths.append(
@@ -254,8 +254,11 @@ class ghspop(interface):
             ghs_io.__cleanup_files(processed_paths)
 
     def __crop_bounds(
-        self, data: np.ndarray[Any, np.dtype[np.float32]], transform: Affine, bounds: "boundingbox"
-    ) -> Tuple[np.ndarray[Any, np.dtype[np.float32]], Affine, str, Tuple[int, int]]:
+        self,
+        data: np.ndarray,
+        transform: Affine,
+        bounds: "boundingbox",
+    ) -> Tuple[np.ndarray, Affine, str, Tuple[int, int]]:
         """
         Crops the raster data to the specified bounding box.
 
@@ -298,7 +301,7 @@ class ghspop(interface):
 
     def get_data(
         self, bounding_box: "boundingbox"
-    ) -> Dict[str, Union[np.ndarray[Any, np.dtype[np.float32]], Affine, str, Tuple[int, int]]]:
+    ) -> Dict[str, Union[np.ndarray, Affine, str, Tuple[int, int]]]:
         """
         Downloads and processes GHS-POP data for the specified bounding box.
 

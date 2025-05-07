@@ -35,7 +35,9 @@ class osm(interface):
         """
         self.osm = osm
 
-    def get_green(self, **kwargs: Dict[str, Any]) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    def get_green(
+        self, **kwargs: Dict[str, Any]
+    ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """
         Filters and processes green areas from the OSM data.
 

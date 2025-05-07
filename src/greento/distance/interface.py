@@ -16,7 +16,12 @@ class interface(ABC):
 
     @abstractmethod
     def directions(
-        self, lat: float, lon: float, start_lat: float, start_lon: float, transport_mode: str
+        self,
+        lat: float,
+        lon: float,
+        start_lat: float,
+        start_lon: float,
+        transport_mode: str,
     ) -> Any:
         """
         Calculates the shortest path and estimated travel time between two points.

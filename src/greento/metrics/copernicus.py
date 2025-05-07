@@ -132,11 +132,11 @@ class copernicus(interface):
             logger = logging.getLogger(__name__)
             if not (isinstance(lat, (int, float)) and isinstance(lon, (int, float))):
                 logger.error("Coordinates not valid")
-                return json.dumps({"error": "Coordinates not valid"})
+                raise ValueError("Coordinates not valid")
             pbar.update(5)
             if not isinstance(max_time, (int, float)) or max_time <= 0:
                 logger.error("Max time not valid")
-                return json.dumps({"error": "Max time not valid"})
+                raise ValueError("Max time not valid")
 
             valid_transport_modes = [
                 "walk",
@@ -149,7 +149,7 @@ class copernicus(interface):
                 logger.error(
                     f"Transport mode not valid. Choose from: {', '.join(valid_transport_modes)}"
                 )
-                return json.dumps({"error": "Transport mode not valid"})
+                raise ValueError("Transport mode not valid")
             pbar.update(5)
             if (
                 not hasattr(self, "vector_traffic_area")

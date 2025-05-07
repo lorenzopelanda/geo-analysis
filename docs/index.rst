@@ -6,7 +6,7 @@
 GreenTo documentation
 ===================================
 
-Date: May 6, 2025  Version: 0.1
+Date: May 6, 2025  Version: 0.1.0
 
 Project and idea by the `University of Turin <https://www.unito.it>`_ under MIT License.
 
@@ -77,7 +77,68 @@ urban planning, environmental analysis, specifically for green areas.
          </div>
        </div>
      </div>
+     <div class="row mt-4">
+      <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title text-center">
+              <i class="fas fa-history"></i> Changelog
+            </h2>
+            <p class="card-text">
+              The changelog provides a detailed history of changes made to the project, including new features, fixes, and updates.
+            </p>
+            <div class="text-center">
+              <a href="CHANGELOG.html" class="btn btn-primary btn-block">To the changelog</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
    </div>
+
+
+Example of something done with GreenTo
+======================================
+
+Here is an example of what you can do with this library to have the green area per person of a selected zone.
+
+.. code-block:: python
+
+    from greento.boundingbox import bounding_box
+    from greento.data.copernicus import copernicus as CopernicusDownloader
+    from greento.utils.geo import geo
+    from greento.green.copernicus import copernicus as GreenCopernicus
+    from greento.metrics.copernicus import copernicus as MetricsCopernicus
+    import json
+
+    # Initialize Copernicus downloader
+    copernicus_downloader = CopernicusDownloader(
+        client_id="your_credential", ...
+    )
+
+    # Define the bounding box
+    bbox = boundingbox()
+    bounding_box = bbox.get_bounding_box(query="Piazza Castello, Torino", method="from_center_radius", radius_km=15)
+
+    # Download Copernicus data
+    copernicus_area = copernicus_downloader.get_data(bounding_box)
+
+    # Calculate green area metrics
+    copernicus_green = GreenCopernicus(copernicus_area)
+    green_copernicus = copernicus_green.get_green()
+
+    metrics = MetricsCopernicus(green_copernicus)
+    green_area_per_person = metrics.green_area_per_person()
+
+    # Output results
+    green_area_per_person = json.loads(green_area_per_person)
+    print(f"Green area per person: {green_area_per_person['green_area_per_person']} sqm")
+
+**Output:**
+
+.. code-block:: text
+
+    Green area per person: 198.9388 sqm
 
 .. toctree::
    :maxdepth: 1
@@ -86,6 +147,8 @@ urban planning, environmental analysis, specifically for green areas.
    README
    EXAMPLES
    modules
+   ../CHANGELOG
+
 
 .. toctree::
    :maxdepth: 1

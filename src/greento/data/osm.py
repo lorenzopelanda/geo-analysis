@@ -96,4 +96,4 @@ class osm(interface):
 
                 except Exception as e:
                     logger.error(f"Error during OSM data download: {str(e)}")
-                    return None
+                    raise ValueError("Error during OSM data download") from e

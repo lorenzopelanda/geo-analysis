@@ -59,11 +59,13 @@ class vector(interface):
 
         if nodes is None or edges is None:
             logger.error("OSM data is not available.")
-            return json.dumps({"error": "OSM data is not available."})
+            raise ValueError("OSM data is not available.")
 
         if "natural" not in nodes.columns:
             logger.error("The 'natural' column is missing in the nodes GeoDataFrame.")
-            return json.dumps({"error": "The 'natural' column is missing in the nodes GeoDataFrame."})
+            raise ValueError(
+                "The 'natural' column is missing in the nodes GeoDataFrame."
+            )
 
         land_use_types = nodes["natural"].value_counts().to_dict()
         total = sum(land_use_types.values())
@@ -106,11 +108,15 @@ class vector(interface):
         if not isinstance(nodes, gpd.GeoDataFrame) or "geometry" not in nodes.columns:
             logger = logging.getLogger(__name__)
             logger.error("Nodes must be a GeoDataFrame and contain a 'geometry' column")
-            return None
+            raise ValueError(
+                "Nodes must be a GeoDataFrame and contain a 'geometry' column"
+            )
         if not isinstance(edges, gpd.GeoDataFrame) or "geometry" not in edges.columns:
             logger = logging.getLogger(__name__)
             logger.error("Edges must be a GeoDataFrame and contain a 'geometry' column")
-            return None
+            raise ValueError(
+                "Edges must be a GeoDataFrame and contain a 'geometry' column"
+            )
 
         with tqdm(total=100, desc="Rasterizing OSM data", leave=False) as pbar:
             node_shapes = [(geom, 1) for geom in nodes.geometry if geom is not None]

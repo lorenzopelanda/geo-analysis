@@ -63,7 +63,7 @@ class copernicus(interface):
         The method uses the `numpy` library to filter raster data and the `tqdm` library to display progress.
         """
         if kwargs is None:
-            green_areas = frozenset(
+            green_areas: frozenset[int] = frozenset(
                 [10, 20, 30]
             )  # 10: tree cover, 20: shrubland, 30: grassland
         else:

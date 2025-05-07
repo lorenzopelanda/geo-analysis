@@ -37,7 +37,11 @@ class osm(interface):
         Calculates the shortest path and estimated travel time between two points.
     """
 
-    def __init__(self, osm_green: Dict[str, Any], vector_traffic_area: Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]) -> None:
+    def __init__(
+        self,
+        osm_green: Dict[str, Any],
+        vector_traffic_area: Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame],
+    ) -> None:
         """
         Initializes the DistanceOSM class with OSM green data and a traffic network graph.
 
@@ -178,7 +182,10 @@ class osm(interface):
         logger = logging.getLogger(__name__)
         with tqdm(total=100, desc="Calculating the direction", leave=False) as pbar:
             if self.preprocessed_graph is None:
-                if isinstance(self.vector_traffic_area, tuple) and len(self.vector_traffic_area) == 2:
+                if (
+                    isinstance(self.vector_traffic_area, tuple)
+                    and len(self.vector_traffic_area) == 2
+                ):
                     gdf_nodes, gdf_edges = self.vector_traffic_area
                     G = ox.graph_from_gdfs(gdf_nodes, gdf_edges)
                     if G is None or len(G.nodes()) == 0:

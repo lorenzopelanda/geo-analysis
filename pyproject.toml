@@ -26,11 +26,20 @@ dependencies = [
     "rasterio",
     "tqdm",
     "geopandas",
+    "geopy",
     "networkx",
     "scipy",
     "pydata-sphinx-theme",
     "sphinx-autodoc-typehints", 
     "sphinx-copybutton" 
+]
+
+[project.optional-dependencies]
+dev = [
+    "nox",
+    "pytest",
+    "black",
+    "mypy"
 ]
 
 [tool.black]

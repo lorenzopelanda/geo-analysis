@@ -171,7 +171,7 @@ Create a bounding box using the ``boundingbox`` class:
 Download Copernicus data using the ``data.copernicus`` class:
 ------------------------------------------------------------------
 
-You can choose between using the refresh token like in the example, or ``use_oidc=True`` to use the authentication in the browser.
+You can choose between using the refresh token like in the example, or ``use_oidc=False`` to use the authentication in the browser.
 
 .. code-block:: python
 
@@ -181,7 +181,7 @@ You can choose between using the refresh token like in the example, or ``use_oid
            client_id="CLIENT-ID",
            client_secret="CLIENT-SECRET",
            token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token',
-           use_oidc=False
+           use_oidc=True
    )
 
    copernicus_area = copernicus_downloader.get_data(bounding_box)
@@ -275,7 +275,7 @@ We use the function ``get_green()``, you can pass some green areas of your chois
 Obtaining the traffic network
 =============================
 
-This example demonstrates how to get the traffic network map of the bounding box selected using the ``Traffic`` class.
+This example demonstrates how to get the traffic network map of the bounding box selected using the ``traffic`` class.
 
 Create a bounding box using the ``boundigbox`` class:
 ------------------------------------------------------

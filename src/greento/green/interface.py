@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
+
 class interface(ABC):
     """
     An abstract base class for processing green areas.

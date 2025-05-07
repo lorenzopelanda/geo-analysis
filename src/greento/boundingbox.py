@@ -144,7 +144,9 @@ class boundingbox:
         self.polygon = self.to_geometry()
         return self
 
-    def __from_geojson(self, geojson: Union[str, Dict[Any, Any]]) -> Optional["boundingbox"]:
+    def __from_geojson(
+        self, geojson: Union[str, Dict[Any, Any]]
+    ) -> Optional["boundingbox"]:
         """
         Creates a bounding box from a GeoJSON object.
 
@@ -275,7 +277,7 @@ class boundingbox:
             logger = logging.getLogger(__name__)
             logger.error("Bounding box polygon is not set.")
             return None
-        return mapping(self.polygon)
+        return dict(mapping(self.polygon))
 
     def transform_to_crs(self, dst_crs: str) -> "boundingbox":
         """
@@ -351,11 +353,14 @@ class boundingbox:
             min_y = kwargs.get("min_y")
             max_x = kwargs.get("max_x")
             max_y = kwargs.get("max_y")
-            if None not in (min_x, min_y, max_x, max_y):
+            if all(
+                isinstance(coord, (int, float))
+                for coord in (min_x, min_y, max_x, max_y)
+            ):
                 return self.__from_coordinates(min_x, min_y, max_x, max_y)
             else:
                 logger = logging.getLogger(__name__)
-                logger.error("Coordinates for bounding box are not set.")
+                logger.error("Coordinates for bounding box are not valid or not set.")
                 return None
 
     def __get_coordinates(
@@ -381,8 +386,6 @@ class boundingbox:
             if not gdf.empty:
                 point = gdf.geometry.iloc[0]
                 return point.y, point.x
-            else:
-                return None
         else:
             gdf = ox.geocode_to_gdf(query, which_result=1)
             if not gdf.empty:
@@ -394,9 +397,7 @@ class boundingbox:
                     .iloc[0]
                 )
                 return center.y, center.x
-            else:
-                return None
-        return None    
+        return None
 
     def __repr__(self) -> str:
         """
