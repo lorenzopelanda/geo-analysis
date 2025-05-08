@@ -70,6 +70,8 @@ print(f"Green area per person: {green_area_per_person['green_area_per_person']} 
 ```
 <br><br>
 
+
+
 ## Usage examples
 
 For more etailed usage examples, refer to the examples [here](EXAMPLES.md).
@@ -77,6 +79,10 @@ For more etailed usage examples, refer to the examples [here](EXAMPLES.md).
 ## Jupyter notebook examples
 
 There's a directory `examples/notebooks` containing some Jupyter Notebook's files with some real world examples of the library.
+
+## Releases 
+
+All releases are listed [here](CHANGELOG.md).
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) for details.

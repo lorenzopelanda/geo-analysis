@@ -10,7 +10,7 @@ Date: May 6, 2025  Version: 0.1.0
 
 Project and idea by the `University of Turin <https://www.unito.it>`_ under MIT License.
 
-Useful links: `Source Repository <https://github.com/lorenzopelanda/geo-analysis>`_ | `Issues & Ideas <https://github.com/lorenzopelanda/geo-analysis/issues>`_
+Useful links: `Source Repository <https://github.com/lorenzopelanda/geo-analysis>`_ | `Issues & Ideas <https://github.com/lorenzopelanda/geo-analysis/issues>`_ | `Changelog <changelog.html>`_
 
 **GreenTo** is a Python library designed for analyzing geographic data,
 including OpenStreetMap (OSM), Copernicus data and Global Human
@@ -46,7 +46,7 @@ urban planning, environmental analysis, specifically for green areas.
                <i class="fas fa-book"></i> Examples
              </h2>
              <p class="card-text">
-               The user guide provides usage examples on the
+               This section provides usage examples on the
                key concepts of GreenTo.
              </p>
              <div class="text-center">
@@ -57,45 +57,49 @@ urban planning, environmental analysis, specifically for green areas.
        </div>
      </div>
      <div class="row mt-4">
-       <div class="col-lg-6 col-md-6 col-sm-12">
-         <div class="card">
-           <div class="card-body">
-             <h2 class="card-title text-center">
-               <i class="fas fa-code"></i> API reference
-             </h2>
-             <p class="card-text">
-               The reference guide contains a detailed description of
-               the GreenTo API. The reference describes how the
-               methods work and which parameters can be used. It
-               assumes that you have an understanding of the key
-               concepts.
-             </p>
-             <div class="text-center">
-               <a href="modules.html" class="btn btn-primary btn-block">To the reference guide</a>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-     <div class="row mt-4">
-      <div class="col-lg-6 col-md-6 col-sm-12">
-        <div class="card">
-          <div class="card-body">
-            <h2 class="card-title text-center">
-              <i class="fas fa-history"></i> Changelog
-            </h2>
-            <p class="card-text">
-              The changelog provides a detailed history of changes made to the project, including new features, fixes, and updates.
-            </p>
-            <div class="text-center">
-              <a href="CHANGELOG.html" class="btn btn-primary btn-block">To the changelog</a>
-            </div>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center">
+            <i class="fas fa-code"></i> API reference
+          </h2>
+          <p class="card-text">
+            The reference guide contains a detailed description of
+            the GreenTo API. The reference describes how the
+            methods work and which parameters can be used. It
+            assumes that you have an understanding of the key
+            concepts.
+          </p>
+          <div class="text-center">
+            <a href="modules.html" class="btn btn-primary btn-block">To the reference guide</a>
           </div>
         </div>
       </div>
     </div>
-   </div>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center">
+            <i class="fas fa-laptop-code"></i> Jupyter Notebook Examples
+          </h2>
+          <p class="card-text">
+            This section provides Jupyter Notebook examples on the
+            key concepts of GreenTo. The examples are with explanations,
+            code snippets and graphical outputs to help you understand how to use
+            the library effectively.
+          </p>
+          <div class="text-center">
+            <a href="jupyter_examples.html" class="btn btn-primary btn-block">To the notebooks</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+.. raw:: html
+
+  <br></br>
+  <hr style="border: 3px solid #56996b;">
 
 Example of something done with GreenTo
 ======================================
@@ -146,8 +150,9 @@ Here is an example of what you can do with this library to have the green area p
 
    README
    EXAMPLES
+   jupyter_examples
    modules
-   ../CHANGELOG
+   
 
 
 .. toctree::

@@ -1,5 +1,9 @@
 Examples
 ================
+Jupyter Notebook's examples are `here <jupyter_examples.html>`_
+
+See the single functions examples:
+
 
 - `Defining a Bounding Box <#defining-a-bounding-box>`_
       - `From Coordinates <#from-coordinates>`_
