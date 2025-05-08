@@ -7,7 +7,6 @@ name = "greento"
 version = "0.1.0"
 description = "Spatial accessibility metrics for green areas"
 readme = "README.md"
-readme-content-type = "text/markdown"
 authors = [
     { name = "Lorenzo Pelanda", email = "lorenzo.pelanda@edu.unito.it" },
     { name = "Rossano Schifanella", email = "rossano.schifanella@unito.it" }
