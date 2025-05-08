@@ -18,15 +18,14 @@ if os.path.exists("_static"):
 
 html_static_path = [os.path.abspath(os.path.join(os.path.dirname(__file__), '_static'))]
 
-# Crea la directory _static se non esiste
 os.makedirs(os.path.join(os.path.dirname(__file__), '_static', 'css'), exist_ok=True)
 
-# Crea un file CSS minimo se non esiste
 css_file = os.path.join(os.path.dirname(__file__), '_static', 'css', 'custom.css')
 if not os.path.exists(css_file):
     with open(css_file, 'w') as f:
         f.write("/* Custom CSS */\n")
 
+language = 'en'
 project = 'GreenTo'
 copyright = '2025, GreenTo'
 author = 'GreenTo'
