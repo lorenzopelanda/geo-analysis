@@ -4,7 +4,7 @@ Example of how to download a raster area using the data.copernicus class
 Download Raster Area giving an address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.data.copernicus import copernicus
     from greento.boundingbox import boundingbox
@@ -60,7 +60,7 @@ Download Raster Area giving an address
 Download Raster Area giving the bounding box Geojson data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     import json
     from greento.data.copernicus import copernicus
@@ -152,7 +152,7 @@ Download Raster Area giving the bounding box Geojson data
 Download Raster Area giving the bounding box coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.data.copernicus import copernicus
     from greento.boundingbox import boundingbox
@@ -208,7 +208,7 @@ Download Raster Area giving the bounding box coordinates
 .. image:: /jupyter_notebooks/example_copernicus_files/example_copernicus_6_4.png
 
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.data.copernicus import copernicus
     from greento.boundingbox import boundingbox

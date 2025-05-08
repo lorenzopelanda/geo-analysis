@@ -1,13 +1,16 @@
-import numpy as np
-import logging
 import json
-import osmnx as ox
-from typing import Tuple, Optional, Dict, Any
+import logging
+from typing import Any, Dict, Optional, Tuple
+
 import geopandas as gpd
 import networkx as nx
-from tqdm import tqdm
+import numpy as np
+import osmnx as ox
 from scipy.spatial import cKDTree
+from tqdm import tqdm
+
 from greento.utils.geo import geo
+
 from .interface import interface
 
 ox.settings.use_cache = False

@@ -1,6 +1,8 @@
+from typing import Any, Dict
+
 import numpy as np
 from tqdm import tqdm
-from typing import Dict, Any
+
 from greento.green.interface import interface
 
 

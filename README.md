@@ -27,6 +27,9 @@ To install the GreenTo package, follow these steps:
     pip install .
     ```
 
+  <br></br>
+  <hr style="border: 3px solid #56996b;">
+
 #### Example of something done with GreenTo
 
 Here is an example of what you can do with this library to have the green area per person of a selected zone.
@@ -41,7 +44,7 @@ import json
 
 # Initialize Copernicus downloader
 copernicus_downloader = CopernicusDownloader(
-    client_id="your_client_id",
+    client_id="your_credential",
     ...
 )
 
@@ -68,9 +71,7 @@ print(f"Green area per person: {green_area_per_person['green_area_per_person']} 
 ```python
     Green area per person: 198.9388 sqm
 ```
-<br><br>
-
-
+<br>
 
 ## Usage examples
 
@@ -84,6 +85,25 @@ There's a directory `examples/notebooks` containing some Jupyter Notebook's file
 
 All releases are listed [here](CHANGELOG.md).
 
+## Contributing
+Contributions are welcome! Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
+
+
+## How to Cite
+
+If you use **GreenTo** in your research, please cite it as follows:
+
+```yaml
+@software{greento,
+  author = {Department of Computer Science, University of Turin},
+  title = {GreenTo: A Python library for spatial accessibility metrics of green areas},
+  version = {0.1.0},
+  doi = {10.1234/greento.2025},
+  url = {https://greento.readthedocs.io},
+  year = {2025}
+}
+```
+
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) for details.
+This project is made by the [University of Turin](https://www.unito.it/) licensed under the MIT License - see the [LICENSE](LICENSE) for details.
 

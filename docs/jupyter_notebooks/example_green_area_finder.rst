@@ -1,5 +1,5 @@
 Example of how to find the nearest green area using the green.copernicus and metrics.copernicus, green.osm and metrics.osm class
---------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
 
 Copernicus
 ----------
@@ -7,7 +7,7 @@ Copernicus
 Find the green area metrics for Copernicus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader
@@ -97,7 +97,7 @@ Find the green area metrics for Copernicus
 Find the nearest green position and return the distances for Copernicus
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader
@@ -181,7 +181,7 @@ OSM
 Find the green area details for OSM
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader
@@ -278,7 +278,7 @@ Find the green area details for OSM
 
     
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader

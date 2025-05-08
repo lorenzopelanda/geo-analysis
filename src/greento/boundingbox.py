@@ -1,12 +1,13 @@
 import json
+import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import geopandas as gpd
 import osmnx as ox
 import pyproj
-import logging
-from typing import Tuple, Union, Dict, Optional, List, Any
 from pyproj import Transformer
+from shapely.geometry import Point, Polygon, box, mapping
 from tqdm import tqdm
-from shapely.geometry import box, Point, mapping, Polygon
 
 
 class boundingbox:

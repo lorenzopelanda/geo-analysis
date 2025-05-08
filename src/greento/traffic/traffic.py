@@ -1,8 +1,10 @@
-import osmnx as ox
-import geopandas as gpd
 import logging
+from typing import Optional, Tuple
+
+import geopandas as gpd
+import osmnx as ox
 from tqdm import tqdm
-from typing import Tuple, Optional
+
 from greento.boundingbox import boundingbox
 
 

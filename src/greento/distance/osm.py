@@ -1,14 +1,17 @@
 import json
-import osmnx as ox
-import numpy as np
 import logging
-from typing import Tuple, Optional, Dict, Any
+from typing import Any, Dict, Optional, Tuple
+
 import geopandas as gpd
 import networkx as nx
-from tqdm import tqdm
+import numpy as np
+import osmnx as ox
+from scipy.ndimage import center_of_mass, label
 from scipy.spatial import cKDTree
-from scipy.ndimage import label, center_of_mass
+from tqdm import tqdm
+
 from greento.utils.geo import geo
+
 from .interface import interface
 
 ox.settings.use_cache = False

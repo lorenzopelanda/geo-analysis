@@ -1,11 +1,14 @@
 import json
-import osmnx as ox
-import numpy as np
 import logging
-from tqdm import tqdm
-from typing import Tuple, Optional, Dict, Any
+from typing import Any, Dict, Optional, Tuple
+
 import geopandas as gpd
+import numpy as np
+import osmnx as ox
+from tqdm import tqdm
+
 from greento.utils.geo import geo
+
 from .interface import interface
 
 

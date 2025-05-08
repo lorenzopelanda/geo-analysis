@@ -4,7 +4,7 @@ Example of how to download a vector area using the data.osm class
 Download Vector OSM Area giving a bounding box and convert to raster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader
@@ -74,7 +74,7 @@ Download Vector OSM Area giving a bounding box and convert to raster
 Download Vector OSM Area giving a bounding box with the network type and convert to raster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.boundingbox import boundingbox
     from greento.data.copernicus import copernicus as CopernicusDownloader

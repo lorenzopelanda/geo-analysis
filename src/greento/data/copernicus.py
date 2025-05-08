@@ -1,11 +1,13 @@
-import requests
-import openeo
-import tempfile
-import rasterio
 import logging
-from tqdm import tqdm
-from typing import Dict, Optional, Any
+import tempfile
+from typing import Any, Dict, Optional
+
+import openeo
+import rasterio
+import requests
 from openeo.rest.connection import Connection
+from tqdm import tqdm
+
 from greento.boundingbox import boundingbox
 from greento.data.interface import interface
 

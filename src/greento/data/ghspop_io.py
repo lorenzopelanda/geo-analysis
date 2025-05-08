@@ -1,9 +1,10 @@
-import shutil
-import requests
-import zipfile
-import os
 import logging
+import os
+import shutil
+import zipfile
 from typing import List, Optional
+
+import requests
 
 
 class ghspop_io:

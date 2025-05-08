@@ -1,5 +1,5 @@
 Getting started
-=======
+================
     
 Installation
 ------------
@@ -19,3 +19,5 @@ To install the GreenTo package, follow these steps:
 3. Install the package and its dependencies::
 
       pip install .
+
+Interest in contributing to GreenTo? Click `here <contributing.html>`_ for guidelines on how to contribute to the project.

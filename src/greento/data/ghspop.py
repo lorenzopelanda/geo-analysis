@@ -1,21 +1,23 @@
-import geopandas as gpd
-from shutil import rmtree
-import os
-import osmnx as ox
-import numpy as np
 import logging
+import os
+from shutil import rmtree
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import geopandas as gpd
+import numpy as np
+import osmnx as ox
 import rasterio
 import rasterio.mask
-from typing import Dict, List, Tuple, Union, Optional, Any
-from rasterio import open as rio_open
 from affine import Affine
+from rasterio import open as rio_open
 from rasterio.io import MemoryFile
 from rasterio.merge import merge
 from shapely.geometry import box
+from tqdm import tqdm
+
 from greento.boundingbox import boundingbox
 from greento.data.ghspop_io import ghspop_io
 from greento.data.interface import interface
-from tqdm import tqdm
 
 ox.settings.use_cache = True
 

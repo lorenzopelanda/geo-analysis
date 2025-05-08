@@ -4,7 +4,7 @@ Example of how to download a raster area using the data.ghspop class
 Download Raster GSH-POP Area giving an address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code-block:: python
 
     from greento.data.ghspop import ghspop
     from greento.boundingbox import boundingbox

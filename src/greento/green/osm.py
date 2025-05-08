@@ -1,7 +1,9 @@
+from typing import Any, Dict, Tuple
+
+import geopandas as gpd
 import pandas as pd
 from tqdm import tqdm
-import geopandas as gpd
-from typing import Tuple, Dict, Any
+
 from .interface import interface
 
 

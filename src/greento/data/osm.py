@@ -1,10 +1,13 @@
-import osmnx as ox
-import geopandas as gpd
-import warnings
 import logging
+import warnings
+from typing import Optional, Tuple
+
+import geopandas as gpd
+import osmnx as ox
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
+                              Polygon)
 from tqdm import tqdm
-from typing import Tuple, Optional
-from shapely.geometry import Point, LineString, MultiLineString, Polygon, MultiPolygon
+
 from greento.boundingbox import boundingbox
 from greento.data.interface import interface
 
