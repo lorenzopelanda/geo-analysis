@@ -253,7 +253,7 @@ class ghspop(interface):
             return result
 
         finally:
-            ghs_io.__cleanup_files(processed_paths)
+            ghs_io._cleanup_files(processed_paths)
 
     def __crop_bounds(
         self,

@@ -3,10 +3,13 @@ import logging
 import time
 from typing import Any, Dict, Optional
 
+import geopandas as gpd
 import numpy as np
 import rasterio
 import rasterio.transform
+from rasterio.features import shapes
 from rasterio.warp import Resampling, calculate_default_transform, reproject
+from shapely.geometry import shape
 from tqdm import tqdm
 
 from greento.utils.interface import interface

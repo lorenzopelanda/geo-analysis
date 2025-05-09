@@ -99,6 +99,8 @@ class copernicus(interface):
                 pbar.close()
                 return json.dumps({"green_area_per_person": green_area_per_person})
 
+
+
     def get_isochrone_green(
         self, lat: float, lon: float, max_time: float, network_type: str
     ) -> str:

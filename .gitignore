@@ -5,7 +5,6 @@ utils/__pycache__
 test/__pycache__
 bounding_box/__pycache__
 test_land.py
-geo_analysis.egg-info/
 cache/
 greento.egg-info/
 examples/cache/

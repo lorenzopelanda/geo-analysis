@@ -99,7 +99,7 @@ class ghspop_io:
             logger.error(f"Error during TIF extraction: {str(e)}")
             return None
 
-    def __cleanup_files(self, file_paths: List[str]) -> None:
+    def _cleanup_files(self, file_paths: List[str]) -> None:
         """
         Cleans up temporary files and directories created during processing.
 
