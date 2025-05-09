@@ -8,7 +8,7 @@ Thank you for your interest in contributing to **GreenTo**! Follow this guide to
 
 Make sure you have the following tools installed:
 
-- **Python 3.10** or higher
+- **Python 3.8** or higher
 - **pip** for package management
 - **virtualenv** (optional but recommended)
 - **Git**
@@ -17,9 +17,12 @@ Make sure you have the following tools installed:
 
 ## Setting up the development environment
 
-1. **Clone the repository**:
+1. **Fork the repository**:  
+    Go to the repository page on GitHub and click **Fork** to create a copy of the project in your account.
+
+2. **Clone your fork**:  
     ```bash
-    git clone https://github.com/lorenzopelanda/geo-analysis.git
+    git clone https://github.com/<your-username>/geo-analysis.git
     cd geo-analysis
     ```
 
@@ -34,7 +37,7 @@ Make sure you have the following tools installed:
     pip install -e .
     ```
 
-4. **Install development dependencies** (optional, for contributors):
+4. **Install development dependencies**:
     ```bash
     pip install .[dev]
     ```
@@ -108,27 +111,37 @@ def test_function_to_test():
 
 ## Proposing changes
 
-1. **Create a branch for your changes**:
+1. **Fork the repository**:  
+    Go to the repository page on GitHub and click **Fork** to create a copy of the project in your account.
+
+2. **Clone your fork**:  
+    ```bash
+    git clone https://github.com/<your-username>/geo-analysis.git
+    cd geo-analysis
+    ```
+
+3. **Create a branch for your changes**:  
     ```bash
     git checkout -b descriptive-branch-name
     ```
 
-2. **Make the necessary changes** and add tests to cover new features or fixes.
+4. **Make the necessary changes** and add tests to cover new features or fixes.
 
-3. **Run the tests** to ensure everything works correctly using **pytest** and **nox**
+5. **Run the tests** to ensure everything works correctly using **pytest** and **nox**.
 
-4. **Create a clear and concise commit**:
+6. **Create a clear and concise commit**:  
     ```bash
     git add .
     git commit -m "Short description of the change"
     ```
 
-5. **Push the branch to the remote repository**:
+7. **Push the branch to your fork**:  
     ```bash
     git push origin descriptive-branch-name
     ```
 
-6. **Open a pull request** on GitHub and describe the changes you made.
+8. **Open a pull request**:  
+    Go to the original repository on GitHub, click **Pull Requests**, and create a new pull request describing the changes you made.
 
 ---
 

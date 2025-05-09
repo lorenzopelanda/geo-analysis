@@ -64,4 +64,4 @@ ignore_missing_imports = true
 
 [project.urls]
 homepage = "https://github.com/lorenzopelanda/geo-analysis"
-documentation = "https://github.com/lorenzopelanda/geo-analysis/docs"
+documentation = "https://greento.readthedocs.io"

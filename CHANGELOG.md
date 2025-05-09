@@ -5,5 +5,5 @@ and this project is versioned with [Semantic Versioning](https://semver.org/spec
 
 ## [0.1.0] - 2025-05-06
 ### Added
-- First release of the project, now supported data of OpenStreetMap, Coprnicus World Land Cover, GHS-POP
+- First release of the project, now supported data of OpenStreetMap, Copernicus World Land Cover, GHS-POP
 - Functions to download, process and analyze these data
