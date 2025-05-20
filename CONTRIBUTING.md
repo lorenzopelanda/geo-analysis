@@ -150,6 +150,7 @@ def test_function_to_test():
 - Follow [PEP 8](https://peps.python.org/pep-0008/) for code style, with the exception of the maximum line length.
 - The maximum line length is set to **88 characters**, as configured in the `pyproject.toml` file.
 - Use **type hints** to improve code readability and maintainability.
+- **Add a docstring to every function, using the [NumPy docstring style](https://numpydoc.readthedocs.io/en/latest/format.html).**
 - Write tests for every new feature or bug fix.
 - Document your changes in the `CHANGELOG.md` file.
 
@@ -163,6 +164,7 @@ def test_function_to_test():
 - **isort**: for sorting imports
 - **mypy**: for type checking
 - **nox**: for automating testing workflows
+- **Sphinx**: for generating documentation
 
 ---
 
