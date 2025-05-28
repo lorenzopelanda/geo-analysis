@@ -21,3 +21,23 @@ To install the GreenTo package, follow these steps:
       pip install .
 
 Interest in contributing to GreenTo? Click `here <contributing.html>`_ for guidelines on how to contribute to the project.
+
+.. raw:: html
+
+   <br><br>
+
+How to Cite
+===========
+
+If you use GreenTo in your research, please cite it as follows:
+
+.. code-block:: bibtex
+
+    @software{greento,
+      author = {Department of Computer Science, University of Turin},
+      title = {GreenTo: A Python library for spatial accessibility metrics of green areas},
+      version = {0.1.0},
+      doi = {10.1234/greento.2025},
+      url = {https://greento.readthedocs.io},
+      year = {2025}
+    }
